@@ -122,8 +122,39 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 .pill.ghost:hover{background:var(--panel-alt); color:var(--accent);}
 
 /* ---------- hero ---------- */
-.hero{padding:132px 0 108px; text-align:center;}
+.hero{padding:132px 0 108px; text-align:center; position:relative; overflow:hidden; isolation:isolate;}
 @media(max-width:700px){ .hero{padding:74px 0 62px;} }
+
+/* Video layer. Carpet roll footage sits behind; a left-to-right white scrim
+   keeps the copy readable and melts the footage into the white page. Desktop
+   only — mobile and reduced-motion never fetch the clip and fall back to the
+   clean poster still. */
+.hero-media{position:absolute; inset:0; z-index:0;
+  background:#ECEDEF url("assets/hero-poster.jpg") center right/cover no-repeat;}
+.hero-video{position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; object-position:72% center;
+  filter:brightness(1.05) saturate(.88) contrast(1.02);
+  opacity:0; transition:opacity .55s ease;}
+.hero-video.in{opacity:1;}
+.hero-scrim{position:absolute; inset:0; z-index:1; pointer-events:none;}
+.hero-scrim::before,.hero-scrim::after{content:""; position:absolute; inset:0;}
+.hero-scrim::before{background:linear-gradient(100deg,
+  var(--bg) 0%, var(--bg) 30%,
+  color-mix(in srgb,var(--bg) 58%, transparent) 48%, transparent 70%);}
+.hero-scrim::after{background:linear-gradient(to bottom,
+  var(--bg), transparent 15%, transparent 78%, var(--bg));}
+.hero .wrap{position:relative; z-index:2;}
+
+@media(min-width:861px){
+  .hero{text-align:left; min-height:84vh; padding:0; display:flex; align-items:center;}
+  .hero-copy{max-width:54%;}
+  .hero .mark-lg,.hero .kicker,.hero h1,.hero .sub{margin-left:0; margin-right:0;}
+  .hero h1{max-width:none;}
+  .hero .sub{margin-top:30px;}
+  .hero .links{justify-content:flex-start;}
+}
+@media(max-width:860px){ .hero-media,.hero-scrim{display:none;} }
+@media (prefers-reduced-motion:reduce){ .hero-video{display:none;} }
 .hero .mark-lg{font-family:var(--rx); font-size:56px; color:var(--accent); line-height:1; margin-bottom:22px;}
 /* Keeps "flooring" and "Ottawa" in the hero now that the headline carries neither.
    Delete this line if the client would rather the hero stayed pure. */
@@ -405,18 +436,27 @@ html{scroll-behavior:smooth;}
 
   <!-- ================= HERO ================= -->
   <header class="hero">
+    <div class="hero-media">
+      <!-- src set from data-src by JS on desktop + motion-OK only; poster still
+           is the CSS background above, so mobile/reduced-motion never fetch it. -->
+      <video class="hero-video" muted playsinline preload="none"
+             data-src="assets/hero.mp4" aria-hidden="true"></video>
+    </div>
+    <div class="hero-scrim"></div>
     <div class="wrap">
-      <div class="mark-lg">℞</div>
-      <p class="kicker">Flooring &amp; renovation · Ottawa</p>
-      <h1 class="triad">
-        <span class="beat">Diagnose.</span>
-        <span class="beat">Prescribe.</span>
-        <span class="beat">Install.</span>
-      </h1>
-      <p class="sub">Now accepting &ldquo;patients&rdquo;.</p>
-      <div class="links">
-        <a class="pill lg" href="#contact" data-book>Book a free assessment</a>
-        <a class="pill lg ghost chev" href="#estimate">Estimate your project</a>
+      <div class="hero-copy">
+        <div class="mark-lg">℞</div>
+        <p class="kicker">Flooring &amp; renovation · Ottawa</p>
+        <h1 class="triad">
+          <span class="beat">Diagnose.</span>
+          <span class="beat">Prescribe.</span>
+          <span class="beat">Install.</span>
+        </h1>
+        <p class="sub">Now accepting &ldquo;patients&rdquo;.</p>
+        <div class="links">
+          <a class="pill lg" href="#contact" data-book>Book a free assessment</a>
+          <a class="pill lg ghost chev" href="#estimate">Estimate your project</a>
+        </div>
       </div>
     </div>
   </header>
@@ -1057,6 +1097,28 @@ bookForm.addEventListener("submit", function(e){
   doneEl.hidden = false;
   card.querySelector(".modal-x").focus();
 });
+
+/* ---------- Hero video: play once, hold on last frame ----------
+   Fetch and play only on wide screens with motion allowed. The clip doesn't
+   loop, so the browser naturally holds the final (clean) frame, which matches
+   the poster still. Mobile and reduced-motion keep the poster only. */
+(function(){
+  var hv = document.querySelector(".hero-video");
+  if (!hv) return;
+  var motionOK = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var wide     = window.matchMedia("(min-width: 861px)").matches;
+  if (!motionOK || !wide) return;
+
+  hv.src = hv.dataset.src;
+  hv.load();
+  var reveal = function(){ hv.classList.add("in"); };
+  var start  = function(){
+    var p = hv.play();
+    if (p && p.catch) p.catch(reveal); // autoplay blocked → still show the frame
+  };
+  hv.addEventListener("loadeddata", start, { once:true });
+  hv.addEventListener("playing", reveal, { once:true });
+})();
 
 /* ---------- Scroll reveal ---------- */
 if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && "IntersectionObserver" in window) {
