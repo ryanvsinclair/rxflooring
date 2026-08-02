@@ -3,24 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RX Flooring — Ottawa carpet, vinyl &amp; hardwood installation</title>
-<meta name="description" content="Ottawa flooring installation by Ray at RX Flooring. Ten years in the trade, 750+ units delivered in 2025 for Minto, Mattamy, Caivan and Claridge. Carpet, LVP, laminate, hardwood and tile — assessed, prescribed, installed.">
+<title>RX Flooring · Ottawa carpet, vinyl &amp; hardwood installation</title>
+<meta name="description" content="Ottawa flooring installation by the RX Flooring team. Ten years in the trade, 750+ units delivered in 2025 for Minto, Mattamy, Caivan and Claridge. Carpet, LVP, laminate, hardwood and tile: assessed, prescribed, installed.">
 <style>
 /* ============================================================
-   RX FLOORING — "The Prescription" direction
+   RX FLOORING · "The Prescription" direction
    Palette  Clinical White · Slate · Mist · Cobalt · Signal
    Type     SF Pro (system) + SF Mono for diagnostic labels
    Layout   Apple-scale whitespace, centred single column
    ============================================================ */
 
 *,*::before,*::after{box-sizing:border-box;}
-html{-webkit-text-size-adjust:100%;}
-body{margin:0;}
+html{-webkit-text-size-adjust:100%; overflow-x:hidden;}
+body{margin:0; overflow-x:hidden;}
 img{max-width:100%;display:block;}
 button,input,select,textarea{font:inherit;color:inherit;}
 
 :root{
-  /* Light only, by design. "The Prescription" is built on clinical white —
+  /* Light only, by design. "The Prescription" is built on clinical white.
      a dark variant would undo the whole idea, so the page commits to one world.
      color-scheme keeps native form controls light even in a dark OS. */
   color-scheme:light;
@@ -108,7 +108,15 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 .nav-links{display:flex; gap:30px;}
 .nav-links a{color:var(--body); font-size:13.5px; letter-spacing:-.005em;}
 .nav-links a:hover{color:var(--ink);}
-@media(max-width:860px){ .nav-links{display:none;} }
+@media(max-width:860px){
+  .nav{
+    background:#fff;
+    -webkit-backdrop-filter:none;
+    backdrop-filter:none;
+    border-bottom:0;
+  }
+  .nav-links{display:none;}
+}
 .pill{
   display:inline-flex; align-items:center; justify-content:center;
   background:var(--accent); color:var(--on-accent);
@@ -122,66 +130,99 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 .pill.ghost:hover{background:var(--panel-alt); color:var(--accent);}
 
 /* ---------- hero ---------- */
-.hero{padding:132px 0 108px; text-align:center; position:relative; overflow:hidden; isolation:isolate;}
-@media(max-width:700px){ .hero{padding:74px 0 62px;} }
+.hero{
+  padding:132px 0 108px; text-align:center; position:relative; overflow:hidden;
+  isolation:isolate; min-height:78vh; display:flex; align-items:center;
+}
+@media(max-width:700px){ .hero{padding:88px 0 72px; min-height:72vh;} }
 
-/* Video layer. Carpet roll footage sits behind; a left-to-right white scrim
-   keeps the copy readable and melts the footage into the white page. Desktop
-   only — mobile and reduced-motion never fetch the clip and fall back to the
-   clean poster still. */
-.hero-media{position:absolute; inset:0; z-index:0;
-  background:#ECEDEF url("assets/hero-poster.jpg") center right/cover no-repeat;}
+/* Poster is the LCP layer; video fades over it only on good connections. */
+.hero-media{position:absolute; inset:0; z-index:0; background:#fff;}
+.hero-poster{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; object-position:center; display:block;
+}
 .hero-video{position:absolute; inset:0; width:100%; height:100%;
-  object-fit:cover; object-position:72% center;
-  filter:brightness(1.05) saturate(.88) contrast(1.02);
-  opacity:0; transition:opacity .55s ease;}
-.hero-video.in{opacity:1;}
-.hero-scrim{position:absolute; inset:0; z-index:1; pointer-events:none;}
-.hero-scrim::before,.hero-scrim::after{content:""; position:absolute; inset:0;}
-.hero-scrim::before{background:linear-gradient(100deg,
-  var(--bg) 0%, var(--bg) 30%,
-  color-mix(in srgb,var(--bg) 58%, transparent) 48%, transparent 70%);}
-.hero-scrim::after{background:linear-gradient(to bottom,
-  var(--bg), transparent 15%, transparent 78%, var(--bg));}
-.hero .wrap{position:relative; z-index:2;}
+  object-fit:cover; object-position:center;
+  opacity:0; visibility:hidden;}
+.hero-video.in{opacity:1; visibility:visible;}
+.hero .wrap{position:relative; z-index:2; width:100%;}
 
 @media(min-width:861px){
-  .hero{text-align:left; min-height:84vh; padding:0; display:flex; align-items:center;}
-  .hero-copy{max-width:54%;}
-  .hero .mark-lg,.hero .kicker,.hero h1,.hero .sub{margin-left:0; margin-right:0;}
+  .hero{min-height:84vh; padding:0;}
+  .hero-copy{max-width:36ch; margin:0 auto;}
   .hero h1{max-width:none;}
-  .hero .sub{margin-top:30px;}
-  .hero .links{justify-content:flex-start;}
 }
-@media(max-width:860px){ .hero-media,.hero-scrim{display:none;} }
 @media (prefers-reduced-motion:reduce){ .hero-video{display:none;} }
-.hero .mark-lg{font-family:var(--rx); font-size:56px; color:var(--accent); line-height:1; margin-bottom:22px;}
 /* Keeps "flooring" and "Ottawa" in the hero now that the headline carries neither.
    Delete this line if the client would rather the hero stayed pure. */
 .hero .kicker{
   font-family:var(--mono); font-size:11px; letter-spacing:.16em;
-  text-transform:uppercase; color:var(--muted); margin-bottom:24px;
+  text-transform:uppercase; color:#fff; margin:56px 0 24px;
 }
 .hero h1{
   font-size:clamp(44px,8.4vw,86px); line-height:1.02;
   letter-spacing:-.038em; font-weight:600; max-width:16ch; margin:0 auto;
+  color:#fff;
 }
-/* One beat per line — the stack is the sequence. */
+/* One beat per line: the stack is the sequence. */
 .hero h1.triad{max-width:none; line-height:1.04;}
 .hero .beat{display:block;}
-.hero .sub{
-  max-width:56ch; margin:30px auto 0; font-size:21px; line-height:1.5;
-  color:var(--ink); letter-spacing:-.018em;
+/* Slot keeps the sub's vertical space so a fade-in never shoves the CTAs. */
+.hero .sub-slot{
+  min-height:1.55em; margin-top:28px;
+  display:flex; justify-content:center; align-items:center;
 }
-@media(max-width:700px){ .hero .sub{font-size:19px;} }
-.hero .links{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:38px;}
+.hero .sub{
+  margin:0; font-size:21px; line-height:1.5; text-align:center;
+  color:#fff; letter-spacing:-.018em;
+  opacity:0; pointer-events:none;
+  transition:opacity .7s ease;
+}
+.hero .sub.in{opacity:1; pointer-events:auto;}
+@media(max-width:700px){ .hero .sub-slot{margin-top:22px;} .hero .sub{font-size:19px;} }
+.hero .links{
+  display:flex; flex-wrap:nowrap; gap:12px; justify-content:center;
+  width:100%; max-width:440px; margin:24px auto 0;
+  pointer-events:none;
+}
+.hero .links.in{pointer-events:auto;}
+.hero .links .label-short{display:none;}
+/* Glass styles stay constant: do not put opacity/transform on `.links` or
+   backdrop-filter samples the wrong layer and the look “pops” when .in lands. */
+.hero .links .pill,
+.hero .links .pill.ghost{
+  flex:1 1 0; min-width:0;
+  background:rgba(255,255,255,.06); color:#fff; font-weight:600;
+  border:1px solid rgba(255,255,255,.85);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  backdrop-filter:blur(14px) saturate(140%);
+  opacity:0; visibility:hidden;
+  transition:opacity .62s cubic-bezier(.2,.7,.3,1), visibility 0s linear .62s;
+}
+.hero .links.in .pill,
+.hero .links.in .pill.ghost{
+  opacity:1; visibility:visible;
+  transition:opacity .62s cubic-bezier(.2,.7,.3,1), visibility 0s;
+}
+.hero .links .pill:hover,
+.hero .links .pill.ghost:hover{
+  background:rgba(255,255,255,.12); color:#fff;
+  border-color:#fff;
+}
+@media(max-width:860px){
+  .hero .links{gap:10px; max-width:420px; margin-top:18px;}
+  .hero .links .pill,
+  .hero .links .pill.ghost{padding:12px 10px; font-size:14px;}
+  .hero .links .label-full{display:none;}
+  .hero .links .label-short{display:inline;}
+  .hero .links .chev::after{content:none;}
+}
 
 /* The page's single orchestrated moment: the three beats arrive in order. */
 @keyframes beatIn{ to{ opacity:1; transform:none; } }
 .hero .beat,
-.hero .kicker,
-.hero .sub,
-.hero .links{
+.hero .kicker{
   opacity:0; transform:translateY(13px);
   animation:beatIn .62s cubic-bezier(.2,.7,.3,1) forwards;
 }
@@ -189,27 +230,137 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 .hero .beat:nth-child(1){animation-delay:.14s;}
 .hero .beat:nth-child(2){animation-delay:.26s;}
 .hero .beat:nth-child(3){animation-delay:.38s;}
-.hero .sub{animation-delay:.54s;}
-.hero .links{animation-delay:.64s;}
 .chev::after{content:"›"; margin-left:.42em; }
 
-/* ---------- stats ---------- */
-.stats{display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
-       background:var(--rule); border-block:1px solid var(--rule);}
-@media(max-width:760px){ .stats{grid-template-columns:repeat(2,1fr);} }
-.stat{background:var(--bg); padding:38px 22px; text-align:center;}
+/* ---------- track record: trusted + stats ---------- */
+.trusted{text-align:center;}
+.trusted .label{
+  display:block; margin-bottom:34px;
+  font-size:13px; letter-spacing:.16em; color:var(--ink);
+}
+.trusted-carousel{
+  position:relative;
+  overflow:hidden;
+  width:100vw;
+  margin-left:calc(50% - 50vw);
+  margin-right:calc(50% - 50vw);
+  padding:8px 0;
+  -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
+  mask-image:linear-gradient(90deg, transparent 0%, #000 12%, #000 88%, transparent 100%);
+}
+.trusted-carousel::before,
+.trusted-carousel::after{
+  content:"";
+  position:absolute; top:0; bottom:0; width:min(120px, 14vw); z-index:2;
+  pointer-events:none;
+}
+.trusted-carousel::before{
+  left:0;
+  background:linear-gradient(90deg, var(--bg) 0%, rgba(255,255,255,0) 100%);
+}
+.trusted-carousel::after{
+  right:0;
+  background:linear-gradient(270deg, var(--bg) 0%, rgba(255,255,255,0) 100%);
+}
+.trusted-track{
+  display:flex; width:max-content; align-items:center;
+  animation:trustedMarquee 32s linear infinite;
+}
+.trusted-group{
+  display:flex; align-items:center; flex-shrink:0;
+  gap:72px; padding-inline:36px;
+}
+.trusted-group img{
+  display:block; height:40px; width:auto; max-width:200px;
+  object-fit:contain; flex-shrink:0;
+}
+.trusted-group img.mattamy{height:48px; max-width:240px;}
+.trusted-group img.caivan{height:28px; max-width:210px;}
+.trusted-group img.claridge{height:46px; max-width:210px;}
+.trusted-group img.demarco{height:36px; max-width:220px;}
+@keyframes trustedMarquee{
+  from{ transform:translateX(0); }
+  to{ transform:translateX(-50%); }
+}
+@media(max-width:700px){
+  .trusted-group{gap:48px; padding-inline:24px;}
+  .trusted-group img{height:32px; max-width:150px;}
+  .trusted-group img.mattamy{height:38px; max-width:180px;}
+  .trusted-group img.caivan{height:22px; max-width:160px;}
+  .trusted-group img.claridge{height:36px; max-width:160px;}
+  .trusted-group img.demarco{height:28px; max-width:170px;}
+  .trusted-track{animation-duration:24s;}
+  .trusted-carousel{
+    -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+    mask-image:linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .trusted-track{animation:none; width:100%; justify-content:center; flex-wrap:wrap;}
+  .trusted-group{flex-wrap:wrap; justify-content:center; padding-inline:0; gap:40px 52px;}
+  .trusted-group[aria-hidden="true"]{display:none;}
+  .trusted-carousel{
+    width:auto; margin:0;
+    -webkit-mask-image:none; mask-image:none;
+  }
+  .trusted-carousel::before,
+  .trusted-carousel::after{display:none;}
+}
+
+.stats{display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-top:64px;}
+@media(max-width:760px){ .stats{grid-template-columns:repeat(2,1fr); gap:28px 16px;} }
+.stat{text-align:center; padding:8px 10px;}
 .stat .n{font-size:clamp(34px,5vw,50px); line-height:1; font-weight:600; color:var(--ink);
          letter-spacing:-.04em; font-variant-numeric:tabular-nums;}
 .stat .c{margin-top:11px; font-size:13.5px; color:var(--muted); line-height:1.45;}
 
-/* ---------- process ---------- */
-.steps{display:grid; grid-template-columns:repeat(4,1fr); gap:44px 34px; margin-top:66px;}
-@media(max-width:900px){ .steps{grid-template-columns:repeat(2,1fr); gap:40px 30px;} }
-@media(max-width:540px){ .steps{grid-template-columns:1fr;} }
-.step .idx{font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:var(--accent);
-           padding-bottom:13px; border-bottom:1px solid var(--rule); display:block; margin-bottom:17px;}
-.step h3{font-size:20px; letter-spacing:-.02em;}
-.step p{margin-top:9px; font-size:15.5px; line-height:1.55;}
+/* ---------- process: prescription mock ---------- */
+.rx-sheet-wrap{
+  display:grid; grid-template-columns:1.1fr .9fr; gap:48px;
+  align-items:center; margin-top:56px;
+}
+@media(max-width:820px){ .rx-sheet-wrap{grid-template-columns:1fr; gap:32px;} }
+.rx-sheet{
+  background:var(--panel);
+  border:1px solid var(--rule);
+  border-radius:18px;
+  box-shadow:0 18px 50px rgba(29,36,43,.1);
+  padding:30px 30px 26px;
+}
+@media(max-width:520px){ .rx-sheet{padding:24px 20px 22px;} }
+.rx-sheet .rx-mark{
+  font-family:var(--rx); font-size:42px; color:var(--accent); line-height:1;
+}
+.rx-sheet .sheet-top{
+  display:flex; justify-content:space-between; align-items:flex-start; gap:16px;
+  padding-bottom:16px; border-bottom:1px solid var(--rule);
+  margin-bottom:10px;
+}
+.rx-sheet .sheet-meta{
+  text-align:right; font-family:var(--mono); font-size:10px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--muted); line-height:1.7;
+}
+.rx-line{
+  display:grid; grid-template-columns:52px 1fr; gap:12px;
+  padding:14px 0; border-bottom:1px dashed var(--rule-soft);
+}
+.rx-line:last-child{border-bottom:0;}
+.rx-line .n{
+  font-family:var(--mono); font-size:11px; letter-spacing:.1em;
+  color:var(--accent); padding-top:3px;
+}
+.rx-line h3{font-size:17px; letter-spacing:-.02em;}
+.rx-line p{margin-top:4px; font-size:14px; color:var(--muted); line-height:1.45;}
+.rx-annotations{display:flex; flex-direction:column; gap:22px;}
+@media(max-width:820px){
+  .rx-annotations{display:grid; grid-template-columns:1fr; gap:18px;}
+}
+.rx-annotations .ann{padding-left:14px; border-left:2px solid var(--accent);}
+.rx-annotations .ann .k{
+  font-family:var(--mono); font-size:10px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--accent);
+}
+.rx-annotations .ann p{margin-top:7px; font-size:15.5px; color:var(--body); line-height:1.5;}
 
 /* ---------- diagnostics ---------- */
 .dx{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:60px;}
@@ -223,90 +374,263 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 .dxrow .v{font-size:15px; line-height:1.5;}
 .dxrow .v.time{color:var(--signal); font-weight:500;}
 
-/* ---------- services ---------- */
-.svc{display:grid; grid-template-columns:1fr 1fr; gap:56px; margin-top:60px;}
-@media(max-width:820px){ .svc{grid-template-columns:1fr; gap:44px;} }
-.svc h3{font-size:15px; letter-spacing:-.01em; padding-bottom:15px; border-bottom:1px solid var(--rule);}
-.svc ul{list-style:none; margin:0; padding:0;}
-.svc li{padding:15px 0 15px 26px; border-bottom:1px solid var(--rule-soft);
-        position:relative; font-size:16.5px; color:var(--ink); letter-spacing:-.015em;}
-.svc li::before{content:"℞"; font-family:var(--rx); position:absolute; left:0; top:14px;
-                color:var(--accent); font-size:15px; opacity:.55;}
-.svc li span{display:block; font-size:14px; color:var(--muted); margin-top:3px; letter-spacing:0;}
-
-/* ---------- calculator ---------- */
-.calc{background:var(--panel); border:1px solid var(--rule); border-radius:22px;
-      box-shadow:var(--shadow); overflow:hidden; margin-top:56px;}
-.calc-in{padding:34px;}
-@media(max-width:640px){ .calc-in{padding:24px 20px;} }
-.calc-form{display:grid; grid-template-columns:1fr 130px auto; gap:12px; align-items:end;}
-@media(max-width:640px){ .calc-form{grid-template-columns:1fr; } }
-.field label{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.13em;
-             text-transform:uppercase; color:var(--muted); margin-bottom:8px;}
-.field select,.field input{
-  width:100%; background:var(--bg); border:1px solid var(--rule); border-radius:11px;
-  padding:12px 13px; font-size:16px; color:var(--ink); letter-spacing:-.01em;
-  appearance:none; -webkit-appearance:none;
+/* ---------- services: glass card carousel (freezer scene parked) ----------
+#services{
+  position:relative;
+  padding:22vh 0;
+  background:#fff;
 }
-.field select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
-  background-position:calc(100% - 19px) 21px,calc(100% - 14px) 21px;
-  background-size:5px 5px,5px 5px; background-repeat:no-repeat; padding-right:38px;}
-.field input{font-variant-numeric:tabular-nums;}
-.calc-form .pill{height:45px; white-space:nowrap;}
+#services .wrap{ max-width:none; width:100%; padding:0; }
+.svc-stage{ position:relative; width:100%; height:100vh; overflow:hidden; background:#fff; }
+.svc-stage iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; display:block; background:#fff; }
+.svc-cta{ position:absolute; left:50%; bottom:40px; transform:translateX(-50%); z-index:2; display:flex; flex-direction:column; align-items:center; pointer-events:none; }
+.svc-cta .pill{pointer-events:auto;}
+.pill.glass{
+  cursor:pointer; color:var(--accent);
+  background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.7) 0%, rgba(255,255,255,.2) 35%, rgba(255,255,255,.08) 70%), rgba(255,255,255,.42);
+  border:1px solid rgba(255,255,255,.7);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.35), inset 8px 10px 22px rgba(255,255,255,.35), inset -8px -12px 24px rgba(40,70,110,.06), 0 10px 28px rgba(29,36,43,.08);
+  -webkit-backdrop-filter:blur(16px) saturate(160%); backdrop-filter:blur(16px) saturate(160%);
+}
+body.svc-playing{ overflow:hidden; }
+body.svc-playing #services{ padding:0; min-height:100vh; }
+body.svc-playing .svc-stage{ position:fixed; inset:0; z-index:40; width:100vw; height:100vh; }
+body.svc-playing .nav,
+body.svc-playing #about,
+body.svc-playing #contact,
+body.svc-playing footer{ opacity:0; pointer-events:none; }
+---------- end parked freezer styles ---------- */
 
-.lines{list-style:none; margin:26px 0 0; padding:0; border-top:1px solid var(--rule);}
-.lines:empty{border-top:0;}
-.line{display:flex; align-items:baseline; gap:14px; padding:14px 0; border-bottom:1px solid var(--rule-soft);}
-.line .nm{flex:1; font-size:15.5px; color:var(--ink); letter-spacing:-.012em;}
-.line .qt{font-family:var(--mono); font-size:12px; color:var(--muted); white-space:nowrap;
-          font-variant-numeric:tabular-nums;}
-.line .amt{font-size:15.5px; color:var(--ink); white-space:nowrap; font-variant-numeric:tabular-nums;}
-.line .rm{background:none; border:0; color:var(--muted); cursor:pointer; font-size:19px;
-          line-height:1; padding:0 2px;}
-.line .rm:hover{color:var(--ink);}
+/* ---------- services: auto carousel + manual skim ---------- */
+#services{ overflow:hidden; }
+#services .svc-head{ margin-bottom:48px; }
+.svc-carousel{
+  position:relative;
+  overflow-x:auto;
+  overflow-y:hidden;
+  width:100vw;
+  margin-left:calc(50% - 50vw);
+  margin-right:calc(50% - 50vw);
+  /* Extra bottom pad so card shadows aren't clipped into a hard line */
+  padding:28px 0 140px;
+  perspective:1100px;
+  perspective-origin:50% 45%;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+  cursor:grab;
+  scrollbar-width:none; /* Firefox */
+  -ms-overflow-style:none; /* legacy Edge */
+  -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  mask-image:linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+}
+.svc-carousel:active{ cursor:grabbing; }
+.svc-carousel::-webkit-scrollbar{ display:none; width:0; height:0; }
+.svc-track{
+  display:flex; width:max-content; align-items:stretch;
+  transform-style:preserve-3d;
+}
+.svc-group{
+  display:flex; align-items:stretch; flex-shrink:0;
+  gap:22px; padding-inline:11px;
+  transform-style:preserve-3d;
+}
+.svc-carousel .site-card{
+  width:260px;
+  flex:0 0 260px;
+  transform-style:preserve-3d;
+  transform-origin:center center;
+  will-change:transform;
+  transform:rotateY(0deg);
+  box-shadow:
+    0 28px 28px -20px rgba(29,36,43,.07),
+    0 40px 48px -18px rgba(29,36,43,.1);
+}
+.svc-carousel .site-card::after{ display:none; }
+.svc-media{
+  background:
+    linear-gradient(160deg, rgba(255,255,255,.55) 0%, transparent 42%),
+    linear-gradient(180deg, #d8dde3 0%, #b7c0c9 100%);
+  background-size:cover; background-position:center;
+}
+.svc-carousel .site-card-meta .role{ margin-top:10px; padding-top:10px; }
+@media(max-width:700px){
+  .svc-carousel .site-card{ width:220px; flex-basis:220px; }
+  .svc-group{ gap:16px; padding-inline:8px; }
+  .svc-carousel{
+    perspective:900px;
+    -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+    mask-image:linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .svc-carousel{ perspective:none; }
+  .svc-carousel .site-card{ transform:none !important; }
+  .svc-group[aria-hidden="true"]{ display:none; }
+}
 
-.total{display:flex; align-items:flex-end; justify-content:space-between; gap:20px;
-       flex-wrap:wrap; padding:30px 34px 34px; background:var(--panel-alt);
-       border-top:1px solid var(--rule);}
-@media(max-width:640px){ .total{padding:24px 20px 26px;} }
-.total .tl{font-family:var(--mono); font-size:10px; letter-spacing:.13em;
-           text-transform:uppercase; color:var(--muted);}
-.total .tv{font-size:clamp(30px,5.6vw,46px); line-height:1.05; font-weight:600; color:var(--ink);
-           letter-spacing:-.038em; font-variant-numeric:tabular-nums; margin-top:9px;}
-.total .empty{font-size:16px; color:var(--muted); margin-top:11px;}
-.disclaimer{margin-top:22px; font-size:13px; line-height:1.6; color:var(--muted); max-width:66ch;}
-.disclaimer b{color:var(--ink); font-weight:500;}
-
-/* ---------- builders ---------- */
-.builders{display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
-          background:var(--rule); border:1px solid var(--rule); border-radius:18px;
-          overflow:hidden; margin-top:56px;}
-@media(max-width:860px){ .builders{grid-template-columns:repeat(2,1fr);} }
-@media(max-width:520px){ .builders{grid-template-columns:1fr;} }
-.bd{background:var(--panel); padding:28px 24px;}
-.bd h3{font-size:19px; letter-spacing:-.025em;}
-.bd ul{list-style:none; margin:16px 0 0; padding:0; display:flex; flex-direction:column; gap:9px;}
-.bd li{font-size:14.5px; color:var(--body); padding-left:16px; position:relative;}
-.bd li::before{content:""; position:absolute; left:0; top:.66em; width:7px; height:1px; background:var(--accent);}
-
-.sites{display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:22px;}
-@media(max-width:700px){ .sites{grid-template-columns:1fr;} }
-.site{background:var(--panel); border:1px solid var(--rule); border-radius:18px; padding:26px 24px;}
-.site .label{display:block; margin-bottom:10px;}
-.site h3{font-size:21px; letter-spacing:-.025em;}
-.site .addr{margin-top:7px; font-size:14.5px; color:var(--muted);}
-.site .role{margin-top:14px; padding-top:13px; border-top:1px solid var(--rule-soft);
-            font-size:14.5px; color:var(--body);}
+.sites{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:28px;
+  align-items:stretch;
+  margin-top:56px;
+  padding-bottom:40px; /* room for floating ground shadows */
+  perspective:1100px;
+  perspective-origin:50% 40%;
+}
+@media(max-width:700px){
+  .sites{
+    display:flex;
+    flex-wrap:nowrap;
+    justify-content:flex-start;
+    align-items:stretch;
+    gap:16px;
+    overflow-x:auto;
+    overflow-y:visible;
+    -webkit-overflow-scrolling:touch;
+    scroll-snap-type:x mandatory;
+    overscroll-behavior-x:contain;
+    margin-left:calc(-1 * var(--gut));
+    margin-right:calc(-1 * var(--gut));
+    padding:8px var(--gut) 88px; /* extra bottom room so float shadows aren't clipped */
+    width:auto;
+    scrollbar-width:none;
+  }
+  .sites::-webkit-scrollbar{display:none;}
+  .site-card{
+    flex:0 0 min(68vw, 260px);
+    width:min(68vw, 260px);
+    max-width:none;
+    scroll-snap-align:start;
+  }
+  #work{padding-bottom:96px;}
+}
+.site-card{
+  width:100%;
+  max-width:none;
+  aspect-ratio:3/4;
+  border-radius:22px; padding:0; box-sizing:border-box;
+  position:relative;
+  background:transparent;
+  border:0;
+  /* Soft layered ground shadow — wide falloff, no hard edge */
+  box-shadow:
+    0 28px 28px -20px rgba(29,36,43,.08),
+    0 40px 48px -18px rgba(29,36,43,.12),
+    0 56px 70px -16px rgba(29,36,43,.1);
+  transform:rotateX(8deg);
+  transform-style:preserve-3d;
+  transition:transform .45s cubic-bezier(.22,.7,.3,1), box-shadow .45s ease;
+}
+.site-card:hover{
+  transform:translateY(-6px) rotateX(5deg);
+  box-shadow:
+    0 32px 32px -20px rgba(29,36,43,.09),
+    0 48px 56px -18px rgba(29,36,43,.14),
+    0 64px 80px -14px rgba(29,36,43,.12);
+}
+.site-card::after{
+  content:"";
+  position:absolute; left:8%; right:8%; bottom:-42px; height:36px;
+  border-radius:50%;
+  background:radial-gradient(ellipse at center, rgba(29,36,43,.2) 0%, rgba(29,36,43,.08) 42%, transparent 72%);
+  filter:blur(16px);
+  z-index:-1; pointer-events:none;
+}
+.site-card-inner{
+  position:relative; height:100%; border-radius:inherit; overflow:hidden;
+  background:var(--panel-alt);
+}
+/* Blurred under-layer — visible in the glass rim around the sharp photo */
+.site-card-blur{
+  position:absolute; inset:0; z-index:0;
+  width:100%; height:100%; object-fit:cover; display:block;
+  filter:blur(14px); transform:scale(1.08);
+}
+.svc-media.site-card-blur{ filter:blur(14px); transform:scale(1.08); }
+/* Sharp photo inset so the frosted rim shows around it */
+.site-card-photo{
+  position:absolute; z-index:1;
+  inset:11px; width:calc(100% - 22px); height:calc(100% - 22px);
+  object-fit:cover; display:block; border-radius:14px;
+}
+.site-card picture.site-card-photo{
+  display:block; overflow:hidden; padding:0; margin:0; border:0;
+}
+.site-card picture.site-card-photo img{
+  width:100%; height:100%; object-fit:cover; display:block;
+  border-radius:inherit;
+}
+.site-card img.palmer,.site-card picture.palmer img{object-position:42% 40%;}
+.site-card img.landing,.site-card picture.landing img{object-position:55% 45%;}
+.site-card img.element,.site-card picture.element img{object-position:50% 42%;}
+/* Semi-opaque glass wash on the rim only (transparent center) */
+.site-card-rim{
+  position:absolute; inset:0; z-index:2; pointer-events:none; border-radius:inherit;
+  box-shadow:inset 0 0 0 11px rgba(255,255,255,.22);
+}
+/* Soft top sheen + bottom for the caption panel */
+.site-card-inner::after{
+  content:""; position:absolute; inset:0; z-index:2; pointer-events:none;
+  border-radius:inherit;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.1) 0%, transparent 16%),
+    linear-gradient(180deg, transparent 58%, rgba(12,16,22,.4) 100%);
+}
+.site-card-meta{
+  position:absolute; left:20px; right:20px; bottom:20px; z-index:3;
+  padding:16px 17px 15px;
+  border-radius:14px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.42);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28);
+  -webkit-backdrop-filter:blur(16px) saturate(150%);
+  backdrop-filter:blur(16px) saturate(150%);
+  color:#fff;
+}
+.site-card-meta .label{
+  display:block; margin-bottom:8px;
+  color:rgba(255,255,255,.72); font-size:10px;
+}
+.site-card-meta h3{
+  font-size:19px; letter-spacing:-.025em; color:#fff;
+  text-wrap:balance;
+}
+.site-card-meta .addr{
+  margin-top:6px; font-size:13.5px; color:rgba(255,255,255,.72); line-height:1.4;
+}
+.site-card-meta .role{
+  margin-top:12px; padding-top:11px;
+  border-top:1px solid rgba(255,255,255,.22);
+  font-size:12px; color:rgba(255,255,255,.88); line-height:1.45;
+}
+/* Keep the X-tilt after .rise lands (`.rise.in { transform:none }` would flatten it). */
+.site-card.rise{transform:translateY(18px) rotateX(8deg);}
+.site-card.rise.in{transform:rotateX(8deg);}
+.site-card.rise.in:hover{transform:translateY(-6px) rotateX(5deg);}
+@media (prefers-reduced-motion:reduce){
+  .site-card,.site-card:hover,
+  .site-card.rise,.site-card.rise.in,.site-card.rise.in:hover{transform:none; transition:none;}
+}
 
 /* ---------- about ---------- */
 .about{display:grid; grid-template-columns:300px 1fr; gap:56px; align-items:start; margin-top:56px;}
 @media(max-width:820px){ .about{grid-template-columns:1fr; gap:34px;} }
-.shot{aspect-ratio:4/5; background:var(--panel-alt); border:1px dashed var(--rule);
-      border-radius:18px; display:flex; flex-direction:column; align-items:center;
-      justify-content:center; gap:9px; text-align:center; padding:24px;}
-.shot .ph{font-family:var(--mono); font-size:10px; letter-spacing:.13em;
-          text-transform:uppercase; color:var(--muted);}
-.shot .hint{font-size:13px; color:var(--muted); max-width:24ch; line-height:1.5;}
+.shot{
+  aspect-ratio:4/5; border-radius:22px; padding:11px; box-sizing:border-box;
+  background:rgba(255,255,255,.48);
+  border:1px solid rgba(255,255,255,.88);
+  box-shadow:
+    0 1px 2px rgba(29,36,43,.04),
+    0 14px 40px rgba(29,36,43,.08),
+    inset 0 1px 0 rgba(255,255,255,.95);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  backdrop-filter:blur(18px) saturate(140%);
+}
+.shot img{
+  width:100%; height:100%; object-fit:cover; object-position:center 18%;
+  display:block; border-radius:14px;
+}
 .about-body{display:flex; flex-direction:column; gap:20px; font-size:17.5px; line-height:1.62;}
 .about-body p:first-of-type{font-size:21px; line-height:1.48; color:var(--ink); letter-spacing:-.02em;}
 
@@ -328,23 +652,51 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 .detail .v a:hover{color:var(--accent);}
 
 /* ---------- footer ---------- */
-footer{padding:52px 0 64px; border-top:1px solid var(--rule); font-size:13.5px; color:var(--muted);}
-.foot-in{display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap;}
-.foot-note{font-family:var(--mono); font-size:11px; letter-spacing:.05em; line-height:1.9;}
+footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; color:var(--muted);}
+.foot-grid{
+  display:grid;
+  grid-template-columns:1.4fr repeat(3, 1fr);
+  gap:40px 32px;
+  align-items:start;
+}
+@media(max-width:820px){
+  .foot-grid{ grid-template-columns:1fr 1fr; gap:36px 28px; }
+}
+@media(max-width:520px){
+  .foot-grid{ grid-template-columns:1fr; gap:32px; }
+}
+.foot-brand .brand{ margin:0 0 12px; display:inline-flex; }
+.foot-brand p{ max-width:34ch; line-height:1.55; }
+.foot-col .k{
+  font-family:var(--mono); font-size:10px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--muted); display:block; margin-bottom:12px;
+}
+.foot-col .v{ color:var(--ink); line-height:1.55; letter-spacing:-.01em; }
+.foot-col .v a{ color:var(--ink); }
+.foot-col .v a:hover{ color:var(--accent); }
+.foot-col .v + .v{ margin-top:8px; }
+.foot-col .muted{ color:var(--muted); font-size:13.5px; }
+.foot-bottom{
+  margin-top:48px; padding-top:22px; border-top:1px solid var(--rule-soft);
+  display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  font-family:var(--mono); font-size:11px; letter-spacing:.05em; line-height:1.7;
+}
 
 /* ---------- booking modal ---------- */
-/* The morph layer is what actually expands. It starts as a pixel-exact copy of
-   the clicked button — same rect, colour, radius, label — and animates into the
-   card's geometry while the real button sits hidden. The card itself only
-   cross-fades in behind it, so the button appears to *become* the modal. */
+/* The morph layer is the only visible shape while opening: a copy of the
+   clicked button that expands into the card rect. The real card stays hidden
+   until that expand finishes, then swaps in: no second container on screen. */
 .morph{
   position:fixed; z-index:101; pointer-events:none; overflow:hidden;
   display:flex; align-items:center; justify-content:center;
-  background:var(--accent);
+  box-sizing:border-box; background:transparent; border:1px solid transparent;
+  /* Match .modal-card glass so the morph→card handoff doesn't "milk up". */
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  backdrop-filter:blur(18px) saturate(140%);
 }
 .morph[hidden]{display:none;}
 .morph span{
-  color:var(--on-accent); font-weight:500; font-size:15px;
+  font-weight:600; font-size:15px;
   white-space:nowrap; letter-spacing:-.005em; padding:0 12px;
 }
 
@@ -353,6 +705,8 @@ footer{padding:52px 0 64px; border-top:1px solid var(--rule); font-size:13.5px; 
   display:flex; align-items:center; justify-content:center; padding:24px;
 }
 .modal-root[hidden]{display:none;}
+/* Only the card is hidden while measuring: backdrop can start fading on click. */
+.modal-root.measuring .modal-card{visibility:hidden;}
 .modal-backdrop{
   position:absolute; inset:0; opacity:0;
   background:rgba(29,36,43,.34);
@@ -361,8 +715,11 @@ footer{padding:52px 0 64px; border-top:1px solid var(--rule); font-size:13.5px; 
 .modal-card{
   position:relative; width:min(560px,100%);
   max-height:calc(100dvh - 48px); overflow-y:auto;
-  background:var(--panel); border-radius:26px; opacity:0;
-  box-shadow:0 30px 80px rgba(29,36,43,.22),0 2px 10px rgba(29,36,43,.08);
+  background:rgba(255,255,255,.08); color:#fff; border-radius:26px; opacity:0;
+  border:1px solid rgba(255,255,255,.85);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:0 20px 60px rgba(29,36,43,.18);
   padding:40px 38px 34px; transform-origin:center center;
 }
 @media(max-width:560px){
@@ -371,46 +728,86 @@ footer{padding:52px 0 64px; border-top:1px solid var(--rule); font-size:13.5px; 
 }
 .modal-x{
   position:absolute; top:16px; right:16px; width:34px; height:34px;
-  border:0; border-radius:50%; background:var(--panel-alt); color:var(--muted);
-  font-size:19px; line-height:1; cursor:pointer; transition:background .18s ease,color .18s ease;
+  border:1px solid rgba(255,255,255,.45); border-radius:50%;
+  background:rgba(255,255,255,.1); color:#fff;
+  font-size:19px; line-height:1; cursor:pointer; transition:background .18s ease,border-color .18s ease;
 }
-.modal-x:hover{background:var(--rule); color:var(--ink);}
-.modal-card .mark{font-family:var(--rx); font-size:34px; color:var(--accent); line-height:1; display:block;}
-.modal-card h2{font-size:29px; letter-spacing:-.03em; margin-top:14px;}
-.modal-sub{margin-top:10px; font-size:16px; line-height:1.5; color:var(--body);}
+.modal-x:hover{background:rgba(255,255,255,.2); color:#fff; border-color:rgba(255,255,255,.7);}
+.modal-card .mark{font-family:var(--rx); font-size:34px; color:#fff; line-height:1; display:block;}
+.modal-card h2{font-size:29px; letter-spacing:-.03em; margin-top:14px; color:#fff;}
+.modal-sub{margin-top:10px; font-size:16px; line-height:1.5; color:rgba(255,255,255,.78);}
 
 .modal-form{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:26px;}
 @media(max-width:480px){ .modal-form{grid-template-columns:1fr;} }
 .modal-form .full{grid-column:1/-1;}
-.modal-form input,.modal-form select,.modal-form textarea{
-  width:100%; background:var(--bg); border:1px solid var(--rule); border-radius:12px;
-  padding:13px 14px; font-size:16px; color:var(--ink); letter-spacing:-.01em;
-  transition:border-color .16s ease, box-shadow .16s ease;
+/* Everything inside the card stays hidden until the glass shell opacity
+   ramp finishes, then the whole stack slides in. */
+@keyframes modalFieldIn{
+  from{opacity:0; transform:translateY(16px);}
+  to{opacity:1; transform:none;}
 }
+.modal-reveal > *,
+.modal-card > .modal-x{opacity:0;}
+.modal-card.fields-in .modal-reveal > *,
+.modal-card.fields-in > .modal-x{
+  animation:modalFieldIn 1.05s cubic-bezier(.22,.55,.3,1) forwards;
+}
+.modal-card.fields-in > .modal-x{animation-delay:.04s;}
+.modal-card.fields-in .modal-reveal > *:nth-child(1){animation-delay:.08s;}
+.modal-card.fields-in .modal-reveal > *:nth-child(2){animation-delay:.18s;}
+.modal-card.fields-in .modal-reveal > *:nth-child(3){animation-delay:.28s;}
+.modal-card.fields-in .modal-reveal > *:nth-child(4){animation-delay:.40s;}
+.modal-card.fields-in .modal-reveal > *:nth-child(5){animation-delay:.52s;}
+.modal-card.fields-in .modal-reveal > *:nth-child(6){animation-delay:.64s;}
+.modal-card.fields-in .modal-reveal > *:nth-child(7){animation-delay:.76s;}
+.modal-fine{
+  margin-top:16px; font-size:12.5px; line-height:1.6; color:rgba(255,255,255,.55);
+}
+@media (prefers-reduced-motion:reduce){
+  .modal-reveal > *,.modal-card > .modal-x{opacity:1; transform:none; animation:none !important;}
+}
+.modal-form input,.modal-form select,.modal-form textarea{
+  width:100%; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.45);
+  border-radius:12px; padding:13px 14px; font-size:16px; color:#fff; letter-spacing:-.01em;
+  transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
+  color-scheme:dark;
+}
+.modal-form input[type="date"]{min-height:48px;}
+.modal-form input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(1); opacity:.75; cursor:pointer;}
+.modal-form input::placeholder,
+.modal-form textarea::placeholder{color:rgba(255,255,255,.5);}
 .modal-form input:focus,.modal-form select:focus,.modal-form textarea:focus{
-  outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(27,77,255,.13);
+  outline:none; border-color:rgba(255,255,255,.9);
+  background:rgba(255,255,255,.14); box-shadow:0 0 0 3px rgba(255,255,255,.12);
 }
 .modal-form textarea{min-height:92px; resize:vertical;}
 .modal-form select{appearance:none; -webkit-appearance:none;
-  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-image:linear-gradient(45deg,transparent 50%,rgba(255,255,255,.7) 50%),linear-gradient(135deg,rgba(255,255,255,.7) 50%,transparent 50%);
   background-position:calc(100% - 19px) 22px,calc(100% - 14px) 22px;
   background-size:5px 5px,5px 5px; background-repeat:no-repeat; padding-right:38px;}
-.modal-form .pill{grid-column:1/-1; margin-top:4px; padding:14px 30px; font-size:17px;}
-.modal-fine{margin-top:16px; font-size:12.5px; line-height:1.6; color:var(--muted);}
-
+.modal-form select option{color:var(--ink); background:var(--panel);}
+.modal-form .pill{
+  grid-column:1/-1; margin-top:4px; padding:14px 30px; font-size:17px; font-weight:600;
+  background:rgba(255,255,255,.06); color:#fff; border:1px solid rgba(255,255,255,.85);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  backdrop-filter:blur(14px) saturate(140%);
+}
+.modal-form .pill:hover{background:rgba(255,255,255,.14); color:#fff;}
 .modal-done{text-align:center; padding:22px 0 12px;}
-.modal-done .mark{font-size:44px; margin-bottom:18px;}
-.modal-done h2{font-size:28px;}
-.modal-done p{margin-top:12px; font-size:16.5px; color:var(--body);}
+.modal-done .mark{font-size:44px; margin-bottom:18px; color:#fff;}
+.modal-done h2{font-size:28px; color:#fff;}
+.modal-done p{margin-top:12px; font-size:16.5px; color:rgba(255,255,255,.78);}
 
 /* ---------- reveal ---------- */
 .rise{opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s ease;}
 .rise.in{opacity:1; transform:none;}
 @media (prefers-reduced-motion:reduce){
   .rise{opacity:1; transform:none; transition:none;}
-  .hero .beat,.hero .kicker,.hero .sub,.hero .links{
+  .hero .beat,.hero .kicker{
     opacity:1; transform:none; animation:none;
   }
+  .hero .sub{transition:none;}
+  .hero .links .pill,.hero .links .pill.ghost{transition:none;}
   *{scroll-behavior:auto !important;}
 }
 html{scroll-behavior:smooth;}
@@ -418,17 +815,26 @@ html{scroll-behavior:smooth;}
 </head>
 <body>
 
+<!-- PREVIOUS FULLSCREEN OVERLAY (commented out)
+<div class="svc-scene" id="svcScene" aria-hidden="true">
+  <iframe id="svcSceneFrame" title="RX Flooring services scene" allow="fullscreen"></iframe>
+</div>
+<div class="svc-chrome" id="svcChrome" aria-hidden="true">
+  <button type="button" class="svc-exit" id="btnSvcExit">Exit</button>
+</div>
+<div class="svc-hint" id="svcHint">Scroll to pan to the lab</div>
+-->
+
 <nav class="nav">
   <div class="nav-in">
     <a class="brand" href="#top"><span class="mark">℞</span> RX Flooring</a>
     <div class="nav-links">
+      <a href="#work">Work</a>
       <a href="#process">Process</a>
       <a href="#services">Services</a>
-      <a href="#estimate">Estimate</a>
-      <a href="#work">Work</a>
       <a href="#about">About</a>
+      <a href="tel:+16138903394">Call</a>
     </div>
-    <a class="pill" href="#contact" data-book>Book an assessment</a>
   </div>
 </nav>
 
@@ -437,37 +843,125 @@ html{scroll-behavior:smooth;}
   <!-- ================= HERO ================= -->
   <header class="hero">
     <div class="hero-media">
-      <!-- src set from data-src by JS on desktop + motion-OK only; poster still
-           is the CSS background above, so mobile/reduced-motion never fetch it. -->
+      <img class="hero-poster" src="assets/hero-poster.jpg?v=4" alt=""
+           width="1920" height="1080" fetchpriority="high" decoding="async" aria-hidden="true">
+      <!-- src set from data-src only on good connections; otherwise poster-only. -->
       <video class="hero-video" muted playsinline preload="none"
-             data-src="assets/hero.mp4" aria-hidden="true"></video>
+             data-src="assets/hero.mp4?v=4" aria-hidden="true"></video>
     </div>
-    <div class="hero-scrim"></div>
     <div class="wrap">
       <div class="hero-copy">
-        <div class="mark-lg">℞</div>
         <p class="kicker">Flooring &amp; renovation · Ottawa</p>
         <h1 class="triad">
           <span class="beat">Diagnose.</span>
           <span class="beat">Prescribe.</span>
           <span class="beat">Install.</span>
         </h1>
-        <p class="sub">Now accepting &ldquo;patients&rdquo;.</p>
+        <div class="sub-slot">
+          <p class="sub">Now accepting &ldquo;patients&rdquo;.</p>
+        </div>
         <div class="links">
-          <a class="pill lg" href="#contact" data-book>Book a free assessment</a>
-          <a class="pill lg ghost chev" href="#estimate">Estimate your project</a>
+          <a class="pill lg" href="tel:+16138903394" aria-label="Call RX Flooring at 613-890-3394">
+            <span class="label-full">Call now</span>
+            <span class="label-short">Call</span>
+          </a>
+          <a class="pill lg ghost" href="tel:+16138903394" data-book aria-label="Book a free on-site assessment">
+            <span class="label-full">Book assessment</span>
+            <span class="label-short">Book</span>
+          </a>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- ================= STATS ================= -->
-  <div class="stats">
-    <div class="stat"><div class="n">10</div><div class="c">years in the trade</div></div>
-    <div class="stat"><div class="n">750+</div><div class="c">units delivered in 2025</div></div>
-    <div class="stat"><div class="n">10+</div><div class="c">crews coordinated at once</div></div>
-    <div class="stat"><div class="n">4</div><div class="c">major Ottawa builders</div></div>
-  </div>
+  <!-- ================= WORK / TRACK RECORD ================= -->
+  <section id="work">
+    <div class="wrap">
+      <div class="trusted">
+        <span class="label">Trusted by</span>
+        <div class="trusted-carousel" aria-label="Builders we work with">
+          <div class="trusted-track">
+            <div class="trusted-group">
+              <img src="public/logos/minto.png" alt="Minto" width="560" height="200" loading="lazy">
+              <img class="mattamy" src="public/logos/mattamy.png" alt="Mattamy Homes" width="640" height="242" loading="lazy">
+              <img class="caivan" src="public/logos/caivan.png" alt="Caivan" width="560" height="106" loading="lazy">
+              <img class="claridge" src="public/logos/claridge.png" alt="Claridge Homes" width="560" height="194" loading="lazy">
+              <img class="demarco" src="public/logos/demarco.png" alt="Demarco Construction" width="560" height="134" loading="lazy">
+              <img src="public/logos/minto.png" alt="" width="560" height="200" loading="lazy" aria-hidden="true">
+              <img class="mattamy" src="public/logos/mattamy.png" alt="" width="640" height="242" loading="lazy" aria-hidden="true">
+              <img class="caivan" src="public/logos/caivan.png" alt="" width="560" height="106" loading="lazy" aria-hidden="true">
+              <img class="claridge" src="public/logos/claridge.png" alt="" width="560" height="194" loading="lazy" aria-hidden="true">
+              <img class="demarco" src="public/logos/demarco.png" alt="" width="560" height="134" loading="lazy" aria-hidden="true">
+            </div>
+            <div class="trusted-group" aria-hidden="true">
+              <img src="public/logos/minto.png" alt="" width="560" height="200" loading="lazy">
+              <img class="mattamy" src="public/logos/mattamy.png" alt="" width="640" height="242" loading="lazy">
+              <img class="caivan" src="public/logos/caivan.png" alt="" width="560" height="106" loading="lazy">
+              <img class="claridge" src="public/logos/claridge.png" alt="" width="560" height="194" loading="lazy">
+              <img class="demarco" src="public/logos/demarco.png" alt="" width="560" height="134" loading="lazy">
+              <img src="public/logos/minto.png" alt="" width="560" height="200" loading="lazy">
+              <img class="mattamy" src="public/logos/mattamy.png" alt="" width="640" height="242" loading="lazy">
+              <img class="caivan" src="public/logos/caivan.png" alt="" width="560" height="106" loading="lazy">
+              <img class="claridge" src="public/logos/claridge.png" alt="" width="560" height="194" loading="lazy">
+              <img class="demarco" src="public/logos/demarco.png" alt="" width="560" height="134" loading="lazy">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="n">10</div><div class="c">years in the trade</div></div>
+        <div class="stat">
+          <div class="n"><span data-count="750">0</span>+</div>
+          <div class="c">units delivered in 2025</div>
+        </div>
+        <div class="stat"><div class="n">10+</div><div class="c">crews coordinated at once</div></div>
+        <div class="stat"><div class="n">5</div><div class="c">major Ottawa builders</div></div>
+      </div>
+
+      <div class="sites">
+        <article class="site-card rise">
+          <div class="site-card-inner">
+            <img class="site-card-blur palmer" src="public/assets/palmer.jpg" alt="" width="1024" height="651" loading="lazy" decoding="async" aria-hidden="true">
+            <img class="site-card-photo palmer" src="public/assets/palmer.jpg" alt="The Palmer Residences in Kanata" width="1024" height="651" loading="lazy" decoding="async">
+            <div class="site-card-rim" aria-hidden="true"></div>
+            <div class="site-card-meta">
+              <span class="label">Multi-residential</span>
+              <h3>The Palmer Residences</h3>
+              <p class="addr">6301 Campeau Drive, Kanata</p>
+              <p class="role">Carpet installation throughout suites and common corridors.</p>
+            </div>
+          </div>
+        </article>
+        <article class="site-card rise">
+          <div class="site-card-inner">
+            <img class="site-card-blur landing" src="public/assets/landing.jpg" alt="" width="1024" height="576" loading="lazy" decoding="async" aria-hidden="true">
+            <img class="site-card-photo landing" src="public/assets/landing.jpg" alt="Landing on Main in Stittsville" width="1024" height="576" loading="lazy" decoding="async">
+            <div class="site-card-rim" aria-hidden="true"></div>
+            <div class="site-card-meta">
+              <span class="label">Multi-residential</span>
+              <h3>Landing on Main</h3>
+              <p class="addr">Stittsville Main Street · Bayview Group</p>
+              <p class="role">Carpet installation throughout this purpose-built boutique building.</p>
+            </div>
+          </div>
+        </article>
+        <article class="site-card rise">
+          <div class="site-card-inner">
+            <img class="site-card-blur element" src="public/assets/element.jpg" alt="" width="480" height="297" loading="lazy" decoding="async" aria-hidden="true">
+            <img class="site-card-photo element" src="public/assets/element.jpg" alt="Elements Apartments in Ottawa" width="480" height="297" loading="lazy" decoding="async">
+            <div class="site-card-rim" aria-hidden="true"></div>
+            <div class="site-card-meta">
+              <span class="label">Multi-residential</span>
+              <h3>Elements Apartments</h3>
+              <p class="addr">400 Kirkwood Avenue, Westboro</p>
+              <p class="role">Carpet installation throughout the building's hallways.</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
 
   <!-- ================= PROCESS ================= -->
   <section id="process">
@@ -475,35 +969,70 @@ html{scroll-behavior:smooth;}
       <div class="center narrow">
         <div class="label accent">The prescription</div>
         <h2 class="big" style="margin-top:16px;">The same four steps, every job.</h2>
-        <p class="sec-intro">Most flooring quotes are a number on a page. Every RX job starts with a diagnosis and ends with a document you can hold the work against.</p>
       </div>
 
-      <div class="steps">
-        <div class="step rise">
-          <span class="idx">01 — DIAGNOSE</span>
-          <h3>On site, not over the phone</h3>
-          <p>Room-by-room measure, subfloor inspection, moisture and level readings. Ray identifies what is actually wrong before anyone talks about product.</p>
+      <div class="rx-sheet-wrap">
+        <div class="rx-sheet rise" aria-label="Sample RX Flooring prescription">
+          <div class="sheet-top">
+            <div>
+              <div class="rx-mark" aria-hidden="true">℞</div>
+              <div class="label" style="margin-top:8px;">RX Flooring</div>
+            </div>
+            <div class="sheet-meta">
+              Patient: Homeowner<br>
+              Site: Ottawa<br>
+              Date: On assessment
+            </div>
+          </div>
+          <div class="rx-line">
+            <div class="n">01</div>
+            <div>
+              <h3>Diagnose</h3>
+              <p>On-site measure, moisture &amp; level readings</p>
+            </div>
+          </div>
+          <div class="rx-line">
+            <div class="n">02</div>
+            <div>
+              <h3>Prescribe</h3>
+              <p>Written spec · materials · fixed price</p>
+            </div>
+          </div>
+          <div class="rx-line">
+            <div class="n">03</div>
+            <div>
+              <h3>Install</h3>
+              <p>Same crew that measured · daily cleanup</p>
+            </div>
+          </div>
+          <div class="rx-line">
+            <div class="n">04</div>
+            <div>
+              <h3>Sign off</h3>
+              <p>Walkthrough · written warranty</p>
+            </div>
+          </div>
         </div>
-        <div class="step rise">
-          <span class="idx">02 — PRESCRIBE</span>
-          <h3>A written spec</h3>
-          <p>Material and underlay, plank direction, seam plan, transitions, prep required, start date and a fixed price. One page. No line reading "misc."</p>
-        </div>
-        <div class="step rise">
-          <span class="idx">03 — INSTALL</span>
-          <h3>The crew that measured it</h3>
-          <p>Furniture moved, old flooring hauled away, dust contained, site swept daily. Ray is on the job, not dispatching it from a truck across town.</p>
-        </div>
-        <div class="step rise">
-          <span class="idx">04 — SIGN OFF</span>
-          <h3>Walkthrough and warranty</h3>
-          <p>Deficiency walk with you before final payment, then written workmanship warranty. The same close-out process used on 750 builder units last year.</p>
+
+        <div class="rx-annotations">
+          <div class="ann rise">
+            <div class="k">Not a phone quote</div>
+            <p>Diagnosis happens in the room, with tools on the floor.</p>
+          </div>
+          <div class="ann rise">
+            <div class="k">One page, fixed price</div>
+            <p>No “misc.” lines. The spec is the agreement.</p>
+          </div>
+          <div class="ann rise">
+            <div class="k">Same close-out as 750 units</div>
+            <p>Walkthrough before final payment, then warranty in writing.</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ================= DIAGNOSTICS ================= -->
+  <!-- ================= DIAGNOSTICS (hidden for now) =================
   <section class="alt">
     <div class="wrap">
       <div class="center narrow">
@@ -515,7 +1044,7 @@ html{scroll-behavior:smooth;}
       <div class="dx">
         <article class="dxcard rise">
           <p class="quote">“There's a ridge running down the hallway.”</p>
-          <div class="dxrow"><span class="k">Diagnosis</span><p class="v">Carpet has relaxed off the tack strip — normal after three to five years, worse over radiant heat.</p></div>
+          <div class="dxrow"><span class="k">Diagnosis</span><p class="v">Carpet has relaxed off the tack strip, normal after three to five years, worse over radiant heat.</p></div>
           <div class="dxrow"><span class="k">Treatment</span><p class="v">Power-stretch and re-tack. No new carpet required.</p></div>
           <div class="dxrow"><span class="k">Duration</span><p class="v time">Half a day</p></div>
         </article>
@@ -529,179 +1058,77 @@ html{scroll-behavior:smooth;}
 
         <article class="dxcard rise">
           <p class="quote">“The planks are lifting near the patio door.”</p>
-          <div class="dxrow"><span class="k">Diagnosis</span><p class="v">Slab moisture, or no expansion gap left at the perimeter — the floor has nowhere to move.</p></div>
+          <div class="dxrow"><span class="k">Diagnosis</span><p class="v">Slab moisture, or no expansion gap left at the perimeter. The floor has nowhere to move.</p></div>
           <div class="dxrow"><span class="k">Treatment</span><p class="v">Moisture test, vapour barrier where the reading calls for it, re-lay with correct gap and transitions.</p></div>
           <div class="dxrow"><span class="k">Duration</span><p class="v time">Two to three days</p></div>
         </article>
       </div>
     </div>
   </section>
+  ================= END DIAGNOSTICS ================= -->
 
   <!-- ================= SERVICES ================= -->
+  <!-- FREEZER SCENE (parked)
   <section id="services">
     <div class="wrap">
-      <div class="center narrow">
+      <div class="svc-stage" id="svcStage">
+        <iframe id="svcFrame" title="RX Flooring services scene" src="freezer.html?embed=1&amp;underlay=1&amp;inline=1&amp;v=3" loading="lazy"></iframe>
+        <div class="svc-cta">
+          <button type="button" class="pill lg glass" id="btnViewServices">View services</button>
+        </div>
+        <button type="button" class="svc-close" id="btnSvcClose">Close</button>
+      </div>
+    </div>
+  </section>
+  -->
+  <section id="services">
+    <div class="wrap">
+      <div class="center narrow svc-head">
         <div class="label accent">Services</div>
-        <h2 class="big" style="margin-top:16px;">Everything under the floor, and most of what's above it.</h2>
-      </div>
-
-      <div class="svc">
-        <div>
-          <h3 class="label">Flooring</h3>
-          <ul>
-            <li>Carpet installation<span>Wall-to-wall stretch-in and glue-down</span></li>
-            <li>Stair wrapping &amp; stair runners<span>Waterfall or cap-and-band, wrapped around every spindle</span></li>
-            <li>Carpet seaming, repair &amp; restretching</li>
-            <li>Luxury vinyl plank &amp; tile<span>LVP and LVT, click and glue-down</span></li>
-            <li>Laminate flooring installation</li>
-            <li>Hardwood flooring installation<span>Nail-down, glue-down and floating</span></li>
-            <li>Hardwood sanding &amp; refinishing</li>
-            <li>Ceramic &amp; porcelain tile installation</li>
-            <li>Subfloor prep, levelling &amp; repair</li>
-            <li>Old flooring removal &amp; disposal</li>
-          </ul>
-        </div>
-        <div>
-          <h3 class="label">Renovation</h3>
-          <ul>
-            <li>Interior painting</li>
-            <li>Interior demolition &amp; strip-out</li>
-            <li>Junk removal &amp; debris haul-away</li>
-            <li>Full renovation project management<span>Measuring, scheduling, multi-trade coordination and warranty — the same role Ray ran across 750 units last year</span></li>
-          </ul>
-        </div>
+        <h2 class="big" style="margin-top:16px;">Flooring, and the work around it.</h2>
+        <p class="sec-intro">From stretch-in carpet to full strip-outs — assessed, prescribed, and run like a job site.</p>
       </div>
     </div>
-  </section>
-
-  <!-- ================= CALCULATOR ================= -->
-  <section id="estimate" class="alt">
-    <div class="wrap">
-      <div class="center narrow">
-        <div class="label accent">Cost estimator</div>
-        <h2 class="big" style="margin-top:16px;">A range before you pick up the phone.</h2>
-        <p class="sec-intro">Add the rooms and services you're thinking about. This returns current Ottawa market ranges so you know roughly where a project lands — not a quote.</p>
-      </div>
-
-      <div class="calc narrow" style="max-width:820px;">
-        <div class="calc-in">
-          <form class="calc-form" id="calcForm">
-            <div class="field">
-              <label for="svcSel">Service</label>
-              <select id="svcSel"></select>
-            </div>
-            <div class="field">
-              <label for="qtyIn" id="qtyLabel">Square feet</label>
-              <input id="qtyIn" type="number" min="1" step="1" value="200" inputmode="numeric">
-            </div>
-            <button class="pill" type="submit">Add</button>
-          </form>
-
-          <ul class="lines" id="lines"></ul>
-        </div>
-
-        <div class="total">
-          <div>
-            <div class="tl">Estimated range</div>
-            <div class="tv" id="totalOut">—</div>
-            <div class="empty" id="emptyMsg">Add a service above to see a range.</div>
-          </div>
-          <a class="pill" href="#contact" data-book data-from-estimator>Get an exact price</a>
-        </div>
-      </div>
-
-      <p class="disclaimer narrow" style="max-width:820px;">
-        <b>These are Ottawa-area market ranges, not RX Flooring's prices.</b> Sourced from local flooring, painting and renovation pricing, July 2026, and shown as a sanity check only. Premium materials, patterned or herringbone layouts, heavy cutting, stairs and second-floor work all push toward the top of each range. Full renovations vary too widely to estimate here and are quoted per project. Your written price comes after the on-site assessment.
-      </p>
-    </div>
-  </section>
-
-  <!-- ================= WORK / BUILDERS ================= -->
-  <section id="work">
-    <div class="wrap">
-      <div class="center narrow">
-        <div class="label accent">Track record</div>
-        <h2 class="big" style="margin-top:16px;">750 homes. Four builders. One 2025.</h2>
-        <p class="sec-intro">As subcontractor and project manager, Ray was responsible for carpet across these Ottawa-area communities — measuring, scheduling, installation, walkthrough and warranty.</p>
-      </div>
-
-      <div class="builders">
-        <div class="bd">
-          <h3>Minto</h3>
-          <ul><li>Avalon</li><li>Abbotts Run</li><li>Weavers Way</li></ul>
-        </div>
-        <div class="bd">
-          <h3>Mattamy</h3>
-          <ul><li>Waters Ridge</li><li>Fair Winds</li><li>Promenade</li></ul>
-        </div>
-        <div class="bd">
-          <h3>Caivan</h3>
-          <ul><li>Fox Run</li><li>The Ridge</li><li>Conservancy</li></ul>
-        </div>
-        <div class="bd">
-          <h3>Claridge</h3>
-          <ul><li>River's Edge</li><li>Westwood</li><li>Bridlewood</li></ul>
-        </div>
-      </div>
-
-      <div class="sites">
-        <article class="site rise">
-          <span class="label">Multi-residential</span>
-          <h3>The Palmer Residences</h3>
-          <p class="addr">6301 Campeau Drive, Kanata</p>
-          <p class="role">Carpet installation throughout suites and common corridors.</p>
-        </article>
-        <article class="site rise">
-          <span class="label">Multi-residential</span>
-          <h3>Landing on Main</h3>
-          <p class="addr">Stittsville Main Street · Bayview Group</p>
-          <p class="role">Carpet installation throughout this purpose-built boutique building.</p>
-        </article>
-      </div>
-    </div>
+    <div class="svc-carousel" id="svcCarousel" aria-label="RX Flooring services"></div>
   </section>
 
   <!-- ================= ABOUT ================= -->
-  <section id="about" class="alt">
+  <section id="about">
     <div class="wrap">
       <div class="center narrow">
-        <div class="label accent">The founder</div>
-        <h2 class="big" style="margin-top:16px;">Ray</h2>
+        <div class="label accent">About</div>
+        <h2 class="big" style="margin-top:16px;">Meet Ray</h2>
       </div>
 
       <div class="about">
-        <!-- PLACEHOLDER: swap for Ray's headshot. Chest up, plain background, good light. -->
         <div class="shot">
-          <span class="ph">Photo to come</span>
-          <span class="hint">Chest-up, plain background, natural light. A phone photo is fine.</span>
+          <img src="public/assets/owner.jpg" alt="Ray, owner of RX Flooring" width="681" height="1024" loading="lazy" decoding="async">
         </div>
 
         <div class="about-body">
-          <p>Ray has been installing flooring professionally for close to ten years, and the trade caught him from day one.</p>
-          <p>There's a real craft to it — seaming carpet so the joins disappear, wrapping a staircase cleanly around every spindle, lining up a patterned carpet so the whole room reads as one continuous piece. Getting that exactly right became the standard he holds every job to.</p>
-          <p>After moving to Canada almost seven years ago, Ray built on that foundation. For the past three years he has worked as a trusted subcontractor and project manager for one of Ottawa's flooring companies, handling measuring, scheduling, installation and warranty. In 2025 alone he was responsible for more than 750 units across major Ottawa-area developments — including sites built by Minto, Mattamy, Caivan and Claridge — coordinating more than ten installation crews at once and seeing each home through from first measurement to final walkthrough with the homeowner.</p>
-          <p>That experience shaped the way Ray runs a job today: on schedule, on budget, done right the first time. It is also why this business exists — to bring that same craftsmanship and reliability directly to homeowners, across flooring and the full range of renovation services.</p>
+          <p>Ray’s been installing flooring for close to ten years, and he was hooked from day one. There’s a real craft to it. Seaming carpet so the joins disappear. Wrapping a staircase clean around every spindle. Lining up a patterned carpet so the whole room reads as one piece. Getting that right is the bar he holds every job to.</p>
+          <p>He moved to Canada almost seven years ago and kept building on that. For the past three years he’s worked as a trusted subcontractor and project manager for one of Ottawa’s flooring companies, handling measuring, scheduling, install, and warranty. In 2025 alone he ran more than 750 units across major Ottawa-area developments, including sites for Minto, Mattamy, Caivan, and Claridge Homes, coordinating more than ten crews at once and taking each home from the first measure to the final walkthrough with the homeowner.</p>
+          <p>That’s how Ray runs a job today: on schedule, on budget, done right the first time. It’s also why he started this business. Same craft, same reliability, straight to homeowners, across flooring and the full range of renovation work we do.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ================= CONTACT ================= -->
+  <!-- ================= CONTACT (removed for now; restore if needed) =================
   <section id="contact">
     <div class="wrap">
       <div class="center narrow">
         <div class="label accent">Book an assessment</div>
         <h2 class="big" style="margin-top:16px;">Free, on site, no obligation.</h2>
-        <p class="sec-intro">Tell us the room and the symptom. Ray will come out, measure, and leave you with a written prescription and a fixed price.</p>
+        <p class="sec-intro">Tell us the room and the symptom. We will come out, measure, and leave you with a written prescription and a fixed price.</p>
       </div>
 
       <div class="contact-grid">
-        <!-- PLACEHOLDER: wire to the dev's form handler / CRM. -->
         <form class="form" id="leadForm" novalidate>
           <input type="text" name="name" placeholder="Name" autocomplete="name" required>
           <input type="tel" name="phone" placeholder="Phone" autocomplete="tel" required>
           <input type="email" name="email" placeholder="Email" autocomplete="email">
-          <input type="text" name="area" placeholder="Neighbourhood — Kanata, Barrhaven, Orleans…" autocomplete="address-level3">
+          <input type="text" name="area" placeholder="Neighbourhood: Kanata, Barrhaven, Orleans…" autocomplete="address-level3">
           <textarea name="message" placeholder="What's going on with the floor?"></textarea>
           <button class="pill lg" type="submit">Request assessment</button>
         </form>
@@ -717,7 +1144,7 @@ html{scroll-behavior:smooth;}
           </div>
           <div class="detail">
             <span class="k">Hours</span>
-            <p class="v">Mon – Sat, 7:00 – 18:00</p>
+            <p class="v">Mon – Sat, 7:00 AM – 6:00 PM</p>
           </div>
           <div class="detail" style="border-bottom:0;">
             <span class="k">Response</span>
@@ -727,18 +1154,43 @@ html{scroll-behavior:smooth;}
       </div>
     </div>
   </section>
+  ================= END CONTACT ================= -->
 
 </main>
 
 <footer>
-  <div class="wrap foot-in">
-    <div>
-      <a class="brand" href="#top" style="margin:0 0 10px;"><span class="mark">℞</span> RX Flooring</a>
-      <div>Carpet, vinyl, laminate, hardwood and tile. Ottawa, Ontario.</div>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#top"><span class="mark">℞</span> RX Flooring</a>
+        <p>Carpet, vinyl, laminate, hardwood and tile — assessed, prescribed, installed. Free on-site assessments across Ottawa.</p>
+      </div>
+
+      <div class="foot-col">
+        <span class="k">Contact</span>
+        <p class="v"><a href="tel:+16138903394">(613) 890-3394</a></p>
+        <p class="v" style="margin-top:14px;">
+          <a href="tel:+16138903394" data-book>Book an assessment</a>
+        </p>
+      </div>
+
+      <div class="foot-col">
+        <span class="k">Hours</span>
+        <p class="v">Mon – Sat</p>
+        <p class="v">7:00 AM – 6:00 PM</p>
+      </div>
+
+      <div class="foot-col">
+        <span class="k">Service area</span>
+        <p class="v">Ottawa · Kanata · Barrhaven</p>
+        <p class="v">Nepean · Orleans · Stittsville</p>
+        <p class="v">Manotick &amp; surrounding</p>
+      </div>
     </div>
-    <div class="foot-note">
-      © 2026 RX Flooring<br>
-      Estimator figures are market ranges, not quotes
+
+    <div class="foot-bottom">
+      <div>© 2026 RX Flooring · Ottawa, Ontario</div>
+      <div>Flooring &amp; renovation</div>
     </div>
   </div>
 </footer>
@@ -747,168 +1199,81 @@ html{scroll-behavior:smooth;}
 <div class="morph" id="bookMorph" hidden aria-hidden="true"><span></span></div>
 
 <!-- Booking modal. Every [data-book] CTA opens this; without JS those links
-     still fall through to the #contact form, so the page degrades cleanly. -->
+     fall through to tel: so the page still offers a contact path. -->
 <div class="modal-root" id="bookModal" hidden>
   <div class="modal-backdrop" data-close></div>
 
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="bookTitle">
     <button class="modal-x" type="button" data-close aria-label="Close">&times;</button>
 
-    <div id="bookPanel">
+    <div id="bookPanel" class="modal-reveal">
       <span class="mark" aria-hidden="true">℞</span>
-      <h2 id="bookTitle">New patient intake</h2>
-      <p class="modal-sub">A free on-site visit. Ray measures, diagnoses the subfloor, and leaves you a written price — usually within 24 hours of the call.</p>
+      <h2 id="bookTitle">Book an assessment</h2>
+      <p class="modal-sub">Free on-site visit. Pick a preferred day and window. We&rsquo;ll confirm by phone and send someone out.</p>
 
       <form class="modal-form" id="bookForm" novalidate>
-        <select class="full" name="service" aria-label="Service needed">
-          <option value="">What do you need? (optional)</option>
-          <option>Carpet installation</option>
-          <option>Carpet stairs or runner</option>
-          <option>Carpet repair or restretch</option>
-          <option>Luxury vinyl plank / tile</option>
-          <option>Laminate</option>
-          <option>Hardwood installation</option>
-          <option>Hardwood sanding &amp; refinishing</option>
-          <option>Ceramic or porcelain tile</option>
-          <option>Interior painting</option>
-          <option>Demolition or junk removal</option>
-          <option>Full renovation</option>
-          <option>Something else</option>
-        </select>
         <input type="text" name="name" placeholder="Name" autocomplete="name" required>
         <input type="tel" name="phone" placeholder="Phone" autocomplete="tel" required>
-        <input class="full" type="email" name="email" placeholder="Email (optional)" autocomplete="email">
-        <input class="full" type="text" name="area" placeholder="Neighbourhood — Kanata, Barrhaven, Orleans…" autocomplete="address-level3">
-        <textarea class="full" name="notes" placeholder="What's going on with the floor?"></textarea>
-        <button class="pill" type="submit">Book my assessment</button>
+        <input class="full" type="text" name="address" placeholder="Address or neighbourhood" autocomplete="street-address" required>
+        <input type="date" name="date" aria-label="Preferred date" required>
+        <select name="window" aria-label="Preferred time window" required>
+          <option value="">Preferred time</option>
+          <option>Morning (8–12)</option>
+          <option>Afternoon (12–4)</option>
+          <option>Late afternoon (4–6)</option>
+        </select>
+        <textarea class="full" name="notes" placeholder="What&rsquo;s going on? (optional)"></textarea>
+        <button class="pill" type="submit">Request assessment</button>
       </form>
 
-      <p class="modal-fine">No cost, no obligation, no sales visit. Ray does the assessment himself.</p>
+      <p class="modal-fine">Preferred window only. We confirm the exact time by phone. No cost, no obligation.</p>
     </div>
 
     <div class="modal-done" id="bookDone" hidden>
       <span class="mark" aria-hidden="true">℞</span>
-      <h2>You're on the books.</h2>
-      <p>Ray will call to confirm a time — usually the same day.</p>
+      <h2>Request received.</h2>
+      <p>We will call shortly to confirm your assessment window.</p>
     </div>
   </div>
 </div>
 
 <script>
-/* ---------- Estimator ----------
-   PRICING SOURCE: Ottawa-area market ranges, July 2026.
-   REPLACE with RX's own installer rates before launch. */
-var SERVICES = [
-  {id:"carpet",   name:"Carpet installation (mid-grade, incl. underpad)", unit:"sq ft",   lo:4,    hi:8},
-  {id:"stairs",   name:"Carpet stair wrapping",                           unit:"stairs",  lo:35,   hi:55},
-  {id:"carpetrm", name:"Old carpet removal & disposal",                   unit:"sq ft",   lo:0.5,  hi:1},
-  {id:"subfloor", name:"Subfloor prep & levelling",                       unit:"sq ft",   lo:1,    hi:3},
-  {id:"lvp",      name:"Luxury vinyl plank / tile installation",           unit:"sq ft",   lo:4,    hi:8},
-  {id:"laminate", name:"Laminate installation",                           unit:"sq ft",   lo:3,    hi:7},
-  {id:"hardwood", name:"Hardwood installation",                           unit:"sq ft",   lo:8,    hi:14},
-  {id:"refinish", name:"Hardwood sanding & refinishing",                  unit:"sq ft",   lo:2.5,  hi:5},
-  {id:"tile",     name:"Ceramic / porcelain tile installation",           unit:"sq ft",   lo:8,    hi:15},
-  {id:"hardrm",   name:"Old tile / hardwood removal & disposal",          unit:"sq ft",   lo:1,    hi:3},
-  {id:"paint",    name:"Interior painting",                               unit:"sq ft of wall", lo:2.5, hi:4.5},
-  {id:"demo",     name:"Interior demolition / strip-out",                 unit:"sq ft",   lo:2,    hi:8},
-  {id:"junk",     name:"Junk removal & debris haul-away",                 unit:"loads",   lo:150,  hi:350}
-];
-
-var sel = document.getElementById("svcSel");
-var qtyIn = document.getElementById("qtyIn");
-var qtyLabel = document.getElementById("qtyLabel");
-var linesEl = document.getElementById("lines");
-var totalOut = document.getElementById("totalOut");
-var emptyMsg = document.getElementById("emptyMsg");
-var items = [];
-
-SERVICES.forEach(function(s){
-  var o = document.createElement("option");
-  o.value = s.id; o.textContent = s.name;
-  sel.appendChild(o);
-});
-
-function unitLabel(){
-  var s = SERVICES.find(function(x){ return x.id === sel.value; });
-  qtyLabel.textContent = s.unit.charAt(0).toUpperCase() + s.unit.slice(1);
-  qtyIn.value = s.unit === "stairs" ? 13 : (s.unit === "loads" ? 1 : 200);
-}
-sel.addEventListener("change", unitLabel);
-unitLabel();
-
-function money(n){
-  return "$" + Math.round(n).toLocaleString("en-CA");
-}
-
-function render(){
-  linesEl.innerHTML = "";
-  var lo = 0, hi = 0;
-
-  items.forEach(function(it, i){
-    lo += it.lo * it.qty;
-    hi += it.hi * it.qty;
-
-    var li = document.createElement("li");
-    li.className = "line";
-    li.innerHTML =
-      '<span class="nm"></span>' +
-      '<span class="qt"></span>' +
-      '<span class="amt"></span>' +
-      '<button class="rm" type="button" aria-label="Remove">&times;</button>';
-    li.querySelector(".nm").textContent = it.name;
-    li.querySelector(".qt").textContent = it.qty.toLocaleString("en-CA") + " " + it.unit;
-    li.querySelector(".amt").textContent = money(it.lo * it.qty) + " – " + money(it.hi * it.qty);
-    li.querySelector(".rm").addEventListener("click", function(){
-      items.splice(i, 1); render();
-    });
-    linesEl.appendChild(li);
-  });
-
-  if (items.length) {
-    totalOut.textContent = money(lo) + " – " + money(hi);
-    emptyMsg.style.display = "none";
-  } else {
-    totalOut.textContent = "—";
-    emptyMsg.style.display = "";
-  }
-}
-
-document.getElementById("calcForm").addEventListener("submit", function(e){
-  e.preventDefault();
-  var s = SERVICES.find(function(x){ return x.id === sel.value; });
-  var q = parseFloat(qtyIn.value);
-  if (!s || !q || q <= 0) return;
-  items.push({ name:s.name, unit:s.unit, qty:q, lo:s.lo, hi:s.hi });
-  render();
-});
-
-/* ---------- Lead form placeholder ---------- */
+/* ---------- Lead form placeholder (section commented out; restore with #contact)
 document.getElementById("leadForm").addEventListener("submit", function(e){
   e.preventDefault();
   var b = e.target.querySelector("button");
-  b.textContent = "Thanks — Ray will call you";
+  b.textContent = "Thanks, we will call you";
   b.disabled = true;
-  /* DEV: POST to the form handler / CRM here. */
 });
+---------- */
 
-/* ---------- Booking modal ----------
-   The card animates from the clicked button's centre out to screen centre,
-   so the popup visibly grows out of whatever CTA opened it. */
-var modal    = document.getElementById("bookModal");
-var card     = modal.querySelector(".modal-card");
-var backdrop = modal.querySelector(".modal-backdrop");
+/* ---------- Assessment booking modal ----------
+   Morph copies the clicked button, expands + fades in, then content animates. */
+var bookModal = document.getElementById("bookModal");
 var panel    = document.getElementById("bookPanel");
 var doneEl   = document.getElementById("bookDone");
 var bookForm = document.getElementById("bookForm");
-var lastTrigger = null, busy = false;
+var dateIn   = bookForm.querySelector("[name=date]");
+var activeRoot = null, activeCard = null, activeBackdrop = null;
+var lastTrigger = null, busy = false, lastSkin = null;
 
-card.setAttribute("tabindex", "-1");
+bookModal.querySelector(".modal-card").setAttribute("tabindex", "-1");
+
+function setDateMin(){
+  var d = new Date();
+  var yyyy = d.getFullYear();
+  var mm = String(d.getMonth() + 1).padStart(2, "0");
+  var dd = String(d.getDate()).padStart(2, "0");
+  dateIn.min = yyyy + "-" + mm + "-" + dd;
+}
+setDateMin();
 
 function reduced(){ return window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
 
 function focusables(){
+  if (!activeCard) return [];
   return Array.prototype.filter.call(
-    card.querySelectorAll("a[href],button:not([disabled]),input,select,textarea"),
+    activeCard.querySelectorAll("a[href],button:not([disabled]),input,select,textarea"),
     function(el){ return el.offsetParent !== null; }
   );
 }
@@ -916,133 +1281,267 @@ function focusables(){
 var morph      = document.getElementById("bookMorph");
 var morphLabel = morph.firstElementChild;
 var CARD_RADIUS = 26;
-var SHADOW_ON  = "0 30px 80px rgba(29,36,43,.22)";
+var SHADOW_ON  = "0 20px 60px rgba(29,36,43,.18)";
 var SHADOW_OFF = "0 0 0 rgba(29,36,43,0)";
+var GLASS_BG = "rgba(255, 255, 255, 0.08)";
+var GLASS_BORDER = "rgba(255, 255, 255, 0.85)";
+var GLASS_BORDER_W = "1px";
 
-function tok(name){
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
 function rectOf(el){
   var r = el.getBoundingClientRect();
   return { l:r.left, t:r.top, w:r.width, h:r.height };
 }
-function placeMorph(r, radius){
+function skinOf(el){
+  var cs = getComputedStyle(el);
+  var r = el.getBoundingClientRect();
+  return {
+    bg: cs.backgroundColor,
+    fg: cs.color,
+    borderWidth: cs.borderTopWidth,
+    borderColor: cs.borderTopColor,
+    radius: parseFloat(cs.borderRadius) || (r.height / 2)
+  };
+}
+function placeMorph(r, radius, skin){
   morph.style.left = r.l + "px";
   morph.style.top  = r.t + "px";
   morph.style.width  = r.w + "px";
   morph.style.height = r.h + "px";
   morph.style.borderRadius = radius + "px";
+  if (skin){
+    morph.style.backgroundColor = skin.bg;
+    morph.style.borderWidth = skin.borderWidth;
+    morph.style.borderColor = skin.borderColor;
+    morph.style.borderStyle = "solid";
+    morphLabel.style.color = skin.fg;
+  }
 }
-/* A morph keyframe: the element's full geometry and skin at one instant. */
-function frame(r, radius, bg, shadow){
-  return { left:r.l+"px", top:r.t+"px", width:r.w+"px", height:r.h+"px",
-           borderRadius:radius+"px", backgroundColor:bg, boxShadow:shadow };
+function frame(r, radius, bg, shadow, borderColor, borderWidth){
+  return {
+    left:r.l+"px", top:r.t+"px", width:r.w+"px", height:r.h+"px",
+    borderRadius:radius+"px", backgroundColor:bg, boxShadow:shadow,
+    borderTopColor:borderColor, borderRightColor:borderColor,
+    borderBottomColor:borderColor, borderLeftColor:borderColor,
+    borderTopWidth:borderWidth, borderRightWidth:borderWidth,
+    borderBottomWidth:borderWidth, borderLeftWidth:borderWidth
+  };
 }
-/* Animations can stall when a tab is backgrounded, so completion is never
-   left to onfinish alone — a timeout guarantees the state is settled. */
 function settle(anim, dur, fn){
   var done = false;
   function go(){ if (done) return; done = true; fn(); }
   if (anim) anim.onfinish = go;
   setTimeout(go, dur + 80);
 }
+/* WAAPI fill:forwards leaves opacity/transform effects on the node: cancel
+   before reuse or the next open morph is invisible (opacity stuck at 0). */
+function clearAnims(el){
+  if (!el || !el.getAnimations) return;
+  el.getAnimations().forEach(function(a){ a.cancel(); });
+}
+function resetMorph(){
+  /* Lock opacity before cancel: fill:forwards + cancel() otherwise snaps
+     back to the inline opacity:0 set at open, which flashes the shell out. */
+  morph.style.opacity = "1";
+  clearAnims(morph);
+  clearAnims(morphLabel);
+  morph.hidden = true;
+  morph.style.opacity = "";
+  morphLabel.style.opacity = "";
+}
+function bindActive(root){
+  activeRoot = root;
+  activeCard = root.querySelector(".modal-card");
+  activeBackdrop = root.querySelector(".modal-backdrop");
+}
+function fadeDur(){ return reduced() ? 1 : 860; }
+function expandDur(){ return reduced() ? 1 : 470; }
+/* Card-only fade (reduced-motion / no-trigger path). */
+function showCard(onFaded){
+  clearAnims(activeCard);
+  clearAnims(activeBackdrop);
+  activeCard.style.visibility = "";
+  activeCard.style.opacity = "0";
+  activeBackdrop.style.opacity = "0";
+  var fade = fadeDur();
+  var cardFade = activeCard.animate([{opacity:0},{opacity:1}],
+    { duration:fade, easing:"cubic-bezier(.22,.45,.3,1)", fill:"forwards" });
+  activeBackdrop.animate([{opacity:0},{opacity:1}],
+    { duration:fade + 140, easing:"ease-out", fill:"forwards" });
+  settle(cardFade, fade, function(){ if (onFaded) onFaded(); });
+}
+function revealFields(){
+  if (!activeCard) return;
+  activeCard.classList.remove("fields-in");
+  void activeCard.offsetWidth;
+  requestAnimationFrame(function(){
+    if (!activeCard) return;
+    activeCard.classList.add("fields-in");
+  });
+}
+/* Handoff once morph geometry + opacity ramp have both finished.
+   Card is revealed under the morph first, then morph is cleared: never
+   cancel the fade while the shell is the only visible layer. */
+function handoffMorphToCard(onReady){
+  activeRoot.classList.remove("measuring");
+  clearAnims(activeCard);
+  activeCard.style.visibility = "";
+  activeCard.style.opacity = "1";
+  morph.style.opacity = "1";
+  clearAnims(morph);
+  clearAnims(morphLabel);
+  morph.hidden = true;
+  morph.style.opacity = "";
+  morphLabel.style.opacity = "";
+  if (onReady) onReady();
+}
+function hardHide(root){
+  root.hidden = true;
+  root.classList.remove("measuring");
+  var c = root.querySelector(".modal-card");
+  var b = root.querySelector(".modal-backdrop");
+  clearAnims(c);
+  clearAnims(b);
+  c.classList.remove("fields-in");
+  c.style.opacity = "";
+  c.style.visibility = "";
+  b.style.opacity = "";
+}
 
-function openModal(trigger){
+function openModal(trigger, root){
   if (busy) return;
   busy = true;
   lastTrigger = trigger || null;
+  lastSkin = trigger ? skinOf(trigger) : null;
+  bindActive(root);
+  resetMorph();
 
+  var modal = activeRoot;
+  var card = activeCard;
+  var backdrop = activeBackdrop;
+  var expand = expandDur();
+  var fade = fadeDur();
+
+  clearAnims(card);
+  clearAnims(backdrop);
   modal.hidden = false;
+  modal.classList.add("measuring");
+  card.classList.remove("fields-in");
   document.body.style.overflow = "hidden";
   card.style.opacity = "0";
+  backdrop.style.opacity = "0";
 
-  var dur = reduced() ? 1 : 470;
-  backdrop.animate([{opacity:0},{opacity:1}],
-    { duration:dur, easing:"ease-out", fill:"forwards" });
-
-  /* No trigger, or reduced motion: skip the morph, just fade the card up. */
   if (!trigger || reduced()){
-    card.style.opacity = "";
-    var plain = card.animate([{opacity:0},{opacity:1}], {duration:dur, fill:"forwards"});
-    settle(plain, dur, function(){ busy = false; card.focus({preventScroll:true}); });
+    modal.classList.remove("measuring");
+    showCard(function(){
+      revealFields();
+      busy = false;
+      card.focus({preventScroll:true});
+    });
     return;
   }
 
   var cr = rectOf(card);
   var br = rectOf(trigger);
-  var btnRadius = br.h / 2;
+  var skin = lastSkin;
 
-  morphLabel.textContent = trigger.textContent.trim();
+  morphLabel.textContent = trigger.textContent.trim().replace(/\s+/g, " ");
   morphLabel.style.opacity = "1";
+  morph.style.opacity = "0";
   morph.hidden = false;
-  placeMorph(br, btnRadius);
+  placeMorph(br, skin.radius, skin);
   trigger.style.visibility = "hidden";
 
-  var anim = morph.animate(
-    [ frame(br, btnRadius,   tok("--accent"), SHADOW_OFF),
-      frame(cr, CARD_RADIUS, tok("--panel"),  SHADOW_ON) ],
-    { duration:dur, easing:"cubic-bezier(.22,.85,.28,1)", fill:"forwards" }
+  /* Geometry expand + opacity ramp both start on click. Content waits until
+     the slower of the two has finished. */
+  morph.animate(
+    [
+      frame(br, skin.radius, skin.bg, SHADOW_OFF, skin.borderColor, skin.borderWidth),
+      frame(cr, CARD_RADIUS, GLASS_BG, SHADOW_ON, GLASS_BORDER, GLASS_BORDER_W)
+    ],
+    { duration:expand, easing:"cubic-bezier(.22,.85,.28,1)", fill:"forwards" }
   );
-  /* The label drops away early so it never reads as stretched text. */
+  morph.animate([{opacity:0},{opacity:1}],
+    { duration:fade, easing:"cubic-bezier(.22,.45,.3,1)", fill:"forwards" });
   morphLabel.animate([{opacity:1},{opacity:0}],
-    { duration:Math.round(dur * 0.28), easing:"ease-out", fill:"forwards" });
+    { duration:Math.round(expand * 0.28), easing:"ease-out", fill:"forwards" });
+  backdrop.animate([{opacity:0},{opacity:1}],
+    { duration:fade + 140, easing:"ease-out", fill:"forwards" });
 
-  card.style.opacity = "";
-  card.animate([{opacity:0,offset:0},{opacity:0,offset:.52},{opacity:1,offset:1}],
-    { duration:dur, easing:"ease-out", fill:"forwards" });
-
-  settle(anim, dur, function(){
-    morph.hidden = true;
-    busy = false;
-    card.focus({ preventScroll:true });
+  settle(null, Math.max(expand, fade), function(){
+    handoffMorphToCard(function(){
+      revealFields();
+      busy = false;
+      card.focus({ preventScroll:true });
+    });
   });
 }
 
 function closeModal(){
-  if (busy || modal.hidden) return;
+  if (busy || !activeRoot || activeRoot.hidden) return;
   busy = true;
 
   var dur = reduced() ? 1 : 330;
-  backdrop.animate([{opacity:1},{opacity:0}],
-    { duration:dur, easing:"ease-in", fill:"forwards" });
-
-  /* Only morph back into a trigger that is still on screen. */
+  var modal = activeRoot;
+  var card = activeCard;
+  var backdrop = activeBackdrop;
   var t = lastTrigger;
-  var live = t && document.contains(t) && t.getClientRects().length > 0;
+  /* Restore the CTA immediately: it was hidden during open. If we leave it
+     hidden, getClientRects() is empty (skips morph-back) and the button stays
+     missing until cleanup, which reads as a pop-in. */
+  if (t) t.style.visibility = "";
+  var live = !!(t && document.contains(t));
+  var skin = lastSkin || (live ? skinOf(t) : null);
 
   function cleanup(){
-    morph.hidden = true;
-    modal.hidden = true;
-    card.style.opacity = "";
+    resetMorph();
+    hardHide(modal);
     document.body.style.overflow = "";
     busy = false;
     if (t) t.style.visibility = "";
-    if (!doneEl.hidden){ doneEl.hidden = true; panel.hidden = false; bookForm.reset(); }
+    if (modal === bookModal && !doneEl.hidden){
+      doneEl.hidden = true; panel.hidden = false; bookForm.reset();
+    }
     if (live) t.focus();
+    activeRoot = null; activeCard = null; activeBackdrop = null;
   }
 
-  if (!live || reduced()){
+  if (!live || reduced() || !skin){
+    clearAnims(card);
+    clearAnims(backdrop);
     var plain = card.animate([{opacity:1},{opacity:0}], {duration:dur, fill:"forwards"});
+    backdrop.animate([{opacity:1},{opacity:0}], {duration:dur, fill:"forwards"});
     settle(plain, dur, cleanup);
     return;
   }
 
+  clearAnims(card);
+  clearAnims(backdrop);
+  clearAnims(morph);
+  clearAnims(morphLabel);
+
   var cr = rectOf(card);
-  t.style.visibility = "hidden";
+  card.style.visibility = "hidden";
+  card.style.opacity = "0";
+  backdrop.animate([{opacity:1},{opacity:0}],
+    { duration:Math.round(dur * 0.45), easing:"ease-in", fill:"forwards" });
+
+  /* Keep the real CTA visible under the morph so the handoff never blanks. */
   var br = rectOf(t);
-  var btnRadius = br.h / 2;
 
-  card.animate([{opacity:1,offset:0},{opacity:0,offset:.38},{opacity:0,offset:1}],
-    { duration:dur, easing:"ease-in", fill:"forwards" });
-
-  morphLabel.textContent = t.textContent.trim();
+  morphLabel.textContent = t.textContent.trim().replace(/\s+/g, " ");
   morphLabel.style.opacity = "0";
+  morphLabel.style.color = skin.fg;
+  morph.style.opacity = "1";
   morph.hidden = false;
-  placeMorph(cr, CARD_RADIUS);
+  placeMorph(cr, CARD_RADIUS, {
+    bg:GLASS_BG, fg:skin.fg, borderWidth:GLASS_BORDER_W, borderColor:GLASS_BORDER, radius:CARD_RADIUS
+  });
 
   var anim = morph.animate(
-    [ frame(cr, CARD_RADIUS, tok("--panel"),  SHADOW_ON),
-      frame(br, btnRadius,   tok("--accent"), SHADOW_OFF) ],
+    [
+      frame(cr, CARD_RADIUS, GLASS_BG, SHADOW_ON, GLASS_BORDER, GLASS_BORDER_W),
+      frame(br, skin.radius, skin.bg, SHADOW_OFF, skin.borderColor, skin.borderWidth)
+    ],
     { duration:dur, easing:"cubic-bezier(.4,0,.7,.2)", fill:"forwards" }
   );
   morphLabel.animate([{opacity:0,offset:0},{opacity:0,offset:.5},{opacity:1,offset:1}],
@@ -1051,32 +1550,20 @@ function closeModal(){
   settle(anim, dur, cleanup);
 }
 
-/* Carry the estimator's line items into the notes field. */
-function prefillFromEstimator(){
-  if (!items.length) return;
-  var lo = 0, hi = 0;
-  var lines = items.map(function(it){
-    lo += it.lo * it.qty; hi += it.hi * it.qty;
-    return "• " + it.name + " — " + it.qty.toLocaleString("en-CA") + " " + it.unit;
-  }).join("\n");
-  bookForm.querySelector("[name=notes]").value =
-    "From the estimator:\n" + lines + "\nMarket range: " + money(lo) + " – " + money(hi);
-}
-
 document.querySelectorAll("[data-book]").forEach(function(btn){
   btn.addEventListener("click", function(e){
     e.preventDefault();
-    if (btn.hasAttribute("data-from-estimator")) prefillFromEstimator();
-    openModal(btn);
+    setDateMin();
+    openModal(btn, bookModal);
   });
 });
 
-modal.querySelectorAll("[data-close]").forEach(function(el){
+bookModal.querySelectorAll("[data-close]").forEach(function(el){
   el.addEventListener("click", closeModal);
 });
 
 document.addEventListener("keydown", function(e){
-  if (modal.hidden) return;
+  if (!activeRoot || activeRoot.hidden) return;
   if (e.key === "Escape"){ closeModal(); return; }
   if (e.key !== "Tab") return;
   var f = focusables();
@@ -1090,34 +1577,105 @@ bookForm.addEventListener("submit", function(e){
   e.preventDefault();
   var name  = bookForm.querySelector("[name=name]");
   var phone = bookForm.querySelector("[name=phone]");
+  var addr  = bookForm.querySelector("[name=address]");
+  var win   = bookForm.querySelector("[name=window]");
   if (!name.value.trim())  { name.focus();  return; }
   if (!phone.value.trim()) { phone.focus(); return; }
+  if (!addr.value.trim())  { addr.focus();  return; }
+  if (!dateIn.value)       { dateIn.focus(); return; }
+  if (!win.value)          { win.focus();   return; }
   /* DEV: POST the form data to the handler / CRM here. */
   panel.hidden = true;
   doneEl.hidden = false;
-  card.querySelector(".modal-x").focus();
+  bookModal.querySelector(".modal-x").focus();
 });
 
-/* ---------- Hero video: play once, hold on last frame ----------
-   Fetch and play only on wide screens with motion allowed. The clip doesn't
-   loop, so the browser naturally holds the final (clean) frame, which matches
-   the poster still. Mobile and reduced-motion keep the poster only. */
+/* ---------- Hero: poster-first; video only on good connections ----------
+   Skip hero.mp4 when reduced-motion, Save-Data, or slow effectiveType.
+   After the clip (or immediately if skipped): ".sub" then CTAs. */
 (function(){
   var hv = document.querySelector(".hero-video");
-  if (!hv) return;
-  var motionOK = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var wide     = window.matchMedia("(min-width: 861px)").matches;
-  if (!motionOK || !wide) return;
+  var sub = document.querySelector(".hero .sub");
+  var links = document.querySelector(".hero .links");
+  var showLinks = function(){ if (links) links.classList.add("in"); };
+  var showSub = function(){ if (sub) sub.classList.add("in"); };
+  var afterVideo = function(){
+    showSub();
+    setTimeout(showLinks, 1000);
+  };
+
+  function allowHeroVideo(){
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+    var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (c){
+      if (c.saveData) return false;
+      var t = c.effectiveType;
+      if (t === "slow-2g" || t === "2g") return false;
+    }
+    return true;
+  }
+
+  if (!hv || !allowHeroVideo()){
+    afterVideo();
+    return;
+  }
 
   hv.src = hv.dataset.src;
   hv.load();
   var reveal = function(){ hv.classList.add("in"); };
-  var start  = function(){
+  var start = function(){
     var p = hv.play();
-    if (p && p.catch) p.catch(reveal); // autoplay blocked → still show the frame
+    if (p && p.catch) p.catch(function(){ reveal(); afterVideo(); });
   };
   hv.addEventListener("loadeddata", start, { once:true });
   hv.addEventListener("playing", reveal, { once:true });
+  hv.addEventListener("ended", afterVideo, { once:true });
+})();
+
+/* ---------- 750 units counter ---------- */
+(function(){
+  var el = document.querySelector("[data-count]");
+  if (!el) return;
+  var target = parseInt(el.getAttribute("data-count"), 10) || 0;
+  var targetEl = el.closest(".stat") || el;
+  function finish(){ el.textContent = String(target); }
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+    finish();
+    return;
+  }
+  if (!("IntersectionObserver" in window)){
+    finish();
+    return;
+  }
+  var started = false;
+  function run(){
+    if (started) return;
+    started = true;
+    var dur = 1100;
+    var t0 = performance.now();
+    function frame(now){
+      var p = Math.min(1, (now - t0) / dur);
+      /* Ease-out cubic: climbs fast, settles on 750. */
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(target * eased));
+      if (p < 1) requestAnimationFrame(frame);
+      else finish();
+    }
+    requestAnimationFrame(frame);
+  }
+  /* Start only once the number itself is actually on-screen — not when the
+     section merely peeks into view above/below the fold. */
+  var cio = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting || en.intersectionRatio < 0.65) return;
+      var r = en.boundingClientRect;
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      if (r.top >= vh || r.bottom <= 0) return;
+      cio.disconnect();
+      run();
+    });
+  }, { threshold: [0, 0.65, 1], rootMargin: "0px" });
+  cio.observe(el);
 })();
 
 /* ---------- Scroll reveal ---------- */
@@ -1135,6 +1693,315 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && "Intersect
   document.querySelectorAll(".rise").forEach(function(el){ el.classList.add("in"); });
 }
 </script>
+
+<!-- FREEZER PLAY SCRIPT (parked)
+<script>
+(function(){ /* btnViewServices → rx-services-play / svc-playing */ })();
+</script>
+-->
+
+<script>
+/* ---------- Services: glass card carousel (developers-line marquee) ---------- */
+(function(){
+  var root = document.getElementById("svcCarousel");
+  if (!root) return;
+
+  var SERVICES = [
+    {
+      cat: "Flooring",
+      slug: "carpet",
+      title: "Carpet Installation",
+      detail: "Wall-to-wall stretch-in and glue-down."
+    },
+    {
+      cat: "Flooring",
+      slug: "stairs",
+      title: "Stair Wrapping & Runners",
+      detail: "Carpet stair wrapping and stair runners, clean around every spindle."
+    },
+    {
+      cat: "Flooring",
+      slug: "seaming",
+      title: "Seaming, Repair & Restretching",
+      detail: "Carpet seaming, repair, and power-stretch restretching."
+    },
+    {
+      cat: "Flooring",
+      slug: "lvp",
+      title: "LVP / LVT Installation",
+      detail: "Luxury vinyl plank and luxury vinyl tile."
+    },
+    {
+      cat: "Flooring",
+      slug: "laminate",
+      title: "Laminate Installation",
+      detail: "Laminate flooring, measured and laid right."
+    },
+    {
+      cat: "Flooring",
+      slug: "hardwood",
+      title: "Hardwood Installation",
+      detail: "Nail-down, glue-down, and floating hardwood."
+    },
+    {
+      cat: "Flooring",
+      slug: "refinish",
+      title: "Sanding & Refinishing",
+      detail: "Hardwood sanding and refinishing that restores the grain."
+    },
+    {
+      cat: "Flooring",
+      slug: "tile",
+      title: "Ceramic & Porcelain Tile",
+      detail: "Tile installation with clean lines and correct prep."
+    },
+    {
+      cat: "Flooring",
+      slug: "subfloor",
+      title: "Subfloor Prep & Repair",
+      detail: "Leveling, repair, and prep before the finish floor goes down."
+    },
+    {
+      cat: "Flooring",
+      slug: "removal",
+      title: "Flooring Removal & Disposal",
+      detail: "Old flooring torn out and hauled away."
+    },
+    {
+      cat: "Renovation",
+      slug: "painting",
+      title: "Interior Painting",
+      detail: "Clean interior paint work that finishes the room."
+    },
+    {
+      cat: "Renovation",
+      slug: "demo",
+      title: "Interior Demolition",
+      detail: "Strip-outs and interior demolition, contained and scheduled."
+    },
+    {
+      cat: "Renovation",
+      slug: "junk",
+      title: "Junk Removal",
+      detail: "Debris haul-away so the site is clear when we leave."
+    },
+    {
+      cat: "Renovation",
+      slug: "pm",
+      title: "Project Management",
+      detail: "Measuring, scheduling, multi-trade coordination, and warranty."
+    }
+  ];
+
+  function esc(s){
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  var HAS_PHOTO = {
+    carpet: true, stairs: true, seaming: true, lvp: true,
+    laminate: true, hardwood: true, refinish: true, tile: true,
+    subfloor: true, removal: true, painting: true, demo: true,
+    junk: true, pm: true
+  };
+
+  function cardHTML(s, forClone){
+    var webp = "public/services/" + s.slug + ".webp";
+    var jpg = "public/services/" + s.slug + ".jpg";
+    var label = forClone ? "" : esc(s.title);
+    var media = HAS_PHOTO[s.slug]
+      ? (
+          '<img class="site-card-blur" src="' + webp + '" alt="" width="560" height="840" loading="lazy" decoding="async" aria-hidden="true">' +
+          '<picture class="site-card-photo">' +
+            '<source srcset="' + webp + '" type="image/webp">' +
+            '<img src="' + jpg + '" alt="' + label + '" width="560" height="840" loading="lazy" decoding="async">' +
+          "</picture>"
+        )
+      : (
+          '<div class="site-card-blur svc-media" aria-hidden="true"></div>' +
+          '<div class="site-card-photo svc-media" role="img" aria-label="' + label + '"></div>'
+        );
+    return (
+      '<article class="site-card svc-card">' +
+        '<div class="site-card-inner">' +
+          media +
+          '<div class="site-card-rim" aria-hidden="true"></div>' +
+          '<div class="site-card-meta">' +
+            '<span class="label">' + esc(s.cat) + "</span>" +
+            "<h3>" + esc(s.title) + "</h3>" +
+            '<p class="role">' + esc(s.detail) + "</p>" +
+          "</div>" +
+        "</div>" +
+      "</article>"
+    );
+  }
+
+  function groupHTML(hidden){
+    var html = '<div class="svc-group"' + (hidden ? ' aria-hidden="true"' : "") + ">";
+    for (var i = 0; i < SERVICES.length; i++) html += cardHTML(SERVICES[i], hidden);
+    html += "</div>";
+    return html;
+  }
+
+  root.innerHTML =
+    '<div class="svc-track">' +
+      groupHTML(false) +
+      groupHTML(true) +
+    "</div>";
+
+  var cards = root.querySelectorAll(".svc-card");
+  var groupEl = root.querySelector(".svc-group");
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var maxTilt = reduced ? 0 : 42;
+  var tiltRaf = 0;
+  var autoplaying = !reduced;
+  var idleTimer = null;
+  var IDLE_MS = 1500;
+  var ignoreScrollUntil = 0;
+  var pxPerSec = 0;
+
+  function groupWidth(){
+    return groupEl ? groupEl.offsetWidth : 0;
+  }
+
+  function measureSpeed(){
+    var w = groupWidth();
+    pxPerSec = w > 0 ? w / 72 : 40;
+  }
+
+  function markProgrammatic(){
+    ignoreScrollUntil = performance.now() + 80;
+  }
+
+  function wrapScroll(){
+    var w = groupWidth();
+    if (w <= 0) return;
+    if (root.scrollLeft >= w){
+      markProgrammatic();
+      root.scrollLeft -= w;
+    } else if (root.scrollLeft < 0){
+      markProgrammatic();
+      root.scrollLeft += w;
+    }
+  }
+
+  function pauseAuto(){
+    if (reduced) return;
+    autoplaying = false;
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function(){
+      measureSpeed();
+      autoplaying = true;
+    }, IDLE_MS);
+  }
+
+  function updateTilts(){
+    tiltRaf = 0;
+    if (!maxTilt) return;
+    var cx = window.innerWidth * 0.5;
+    var span = Math.max(window.innerWidth * 0.55, 280);
+    for (var i = 0; i < cards.length; i++){
+      var card = cards[i];
+      var r = card.getBoundingClientRect();
+      if (r.right < -40 || r.left > window.innerWidth + 40) continue;
+      var mid = r.left + r.width * 0.5;
+      var t = (mid - cx) / span;
+      if (t < -1) t = -1;
+      else if (t > 1) t = 1;
+      card.style.transform = "rotateY(" + (-t * maxTilt).toFixed(2) + "deg)";
+      card.style.zIndex = String(Math.round((1 - Math.abs(t)) * 20));
+    }
+  }
+
+  function scheduleTilt(){
+    if (!tiltRaf) tiltRaf = requestAnimationFrame(updateTilts);
+  }
+
+  root.addEventListener("scroll", function(){
+    if (performance.now() > ignoreScrollUntil) pauseAuto();
+    scheduleTilt();
+    wrapScroll();
+  }, { passive: true });
+  window.addEventListener("resize", function(){
+    measureSpeed();
+    scheduleTilt();
+  });
+
+  function isDesktopPointer(){
+    return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  }
+  function inCardBand(clientY){
+    if (!groupEl) return true;
+    var r = groupEl.getBoundingClientRect();
+    return clientY >= r.top && clientY <= r.bottom;
+  }
+
+  root.addEventListener("wheel", function(e){
+    if (isDesktopPointer() && !inCardBand(e.clientY)){
+      if (Math.abs(e.deltaX) > 0) e.preventDefault();
+      return;
+    }
+    var dx = e.deltaX;
+    var dy = e.deltaY;
+    if (Math.abs(dy) > Math.abs(dx)){
+      e.preventDefault();
+      root.scrollLeft += dy;
+    }
+    pauseAuto();
+  }, { passive: false });
+
+  root.addEventListener("touchstart", function(){ pauseAuto(); }, { passive: true });
+
+  var drag = null;
+  root.addEventListener("pointerdown", function(e){
+    if (e.pointerType === "touch"){
+      pauseAuto();
+      return;
+    }
+    if (isDesktopPointer() && !inCardBand(e.clientY)) return;
+    pauseAuto();
+    drag = { id: e.pointerId, x: e.clientX, left: root.scrollLeft };
+    try { root.setPointerCapture(e.pointerId); } catch (err){}
+  });
+  root.addEventListener("pointermove", function(e){
+    if (!drag || e.pointerId !== drag.id) return;
+    pauseAuto();
+    root.scrollLeft = drag.left - (e.clientX - drag.x);
+  });
+  function endDrag(e){
+    if (!drag || e.pointerId !== drag.id) return;
+    drag = null;
+  }
+  root.addEventListener("pointerup", endDrag);
+  root.addEventListener("pointercancel", endDrag);
+
+  var last = performance.now();
+  function tick(now){
+    var dt = Math.min(64, now - last);
+    last = now;
+    if (autoplaying && pxPerSec > 0){
+      markProgrammatic();
+      root.scrollLeft += pxPerSec * (dt / 1000);
+      wrapScroll();
+      scheduleTilt();
+    }
+    requestAnimationFrame(tick);
+  }
+
+  measureSpeed();
+  scheduleTilt();
+  if (!reduced) requestAnimationFrame(tick);
+})();
+</script>
+
+<!-- PREVIOUS OVERLAY / SCROLL-UNLOCK SCRIPT KEPT OUT OF USE
+<script>
+(function(){ /* unlock scroll → fullscreen camera pan */ })();
+</script>
+-->
 
 </body>
 </html>

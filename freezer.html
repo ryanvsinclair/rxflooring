@@ -1,0 +1,1051 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RX · Services</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;}
+html,body{height:100%; margin:0;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Inter,system-ui,sans-serif;
+  background:#fff; color:#4A535C; overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+.chrome{
+  position:fixed; top:0; left:0; right:0; z-index:10;
+  display:flex; flex-wrap:wrap; gap:12px 18px; align-items:center;
+  padding:14px 20px;
+  background:color-mix(in srgb,#fff 86%, transparent);
+  -webkit-backdrop-filter:blur(16px) saturate(160%);
+  backdrop-filter:blur(16px) saturate(160%);
+  border-bottom:1px solid #EDEFF2;
+}
+.brand{font-weight:600; color:#1D242B; letter-spacing:-.02em;}
+.brand span{font-family:"Iowan Old Style","Hoefler Text",Palatino,serif; color:#1B4DFF; margin-right:6px;}
+.chrome p{margin:0; font-size:13.5px; color:#79828B;}
+.actions{margin-left:auto; display:flex; flex-wrap:wrap; gap:8px;}
+.actions button,.actions a{
+  font:inherit; font-size:13px; color:#1B4DFF;
+  background:#fff; border:1px solid #E3E6EA; border-radius:999px;
+  padding:7px 12px; cursor:pointer; text-decoration:none;
+}
+.actions button:hover,.actions a:hover{border-color:#1B4DFF;}
+.actions button.active{background:#1B4DFF; color:#fff; border-color:#1B4DFF;}
+.actions button.exit{background:#1B4DFF; color:#fff; border-color:#1B4DFF;}
+.actions button.exit:hover{filter:brightness(1.05);}
+body.scene-done .actions button.exit{box-shadow:0 0 0 4px rgba(27,77,255,.16);}
+
+#canvas-wrap{position:fixed; inset:0; top:58px;}
+canvas{display:block; width:100%; height:100%;}
+
+.hint{
+  position:fixed; left:50%; bottom:20px; transform:translateX(-50%);
+  z-index:10; font-size:13px; color:#4A535C;
+  background:rgba(255,255,255,.82); border:1px solid #EDEFF2;
+  padding:10px 16px; border-radius:999px;
+  -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+  pointer-events:none;
+}
+body.embed .chrome p{display:none;}
+body.embed .study-only{display:none;}
+body:not(.embed) .embed-only{display:none;}
+body.embed #canvas-wrap{top:56px;}
+/* Underlay: scene sits behind the main page — no chrome of its own */
+body.underlay .chrome,
+body.underlay .hint{display:none !important;}
+body.underlay #canvas-wrap{top:0;}
+body.inline{overflow:hidden;}
+</style>
+</head>
+<body>
+
+<div class="chrome">
+  <div class="brand"><span>℞</span> Services</div>
+  <p class="study-only">Product scene — white room, door, tray slide.</p>
+  <div class="actions">
+    <button type="button" id="btnReplay">Reset</button>
+    <button type="button" id="btnDoor" class="study-only">Open door</button>
+    <a class="study-only" href="index.html">Main site</a>
+    <button type="button" id="btnExit" class="exit embed-only">Exit</button>
+  </div>
+</div>
+<div id="canvas-wrap"></div>
+<div class="hint" id="hint">Scroll to explore</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { FontLoader } from "three/addons/loaders/FontLoader.js";
+import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+const params = new URLSearchParams(location.search);
+const embed = params.has("embed") || params.has("underlay");
+const underlay = params.has("underlay");
+const inline = params.has("inline");
+if (embed) document.body.classList.add("embed");
+if (underlay) document.body.classList.add("underlay");
+if (inline) document.body.classList.add("inline");
+
+function exitScene(){
+  if (window.parent && window.parent !== window){
+    window.parent.postMessage({ type:"rx-services-exit" }, "*");
+  } else {
+    location.href = "index.html#services";
+  }
+}
+document.getElementById("btnExit")?.addEventListener("click", exitScene);
+
+function postParent(msg){
+  if (window.parent && window.parent !== window){
+    window.parent.postMessage(msg, "*");
+  }
+}
+
+const wrap = document.getElementById("canvas-wrap");
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+/* No filmic curve — keeps the cyclorama pure white */
+renderer.toneMapping = THREE.NoToneMapping;
+renderer.toneMappingExposure = 1;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+wrap.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffffff);
+
+/* Studio reflections so painted steel reads shiny */
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 1.35;
+
+const camera = new THREE.PerspectiveCamera(35, wrap.clientWidth / wrap.clientHeight, 0.1, 100);
+camera.position.set(2.4, 1.35, 5.6);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 0.8;
+controls.maxDistance = 12;
+controls.target.set(-2.8, 0.55, 0.4);
+controls.maxPolarAngle = Math.PI * 0.495;
+controls.enabled = false;
+
+/* Bright white room */
+const hemi = new THREE.HemisphereLight(0xffffff, 0xf0f2f5, 0.95);
+scene.add(hemi);
+
+const key = new THREE.DirectionalLight(0xffffff, 1.2);
+key.position.set(1.6, 5.2, 2.4);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+key.shadow.camera.near = 0.5;
+key.shadow.camera.far = 14;
+key.shadow.radius = 6;
+key.shadow.bias = -0.00015;
+Object.assign(key.shadow.camera, { left:-1.4, right:1.4, top:1.4, bottom:-1.4 });
+scene.add(key);
+
+const fill = new THREE.DirectionalLight(0xffffff, 0.65);
+fill.position.set(-2.8, 2.4, -1.0);
+scene.add(fill);
+
+const rim = new THREE.DirectionalLight(0xffffff, 0.35);
+rim.position.set(0.2, 1.5, -3.2);
+scene.add(rim);
+
+/* Pure white floor — unlit, skipped from any remaining tone map */
+const groundMat = new THREE.MeshBasicMaterial({ color:0xffffff });
+groundMat.toneMapped = false;
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), groundMat);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = false;
+scene.add(ground);
+
+/* Tiny soft contact blob under the unit only (not a grey shadow catcher) */
+const groundShadow = new THREE.Mesh(
+  new THREE.CircleGeometry(0.55, 48),
+  new THREE.MeshBasicMaterial({
+    color:0x000000,
+    transparent:true,
+    opacity:0.045,
+    depthWrite:false,
+    toneMapped:false
+  })
+);
+groundShadow.rotation.x = -Math.PI / 2;
+groundShadow.position.y = 0.0015;
+groundShadow.receiveShadow = false;
+scene.add(groundShadow);
+
+const steel = new THREE.MeshPhysicalMaterial({
+  color:0xc4c9cf,
+  metalness:0.94,
+  roughness:0.14,
+  clearcoat:0.85,
+  clearcoatRoughness:0.08,
+  reflectivity:1,
+  envMapIntensity:1.4
+});
+const steelDark = new THREE.MeshPhysicalMaterial({
+  color:0x8a9098, metalness:0.88, roughness:0.22, clearcoat:0.4, clearcoatRoughness:0.2
+});
+const blackTrim = new THREE.MeshStandardMaterial({
+  color:0x1d242b, metalness:0.4, roughness:0.55
+});
+const gasket = new THREE.MeshStandardMaterial({
+  color:0x2a3036, roughness:0.85, metalness:0.1
+});
+/* Interior — molded plastic, lit only by room light (no env blow-out) */
+const liner = new THREE.MeshStandardMaterial({
+  color:0xc5ccd4, roughness:0.95, metalness:0, envMapIntensity:0
+});
+/* Distinct shelf metal so rows read against the liner */
+const shelfMat = new THREE.MeshStandardMaterial({
+  color:0x7a828c, roughness:0.38, metalness:0.62, envMapIntensity:0.25
+});
+const shelfUnder = new THREE.MeshBasicMaterial({
+  color:0x4a525a, transparent:true, opacity:0.22, depthWrite:false, toneMapped:false
+});
+const trayBlack = new THREE.MeshPhysicalMaterial({
+  color:0x16191d, metalness:0.42, roughness:0.48, clearcoat:0.18, clearcoatRoughness:0.5
+});
+
+const freezer = new THREE.Group();
+scene.add(freezer);
+
+const bodyW = 0.9, bodyH = 0.96, bodyD = 0.82;
+const wall = 0.048;
+const innerW = bodyW - wall * 2;
+const innerH = bodyH - wall * 2;
+const innerD = bodyD - wall * 1.5;
+
+function addBox(w, h, d, mat, x, y, z, parent = freezer, radius = 0.012){
+  const m = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, radius), mat);
+  m.position.set(x, y, z);
+  m.castShadow = true;
+  m.receiveShadow = true;
+  parent.add(m);
+  return m;
+}
+
+/* Shared rounded-rect silhouette for body + door */
+const shellR = 0.068;
+function roundedRect(shape, w, h, rad){
+  const x0 = -w, y0 = -h, x1 = w, y1 = h;
+  shape.moveTo(x0 + rad, y0);
+  shape.lineTo(x1 - rad, y0);
+  shape.absarc(x1 - rad, y0 + rad, rad, -Math.PI / 2, 0, false);
+  shape.lineTo(x1, y1 - rad);
+  shape.absarc(x1 - rad, y1 - rad, rad, 0, Math.PI / 2, false);
+  shape.lineTo(x0 + rad, y1);
+  shape.absarc(x0 + rad, y1 - rad, rad, Math.PI / 2, Math.PI, false);
+  shape.lineTo(x0, y0 + rad);
+  shape.absarc(x0 + rad, y0 + rad, rad, Math.PI, Math.PI * 1.5, false);
+}
+
+/* Seamless outer shell — rounded sides/top; flat front face for the door */
+(function buildOuterShell(){
+  const hw = bodyW / 2;
+  const hh = bodyH / 2;
+  const ihw = innerW / 2;
+  const ihh = innerH / 2;
+
+  const frameShape = new THREE.Shape();
+  roundedRect(frameShape, hw, hh, shellR);
+  const cavity = new THREE.Path();
+  cavity.moveTo(-ihw, -ihh);
+  cavity.lineTo(-ihw, ihh);
+  cavity.lineTo(ihw, ihh);
+  cavity.lineTo(ihw, -ihh);
+  cavity.lineTo(-ihw, -ihh);
+  frameShape.holes.push(cavity);
+
+  /* No bevel — front siding stays flat where the door lands */
+  const frameGeo = new THREE.ExtrudeGeometry(frameShape, {
+    depth: bodyD,
+    bevelEnabled: false,
+    curveSegments: 32
+  });
+  const frame = new THREE.Mesh(frameGeo, steel);
+  frame.position.set(0, bodyH / 2, -bodyD / 2);
+  frame.castShadow = true;
+  frame.receiveShadow = true;
+  freezer.add(frame);
+
+  /* Fill the open back of the tunnel — liner color so cavity doesn’t show sky */
+  const backPlug = new THREE.Mesh(
+    new THREE.BoxGeometry(innerW + 0.002, innerH + 0.002, wall),
+    liner
+  );
+  backPlug.position.set(0, bodyH / 2, -bodyD / 2 + wall / 2);
+  backPlug.castShadow = true;
+  backPlug.receiveShadow = true;
+  freezer.add(backPlug);
+})();
+
+/* Interior liner (flat faces) */
+addBox(innerW - 0.01, 0.01, innerD, liner, 0, wall + 0.01, wall * 0.15, freezer, 0.004);
+addBox(innerW - 0.01, 0.01, innerD, liner, 0, bodyH - wall - 0.01, wall * 0.15, freezer, 0.004);
+addBox(0.01, innerH - 0.02, innerD, liner, -innerW / 2 + 0.008, bodyH / 2, wall * 0.15, freezer, 0.004);
+addBox(0.01, innerH - 0.02, innerD, liner, innerW / 2 - 0.008, bodyH / 2, wall * 0.15, freezer, 0.004);
+addBox(innerW - 0.02, innerH - 0.02, 0.01, liner, 0, bodyH / 2, -bodyD / 2 + wall + 0.014, freezer, 0.004);
+
+/* Shelf rows — wire-style so they read in the cavity */
+const shelfDepth = innerD - 0.06;
+const shelfWidth = innerW - 0.08;
+const rowYs = [wall + 0.28, wall + 0.58];
+
+function makeShelfRow(y){
+  const z = 0.02;
+  addBox(0.016, 0.022, shelfDepth, shelfMat, -shelfWidth / 2, y, z, freezer, 0.003);
+  addBox(0.016, 0.022, shelfDepth, shelfMat, shelfWidth / 2, y, z, freezer, 0.003);
+  /* Front + rear rails */
+  addBox(shelfWidth, 0.014, 0.014, shelfMat, 0, y, z + shelfDepth / 2 - 0.01, freezer, 0.003);
+  addBox(shelfWidth, 0.014, 0.014, shelfMat, 0, y, z - shelfDepth / 2 + 0.01, freezer, 0.003);
+  /* Cross wires */
+  const wires = 5;
+  for (let i = 0; i < wires; i++){
+    const t = (i + 0.5) / wires;
+    const zz = z - shelfDepth / 2 + 0.02 + t * (shelfDepth - 0.04);
+    addBox(shelfWidth - 0.02, 0.008, 0.008, shelfMat, 0, y - 0.002, zz, freezer, 0.002);
+  }
+  const shade = new THREE.Mesh(
+    new THREE.PlaneGeometry(shelfWidth * 0.96, shelfDepth * 0.92),
+    shelfUnder
+  );
+  shade.rotation.x = Math.PI / 2;
+  shade.position.set(0, y - 0.016, z);
+  freezer.add(shade);
+}
+
+rowYs.forEach(makeShelfRow);
+
+/* Black specimen tray — starts on top shelf, slides out, then drops to floor */
+const trayH = 0.026;
+function createTray(w = 0.64, d = 0.44, h = trayH){
+  const tray = new THREE.Group();
+  tray.name = "trayAsset";
+  const floor = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, 0.01), trayBlack);
+  floor.castShadow = true;
+  floor.receiveShadow = true;
+  tray.add(floor);
+  const rimH = 0.016;
+  const rimT = 0.011;
+  const rims = [
+    [w, rimH, rimT, 0, h / 2 + rimH / 2, d / 2 - rimT / 2],
+    [w, rimH, rimT, 0, h / 2 + rimH / 2, -d / 2 + rimT / 2],
+    [rimT, rimH, d, -w / 2 + rimT / 2, h / 2 + rimH / 2, 0],
+    [rimT, rimH, d, w / 2 - rimT / 2, h / 2 + rimH / 2, 0]
+  ];
+  rims.forEach(([rw, rh, rd, x, y, z]) => {
+    const rim = new THREE.Mesh(new RoundedBoxGeometry(rw, rh, rd, 1, 0.003), trayBlack);
+    rim.position.set(x, y, z);
+    rim.castShadow = true;
+    tray.add(rim);
+  });
+  return tray;
+}
+
+const trayW = Math.min(0.64, shelfWidth - 0.04);
+const trayD = Math.min(0.44, shelfDepth - 0.06);
+const trayAsset = createTray(trayW, trayD);
+const trayYShelf = rowYs[1] + 0.01;
+const trayYGround = trayH / 2 + 0.002;
+const trayZIn = -0.02;
+const trayZOut = bodyD / 2 + 1.15; /* well clear of the unit */
+trayAsset.position.set(0, trayYShelf, trayZIn);
+freezer.add(trayAsset);
+
+/* Door — same rounded-rect silhouette as the fridge front */
+const doorPivot = new THREE.Group();
+doorPivot.position.set(-bodyW / 2, bodyH / 2, bodyD / 2 + 0.002);
+freezer.add(doorPivot);
+
+const doorDepth = 0.055;
+const doorShape = new THREE.Shape();
+roundedRect(doorShape, bodyW / 2, bodyH / 2, shellR);
+const doorGeo = new THREE.ExtrudeGeometry(doorShape, {
+  depth: doorDepth,
+  bevelEnabled: false,
+  curveSegments: 32
+});
+doorGeo.translate(0, 0, -doorDepth / 2);
+const door = new THREE.Mesh(doorGeo, steel);
+door.position.set(bodyW / 2, 0, 0);
+door.castShadow = true;
+doorPivot.add(door);
+
+const sealInset = 0.05;
+const sealShape = new THREE.Shape();
+roundedRect(sealShape, bodyW / 2 - sealInset, bodyH / 2 - sealInset, Math.max(shellR - sealInset * 0.35, 0.02));
+const sealGeo = new THREE.ExtrudeGeometry(sealShape, {
+  depth: 0.012,
+  bevelEnabled: false,
+  curveSegments: 28
+});
+sealGeo.translate(0, 0, -0.006);
+const seal = new THREE.Mesh(sealGeo, gasket);
+seal.position.set(bodyW / 2, 0, -doorDepth / 2 - 0.004);
+doorPivot.add(seal);
+
+const handle = new THREE.Mesh(
+  new RoundedBoxGeometry(0.028, 0.36, 0.042, 2, 0.008),
+  blackTrim
+);
+handle.position.set(bodyW - 0.1, 0.05, doorDepth / 2 + 0.02);
+handle.castShadow = true;
+doorPivot.add(handle);
+
+/* Barrel hinges on the left swing edge */
+const hingeMetal = new THREE.MeshPhysicalMaterial({
+  color:0x3a4048, metalness:0.85, roughness:0.35, clearcoat:0.2, clearcoatRoughness:0.45
+});
+const hingeYs = [-bodyH * 0.28, bodyH * 0.28];
+const doorGrab = [door, handle, seal];
+
+hingeYs.forEach((y) => {
+  /* Knuckles straddle the pivot — rotate with the door */
+  const knuckle = new THREE.Group();
+  knuckle.position.set(0, y, 0);
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.1, 20), hingeMetal);
+  barrel.castShadow = true;
+  knuckle.add(barrel);
+  const capT = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.012, 20), hingeMetal);
+  capT.position.y = 0.056;
+  knuckle.add(capT);
+  const capB = capT.clone();
+  capB.position.y = -0.056;
+  knuckle.add(capB);
+  /* Door leaf */
+  const leaf = new THREE.Mesh(
+    new RoundedBoxGeometry(0.055, 0.07, 0.014, 1, 0.003),
+    hingeMetal
+  );
+  leaf.position.set(0.034, 0, 0);
+  leaf.castShadow = true;
+  knuckle.add(leaf);
+  doorPivot.add(knuckle);
+  doorGrab.push(barrel, capT, capB, leaf);
+
+  /* Fixed body leaf — stays on the cabinet */
+  const bodyLeaf = new THREE.Mesh(
+    new RoundedBoxGeometry(0.048, 0.07, 0.016, 1, 0.003),
+    hingeMetal
+  );
+  bodyLeaf.position.set(-bodyW / 2 + 0.012, bodyH / 2 + y, bodyD / 2 - 0.006);
+  bodyLeaf.castShadow = true;
+  freezer.add(bodyLeaf);
+});
+
+/* Top vent + feet */
+addBox(bodyW - 0.22, 0.018, 0.08, steelDark, 0, bodyH + 0.004, -bodyD / 2 + 0.14, freezer, 0.004);
+
+for (const [x, z] of [[-0.3,-0.26],[0.3,-0.26],[-0.3,0.26],[0.3,0.26]]){
+  const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.04, 0.04, 16), blackTrim);
+  foot.position.set(x, 0.02, z);
+  foot.castShadow = true;
+  freezer.add(foot);
+}
+
+/* Embossed brand mark — stamped into door face, top-left */
+const embossMat = new THREE.MeshPhysicalMaterial({
+  color:0x6a7078, metalness:0.72, roughness:0.3, clearcoat:0.25, clearcoatRoughness:0.4
+});
+
+const logoBadge = new THREE.Group();
+/* Pivot is door hinge (left); inset from top-left corner */
+logoBadge.position.set(0.1, bodyH / 2 - 0.07, doorDepth / 2 + 0.004);
+doorPivot.add(logoBadge);
+
+/* Brand ℞ mark — same prescription glyph + serif stack as the site */
+function makeRxMarkTexture(){
+  const size = 1024;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, size, size);
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  /* Mirrors site --rx stack */
+  ctx.font = '500 720px "Iowan Old Style", "Hoefler Text", Palatino, "Palatino Linotype", "Times New Roman", serif';
+  ctx.fillText("℞", size / 2, size / 2 + 40);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 8;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+const rxAlpha = makeRxMarkTexture();
+const rxEmbossMat = new THREE.MeshPhysicalMaterial({
+  color:0x9aa1a8,
+  metalness:0.8,
+  roughness:0.24,
+  clearcoat:0.35,
+  clearcoatRoughness:0.3,
+  alphaMap: rxAlpha,
+  transparent: true,
+  alphaTest: 0.08,
+  side: THREE.DoubleSide,
+  depthWrite: true
+});
+
+/* Layered plates = slight emboss thickness for the ℞ */
+const rxMark = new THREE.Group();
+const rxSize = 0.072;
+for (let i = 0; i < 4; i++){
+  const layer = new THREE.Mesh(
+    new THREE.PlaneGeometry(rxSize, rxSize),
+    i === 3 ? rxEmbossMat : new THREE.MeshPhysicalMaterial({
+      color: i < 2 ? 0x5c626a : 0x7a8088,
+      metalness:0.75,
+      roughness:0.34,
+      alphaMap: rxAlpha,
+      transparent: true,
+      alphaTest: 0.08,
+      side: THREE.DoubleSide
+    })
+  );
+  layer.position.z = 0.002 + i * 0.002;
+  rxMark.add(layer);
+}
+rxMark.position.set(rxSize / 2, 0.01, 0);
+logoBadge.add(rxMark);
+
+new FontLoader().load(
+  "https://unpkg.com/three@0.170.0/examples/fonts/helvetiker_bold.typeface.json",
+  (font) => {
+    const geo = new TextGeometry("FLOORING", {
+      font,
+      size: 0.014,
+      depth: 0.008,
+      curveSegments: 10,
+      bevelEnabled: true,
+      bevelThickness: 0.0018,
+      bevelSize: 0.0004,
+      bevelOffset: 0,
+      bevelSegments: 2
+    });
+    geo.computeBoundingBox();
+    const mesh = new THREE.Mesh(geo, embossMat);
+    /* Left-align under the ℞ */
+    mesh.position.set(-geo.boundingBox.min.x, -0.042, 0.004);
+    mesh.castShadow = true;
+    logoBadge.add(mesh);
+  }
+);
+
+/* Door swing state */
+const DOOR_OPEN = -Math.PI * 0.82;
+const DOOR_CLOSED = 0;
+let doorOpen = false;
+let doorTarget = DOOR_CLOSED;
+let doorDragging = false;
+let cinematic = true;
+doorPivot.rotation.y = DOOR_CLOSED;
+
+const btnDoor = document.getElementById("btnDoor");
+const btnReplay = document.getElementById("btnReplay");
+const hintEl = document.getElementById("hint");
+
+function syncDoorButton(){
+  doorOpen = Math.abs(doorTarget - DOOR_OPEN) < Math.abs(doorTarget - DOOR_CLOSED);
+  btnDoor.textContent = doorOpen ? "Close door" : "Open door";
+  btnDoor.classList.toggle("active", doorOpen);
+}
+syncDoorButton();
+
+btnDoor.addEventListener("click", () => {
+  if (cinematic) return;
+  doorTarget = doorOpen ? DOOR_CLOSED : DOOR_OPEN;
+  syncDoorButton();
+});
+
+/* ——— Cinematic sequence ———
+   1) simple lateral pan across white → freezer enters frame
+   2) only then dolly in
+   3) door → tray slides far out → lowers → smooth crane to overhead */
+const camPos = new THREE.Vector3();
+const camTarget = new THREE.Vector3();
+const camUp = new THREE.Vector3(0, 1, 0);
+const _a = new THREE.Vector3();
+const _b = new THREE.Vector3();
+
+function easeInOut(t){
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+function easeOutCubic(t){
+  return 1 - Math.pow(1 - t, 3);
+}
+function smoothstep(t){
+  const x = THREE.MathUtils.clamp(t, 0, 1);
+  return x * x * (3 - 2 * x);
+}
+
+const DOOR_START = 7.4;
+const DOOR_END = 8.9;
+const TRAY_SLIDE_START = 8.9;
+const TRAY_SLIDE_END = 11.0;
+const TRAY_DOWN_START = 11.0;
+const TRAY_DOWN_END = 12.8;
+const SCENE_END = 17.5;
+
+const trayLookShelf = [0.0, trayYShelf, trayZOut];
+const trayLook = [0.0, trayYGround, trayZOut];
+
+/* Far locked tripod for the opening — only the look direction pans */
+const openPos = [2.4, 1.35, 5.6];
+
+/*
+  True overhead end: camera directly above tray center.
+  up=[0,0,-1] keeps lookAt stable looking straight down and aligns tray
+  edges with the screen (width = X, depth = screen-vertical).
+*/
+const worldUp = [0, 1, 0];
+const overheadUp = [0, 0, -1];
+/*
+  Overhead end height: distance above tray so the 0.64×0.44 tray fills
+  ~80% of the shorter viewport axis (a little under full-bleed).
+  Previous 0.58–0.92 values still overflowed once width mapped to screen-Y.
+*/
+const endPos = [0, 1.45, trayZOut];
+
+const shots = [
+  /* 1 — exposition: camera stays put, view angle pans from empty white → freezer */
+  { t: 0.0,  pos: openPos, look: [-2.8, 0.55, 0.4], up: worldUp },
+  { t: 3.8,  pos: openPos, look: [0.05, 0.48, 0.05], up: worldUp },
+  { t: 4.5,  pos: openPos, look: [0.05, 0.48, 0.05], up: worldUp },
+  /* 2 — dolly in */
+  { t: 7.0,  pos: [1.18, 0.92, 1.58], look: [0.06, 0.48, 0.12], up: worldUp },
+  { t: 8.6,  pos: [1.25, 1.05, 1.85], look: [0.06, 0.52, 0.2], up: worldUp },
+  /* Tray emerges — still a front/high angle */
+  { t: 9.4,  pos: [1.2, 1.4, trayZOut + 1.4], look: [0.0, trayYShelf, trayZOut * 0.4], up: worldUp },
+  { t: 11.0, pos: [0.85, 1.35, trayZOut + 1.0], look: trayLookShelf, up: worldUp },
+  /* Descend with tray, drift over its center */
+  { t: 12.8, pos: [0.45, 1.2, trayZOut + 0.55], look: trayLook, up: worldUp },
+  { t: 14.2, pos: [0.18, 1.15, trayZOut + 0.25], look: trayLook, up: worldUp },
+  /* Blend into true nadir + overhead up (no roll flip) */
+  { t: 15.6, pos: [0.0, 1.55, trayZOut + 0.08], look: trayLook, up: overheadUp },
+  /* Final: direct overhead, tray centered a little under the viewport */
+  { t: 16.6, pos: endPos, look: trayLook, up: overheadUp },
+  { t: 17.5, pos: endPos, look: trayLook, up: overheadUp }
+];
+
+/*
+  Scroll → scene time with a speed ramp by timeline beat.
+  Higher weight = more scroll distance needed to cover that time span.
+*/
+const scrollSegments = [
+  { t0: 0.0,  t1: 3.8,  weight: 1.65 },
+  { t0: 3.8,  t1: 4.5,  weight: 1.1 },
+  { t0: 4.5,  t1: 7.0,  weight: 0.9 },
+  { t0: 7.0,  t1: 8.9,  weight: 1.2 },
+  { t0: 8.9,  t1: 11.0, weight: 1.35 },
+  { t0: 11.0, t1: 12.8, weight: 1.3 },
+  { t0: 12.8, t1: 16.6, weight: 1.25 }, /* crane to overhead */
+  { t0: 16.6, t1: 17.5, weight: 1.55 }
+];
+
+const scrollCum = [0];
+for (const seg of scrollSegments){
+  const dur = seg.t1 - seg.t0;
+  scrollCum.push(scrollCum[scrollCum.length - 1] + dur * seg.weight);
+}
+const scrollWeightTotal = scrollCum[scrollCum.length - 1];
+const SCROLL_BUDGET = 5200; /* px of wheel/touch travel to finish the scene */
+
+function scrollPxToTime(px){
+  const u = THREE.MathUtils.clamp(px / SCROLL_BUDGET, 0, 1);
+  const w = u * scrollWeightTotal;
+  let i = 0;
+  while (i < scrollSegments.length - 1 && w > scrollCum[i + 1]) i++;
+  const seg = scrollSegments[i];
+  const local = (w - scrollCum[i]) / (seg.weight * (seg.t1 - seg.t0) || 1);
+  return THREE.MathUtils.clamp(
+    THREE.MathUtils.lerp(seg.t0, seg.t1, THREE.MathUtils.clamp(local, 0, 1)),
+    0,
+    SCENE_END
+  );
+}
+
+let scrollPx = 0;
+let scrollPxTarget = 0;
+let sceneClock = 0;
+let sceneComplete = false;
+
+function sampleShots(time){
+  function applyShot(s){
+    camPos.set(...s.pos);
+    camTarget.set(...s.look);
+    camUp.set(...(s.up || worldUp));
+  }
+  if (time <= shots[0].t){
+    applyShot(shots[0]);
+    return;
+  }
+  if (time >= shots[shots.length - 1].t){
+    applyShot(shots[shots.length - 1]);
+    return;
+  }
+  let i = 0;
+  while (i < shots.length - 1 && time > shots[i + 1].t) i++;
+  const a = shots[i];
+  const b = shots[i + 1];
+  const u = smoothstep((time - a.t) / (b.t - a.t));
+  _a.set(...a.pos); _b.set(...b.pos);
+  camPos.lerpVectors(_a, _b, u);
+  _a.set(...a.look); _b.set(...b.look);
+  camTarget.lerpVectors(_a, _b, u);
+  _a.set(...(a.up || worldUp)); _b.set(...(b.up || worldUp));
+  camUp.lerpVectors(_a, _b, u).normalize();
+}
+
+function applyScene(time){
+  sampleShots(time);
+
+  /* Door */
+  if (time < DOOR_START){
+    doorPivot.rotation.y = DOOR_CLOSED;
+    doorTarget = DOOR_CLOSED;
+  } else if (time < DOOR_END){
+    const u = easeOutCubic((time - DOOR_START) / (DOOR_END - DOOR_START));
+    doorPivot.rotation.y = THREE.MathUtils.lerp(DOOR_CLOSED, DOOR_OPEN, u);
+    doorTarget = doorPivot.rotation.y;
+  } else {
+    doorPivot.rotation.y = DOOR_OPEN;
+    doorTarget = DOOR_OPEN;
+  }
+
+  /* Tray: top shelf → slide out → lower to floor */
+  if (time < TRAY_SLIDE_START){
+    trayAsset.position.set(0, trayYShelf, trayZIn);
+  } else if (time < TRAY_SLIDE_END){
+    const u = easeInOut((time - TRAY_SLIDE_START) / (TRAY_SLIDE_END - TRAY_SLIDE_START));
+    trayAsset.position.set(0, trayYShelf, THREE.MathUtils.lerp(trayZIn, trayZOut, u));
+  } else if (time < TRAY_DOWN_END){
+    const u = easeInOut((time - TRAY_DOWN_START) / (TRAY_DOWN_END - TRAY_DOWN_START));
+    trayAsset.position.set(0, THREE.MathUtils.lerp(trayYShelf, trayYGround, u), trayZOut);
+  } else {
+    trayAsset.position.set(0, trayYGround, trayZOut);
+  }
+
+  camera.up.copy(camUp);
+  camera.position.copy(camPos);
+  camera.lookAt(camTarget);
+  controls.target.copy(camTarget);
+}
+
+function updateHint(){
+  if (!hintEl) return;
+  if (sceneComplete){
+    hintEl.textContent = embed ? "End of scene · Exit to return" : "Orbit · drag door · reset";
+  } else if (scrollPxTarget <= 2){
+    hintEl.textContent = "Scroll to explore";
+  } else {
+    const pct = Math.round((scrollPxTarget / SCROLL_BUDGET) * 100);
+    hintEl.textContent = `Scroll · ${pct}%`;
+  }
+  if (underlay){
+    postParent({
+      type: "rx-services-progress",
+      progress: THREE.MathUtils.clamp(scrollPxTarget / SCROLL_BUDGET, 0, 1),
+      complete: sceneComplete
+    });
+  }
+}
+
+function setCinematicMode(on){
+  cinematic = on;
+  /* In embed, never hand control to orbit — scene owns the camera */
+  controls.enabled = !embed && !on;
+  if (on) doorDragging = false;
+}
+
+function startScene(){
+  scrollPx = 0;
+  scrollPxTarget = 0;
+  sceneClock = 0;
+  sceneComplete = false;
+  document.body.classList.remove("scene-done");
+  setCinematicMode(true);
+  trayAsset.position.set(0, trayYShelf, trayZIn);
+  doorPivot.rotation.y = DOOR_CLOSED;
+  doorTarget = DOOR_CLOSED;
+  syncDoorButton();
+  applyScene(0);
+  updateHint();
+}
+
+function maybeCompleteScene(){
+  if (!sceneComplete && sceneClock >= SCENE_END - 0.001){
+    sceneComplete = true;
+    document.body.classList.add("scene-done");
+    if (embed){
+      controls.enabled = false;
+      cinematic = true;
+    } else {
+      setCinematicMode(false);
+    }
+    syncDoorButton();
+    updateHint();
+    postParent({ type: "rx-services-complete" });
+  } else if (!embed && sceneComplete && sceneClock < SCENE_END - 0.05){
+    sceneComplete = false;
+    document.body.classList.remove("scene-done");
+    setCinematicMode(true);
+    updateHint();
+  }
+}
+
+btnReplay?.addEventListener("click", startScene);
+
+/* Autoplay — continues from the current (idle) pose; never teleports to t=0 */
+let autoplaying = false;
+let autoplayT0 = 0;
+let autoplayFrom = 0;
+const IDLE_TIME = 4.5;
+/* Wall-clock length of the full play-through */
+const AUTOPLAY_MS = 11000;
+/* Scene-time where the final overhead tilt begins — paced slower below */
+const TILT_START = 14.2;
+/* Fraction of wall time spent on the fast body vs. the slow tilt */
+const AUTOPLAY_FAST_SHARE = 0.48;
+
+function smoothstep01(t){
+  t = THREE.MathUtils.clamp(t, 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+/* Fast through dolly/door/tray, then linger on the final overhead tilt */
+function autoplaySceneTime(u){
+  const from = autoplayFrom;
+  const mid = Math.max(from + 0.01, TILT_START);
+  const end = SCENE_END;
+  if (u <= AUTOPLAY_FAST_SHARE){
+    const eased = smoothstep01(u / AUTOPLAY_FAST_SHARE);
+    return THREE.MathUtils.lerp(from, mid, eased);
+  }
+  const eased = smoothstep01((u - AUTOPLAY_FAST_SHARE) / (1 - AUTOPLAY_FAST_SHARE));
+  return THREE.MathUtils.lerp(mid, end, eased);
+}
+
+function playScene(){
+  /* Pick up from wherever the camera already is (idle framed shot) */
+  autoplayFrom = inline ? IDLE_TIME : Math.max(sceneClock, 0);
+  sceneClock = autoplayFrom;
+  applyScene(sceneClock);
+  sceneComplete = false;
+  document.body.classList.remove("scene-done");
+  autoplaying = true;
+  autoplayT0 = performance.now();
+  controls.enabled = false;
+  cinematic = true;
+}
+
+function onSceneScroll(deltaY){
+  if (inline || autoplaying) return;
+  if (doorDragging) return;
+  if (sceneComplete) return;
+  scrollPxTarget = THREE.MathUtils.clamp(scrollPxTarget + deltaY, 0, SCROLL_BUDGET);
+  updateHint();
+}
+
+window.addEventListener("wheel", (e) => {
+  if (inline || autoplaying) return;
+  if (doorDragging) return;
+  e.preventDefault();
+  if (sceneComplete) return;
+  onSceneScroll(e.deltaY);
+}, { passive: false });
+
+let touchY = null;
+window.addEventListener("touchstart", (e) => {
+  if (inline || autoplaying) return;
+  if (e.touches.length === 1) touchY = e.touches[0].clientY;
+}, { passive: true });
+window.addEventListener("touchmove", (e) => {
+  if (inline || autoplaying) return;
+  if (touchY == null || e.touches.length !== 1) return;
+  e.preventDefault();
+  if (sceneComplete) return;
+  const y = e.touches[0].clientY;
+  const dy = touchY - y;
+  touchY = y;
+  onSceneScroll(dy);
+}, { passive: false });
+window.addEventListener("touchend", () => { touchY = null; });
+
+window.addEventListener("message", (e) => {
+  if (!e.data) return;
+  if (e.data.type === "rx-services-play"){
+    playScene();
+  } else if (e.data.type === "rx-services-scroll"){
+    onSceneScroll(e.data.deltaY || 0);
+  } else if (e.data.type === "rx-services-reset"){
+    autoplaying = false;
+    if (inline) showIdleFrame();
+    else startScene();
+  }
+});
+
+postParent({ type: "rx-services-ready" });
+
+/* Pointer drag on door (after cinematic) */
+const raycaster = new THREE.Raycaster();
+const pointerNdc = new THREE.Vector2();
+const dragPlane = new THREE.Plane();
+const dragHit = new THREE.Vector3();
+const hingeWorld = new THREE.Vector3();
+const invFreezer = new THREE.Matrix4();
+const planeNormal = new THREE.Vector3(0, 1, 0);
+
+function pointerToNdc(e){
+  const rect = renderer.domElement.getBoundingClientRect();
+  pointerNdc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  pointerNdc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+}
+
+function angleFromPointer(e){
+  pointerToNdc(e);
+  raycaster.setFromCamera(pointerNdc, camera);
+  doorPivot.getWorldPosition(hingeWorld);
+  dragPlane.setFromNormalAndCoplanarPoint(planeNormal, hingeWorld);
+  if (!raycaster.ray.intersectPlane(dragPlane, dragHit)) return null;
+
+  invFreezer.copy(freezer.matrixWorld).invert();
+  const local = dragHit.clone().applyMatrix4(invFreezer);
+  const hx = -bodyW / 2;
+  const hz = bodyD / 2;
+  const vx = local.x - hx;
+  const vz = local.z - hz;
+  return THREE.MathUtils.clamp(Math.atan2(-vz, vx), DOOR_OPEN, 0.04);
+}
+
+renderer.domElement.addEventListener("pointerdown", (e) => {
+  if (cinematic) return;
+  pointerToNdc(e);
+  raycaster.setFromCamera(pointerNdc, camera);
+  const hits = raycaster.intersectObjects(doorGrab, true);
+  if (!hits.length) return;
+  doorDragging = true;
+  controls.enabled = false;
+  renderer.domElement.setPointerCapture(e.pointerId);
+  const ang = angleFromPointer(e);
+  if (ang != null){
+    doorPivot.rotation.y = ang;
+    doorTarget = ang;
+  }
+});
+
+renderer.domElement.addEventListener("pointermove", (e) => {
+  if (!doorDragging || cinematic) return;
+  const ang = angleFromPointer(e);
+  if (ang == null) return;
+  doorPivot.rotation.y = ang;
+  doorTarget = ang;
+});
+
+function endDoorDrag(e){
+  if (!doorDragging) return;
+  doorDragging = false;
+  if (!cinematic) controls.enabled = true;
+  try { renderer.domElement.releasePointerCapture(e.pointerId); } catch (_){}
+  doorTarget = doorPivot.rotation.y < DOOR_OPEN * 0.45 ? DOOR_OPEN : DOOR_CLOSED;
+  syncDoorButton();
+}
+renderer.domElement.addEventListener("pointerup", endDoorDrag);
+renderer.domElement.addEventListener("pointercancel", endDoorDrag);
+
+let resizeRaf = 0;
+let lastSizeW = 0;
+let lastSizeH = 0;
+function onResize(){
+  /* Ignore resize storms while the cinematic is running — was causing start stutter */
+  if (autoplaying) return;
+  if (resizeRaf) return;
+  resizeRaf = requestAnimationFrame(() => {
+    resizeRaf = 0;
+    const w = wrap.clientWidth;
+    const h = wrap.clientHeight;
+    if (!w || !h) return;
+    if (Math.abs(w - lastSizeW) < 2 && Math.abs(h - lastSizeH) < 2) return;
+    lastSizeW = w;
+    lastSizeH = h;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h, false);
+  });
+}
+window.addEventListener("resize", onResize);
+if (typeof ResizeObserver !== "undefined"){
+  new ResizeObserver(onResize).observe(wrap);
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+
+  if (autoplaying){
+    const u = THREE.MathUtils.clamp((performance.now() - autoplayT0) / AUTOPLAY_MS, 0, 1);
+    sceneClock = autoplaySceneTime(u);
+    applyScene(sceneClock);
+    if (u >= 1){
+      autoplaying = false;
+      sceneClock = SCENE_END;
+      applyScene(SCENE_END);
+      maybeCompleteScene();
+    }
+  } else if (!inline && (cinematic || !sceneComplete)){
+    scrollPx += (scrollPxTarget - scrollPx) * 0.14;
+    if (Math.abs(scrollPxTarget - scrollPx) < 0.15) scrollPx = scrollPxTarget;
+    sceneClock = scrollPxToTime(scrollPx);
+    applyScene(sceneClock);
+    maybeCompleteScene();
+  } else if (!inline && !doorDragging){
+    doorPivot.rotation.y += (doorTarget - doorPivot.rotation.y) * 0.12;
+  }
+
+  if (!cinematic && !inline) controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+/* Inline idle: same camera the playhead continues from */
+function showIdleFrame(){
+  autoplaying = false;
+  sceneComplete = false;
+  document.body.classList.remove("scene-done");
+  setCinematicMode(true);
+  controls.enabled = false;
+  doorPivot.rotation.y = DOOR_CLOSED;
+  doorTarget = DOOR_CLOSED;
+  trayAsset.position.set(0, trayYShelf, trayZIn);
+  sceneClock = IDLE_TIME;
+  applyScene(IDLE_TIME);
+  onResize();
+}
+if (inline){
+  showIdleFrame();
+} else {
+  startScene();
+}
+</script>
+
+</body>
+</html>
