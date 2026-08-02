@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>RX Flooring · Manager</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{margin:0;}
+img{max-width:100%;display:block;}
+button,input,select,textarea{font:inherit;color:inherit;}
+:root{
+  color-scheme:light;
+  --bg:#FFFFFF; --bg-alt:#F5F6F8; --panel:#FFFFFF; --panel-alt:#EDF0F2;
+  --ink:#1D242B; --body:#4A535C; --muted:#79828B;
+  --rule:#E3E6EA; --rule-soft:#EDEFF2;
+  --accent:#1B4DFF; --accent-hover:#0B3AD6; --on-accent:#FFFFFF; --signal:#00875A;
+  --danger:#C0392B;
+  --sf:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",system-ui,sans-serif;
+  --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  --rx:"Iowan Old Style","Hoefler Text",Palatino,"Times New Roman",serif;
+  --gut:24px; --wide:1080px;
+}
+body{
+  background:var(--bg); color:var(--body);
+  font-family:var(--sf); font-size:16px; line-height:1.5;
+  letter-spacing:-.011em;
+  -webkit-font-smoothing:antialiased;
+  min-height:100dvh;
+}
+a{color:var(--accent); text-decoration:none;}
+a:hover{color:var(--accent-hover);}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:4px;}
+.wrap{max-width:var(--wide); margin:0 auto; padding:0 var(--gut);}
+[hidden]{display:none !important;}
+
+.pill{
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--accent); color:var(--on-accent);
+  border:0; border-radius:980px; padding:10px 18px;
+  font-size:14px; font-weight:600; letter-spacing:-.005em; cursor:pointer;
+  transition:background .2s ease;
+}
+.pill:hover{background:var(--accent-hover);}
+.pill:disabled{opacity:.55; cursor:not-allowed;}
+.pill.ghost{background:transparent; color:var(--accent); border:1px solid var(--rule);}
+.pill.ghost:hover{background:var(--panel-alt);}
+.pill.danger{background:transparent; color:var(--danger); border:1px solid rgba(192,57,43,.28);}
+.pill.danger:hover{background:rgba(192,57,43,.06);}
+
+/* ---------- gate / login ---------- */
+.gate{
+  min-height:100dvh; display:flex; align-items:center; justify-content:center;
+  padding:48px var(--gut);
+  background:
+    radial-gradient(90% 70% at 50% 0%, rgba(27,77,255,.06) 0%, transparent 55%),
+    var(--bg);
+}
+.gate-card{width:min(400px,100%);}
+.gate-brand{
+  display:flex; align-items:baseline; gap:10px;
+  color:var(--ink); font-weight:600; font-size:22px; letter-spacing:-.025em;
+  margin-bottom:8px;
+}
+.gate-brand .mark{font-family:var(--rx); font-size:28px; color:var(--accent); line-height:1;}
+.gate-card h1{
+  margin:0 0 8px; color:var(--ink);
+  font-size:28px; letter-spacing:-.03em; font-weight:600;
+}
+.gate-card .sub{margin:0 0 28px; color:var(--muted); font-size:15px;}
+.field{display:grid; gap:7px; margin-bottom:14px;}
+.field label{font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:var(--muted);}
+.field input,.field select,.field textarea{
+  width:100%; border:1px solid var(--rule); border-radius:12px;
+  background:var(--bg); color:var(--ink); padding:12px 14px;
+}
+.field textarea{min-height:96px; resize:vertical;}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none; border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(27,77,255,.12);
+}
+.gate-error{
+  margin:0 0 14px; padding:10px 12px; border-radius:10px;
+  background:rgba(192,57,43,.06); color:var(--danger); font-size:14px;
+}
+.gate-actions{display:flex; gap:10px; margin-top:8px;}
+.gate-actions .pill{flex:1;}
+.gate-hint{margin-top:18px; font-size:13px; color:var(--muted); line-height:1.45;}
+
+/* ---------- app shell ---------- */
+.app-bar{
+  position:sticky; top:0; z-index:20;
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter:saturate(180%) blur(16px);
+  backdrop-filter:saturate(180%) blur(16px);
+  border-bottom:1px solid var(--rule-soft);
+}
+.app-bar-in{
+  max-width:var(--wide); margin:0 auto; padding:0 var(--gut);
+  height:56px; display:flex; align-items:center; gap:18px;
+}
+.app-bar .brand{
+  display:flex; align-items:baseline; gap:8px;
+  color:var(--ink); font-weight:600; font-size:15px; letter-spacing:-.02em;
+  margin-right:auto;
+}
+.app-bar .brand .mark{font-family:var(--rx); font-size:20px; color:var(--accent); line-height:1;}
+.app-bar .who{font-size:13px; color:var(--muted); max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.tabs{display:flex; gap:4px; margin:28px 0 22px;}
+.tab{
+  border:0; background:transparent; color:var(--muted);
+  padding:8px 14px; border-radius:980px; cursor:pointer; font-weight:600; font-size:14px;
+}
+.tab.is-active{background:var(--panel-alt); color:var(--ink);}
+.tab:hover{color:var(--ink);}
+.panel-head{
+  display:flex; align-items:end; justify-content:space-between; gap:16px;
+  margin-bottom:18px; flex-wrap:wrap;
+}
+.panel-head h2{margin:0; color:var(--ink); font-size:26px; letter-spacing:-.03em;}
+.panel-head p{margin:6px 0 0; color:var(--muted); font-size:14px;}
+.toolbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+.toolbar select{
+  border:1px solid var(--rule); border-radius:980px; padding:8px 14px;
+  background:var(--bg); color:var(--ink);
+}
+
+.list{display:grid; gap:12px; padding-bottom:64px;}
+.card{
+  border:1px solid var(--rule); border-radius:16px; padding:18px 18px 16px;
+  background:var(--panel);
+}
+.card-top{display:flex; justify-content:space-between; gap:12px; align-items:start;}
+.card h3{margin:0; color:var(--ink); font-size:17px; letter-spacing:-.02em;}
+.meta{margin-top:4px; font-size:13px; color:var(--muted);}
+.meta strong{color:var(--body); font-weight:500;}
+.badge{
+  display:inline-flex; align-items:center;
+  font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+  padding:5px 9px; border-radius:980px; background:var(--panel-alt); color:var(--muted);
+}
+.badge.new{background:rgba(27,77,255,.08); color:var(--accent);}
+.badge.contacted,.badge.scheduled{background:rgba(0,135,90,.08); color:var(--signal);}
+.badge.done,.badge.closed,.badge.complete{background:var(--panel-alt); color:var(--muted);}
+.badge.in_progress{background:rgba(27,77,255,.08); color:var(--accent);}
+.card-body{margin-top:12px; display:grid; gap:6px; font-size:14.5px; color:var(--body);}
+.card-actions{margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+.card-actions select{
+  border:1px solid var(--rule); border-radius:10px; padding:8px 10px; background:var(--bg);
+}
+.empty{
+  border:1px dashed var(--rule); border-radius:16px; padding:36px 20px;
+  text-align:center; color:var(--muted);
+}
+.err-banner{
+  margin:0 0 16px; padding:12px 14px; border-radius:12px;
+  background:rgba(192,57,43,.06); color:var(--danger); font-size:14px;
+}
+.loading{color:var(--muted); padding:24px 0;}
+
+.job-form{
+  border:1px solid var(--rule); border-radius:16px; padding:18px;
+  margin-bottom:18px; background:var(--bg-alt);
+}
+.job-form h3{margin:0 0 14px; color:var(--ink); font-size:16px;}
+.job-form-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+@media(max-width:700px){
+  .job-form-grid{grid-template-columns:1fr;}
+  .app-bar .who{display:none;}
+}
+.photos{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
+.photos figure{
+  margin:0; width:88px; border-radius:10px; overflow:hidden;
+  border:1px solid var(--rule); background:var(--panel-alt);
+}
+.photos img{width:88px; height:88px; object-fit:cover;}
+.photo-upload{margin-top:10px;}
+.photo-upload input[type=file]{font-size:13px;}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN GATE ================= -->
+<section class="gate" id="gateView">
+  <div class="gate-card">
+    <div class="gate-brand"><span class="mark" aria-hidden="true">℞</span> RX Flooring</div>
+    <h1>Manager</h1>
+    <p class="sub">Sign in to view booking requests and manage jobs.</p>
+    <p class="gate-error" id="gateError" hidden></p>
+    <p class="gate-error" id="gateLocked" hidden style="background:rgba(27,77,255,.06);color:var(--accent);"></p>
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="loginEmail">Email</label>
+        <input id="loginEmail" name="email" type="email" autocomplete="username" required placeholder="you@example.com">
+      </div>
+      <div class="field" id="passwordField">
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" name="password" type="password" autocomplete="current-password" required placeholder="Password">
+      </div>
+      <div class="gate-actions">
+        <button class="pill" type="submit" id="loginBtn">Sign in</button>
+      </div>
+      <div class="gate-actions" id="unlockActions" hidden style="margin-top:12px;">
+        <button class="pill ghost" type="button" id="emailLinkBtn">Email me a sign-in link</button>
+      </div>
+    </form>
+    <p class="gate-hint">Access is invite-only. After 3 failed password attempts, password sign-in locks until you verify via email link.</p>
+  </div>
+</section>
+
+<!-- ================= APP ================= -->
+<div id="appView" hidden>
+  <header class="app-bar">
+    <div class="app-bar-in">
+      <a class="brand" href="/manager"><span class="mark" aria-hidden="true">℞</span> Manager</a>
+      <span class="who" id="userEmail"></span>
+      <a class="pill ghost" href="/">Site</a>
+      <button type="button" class="pill danger" id="signOutBtn">Sign out</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab is-active" data-tab="requests" role="tab" aria-selected="true">Requests</button>
+      <button type="button" class="tab" data-tab="jobs" role="tab" aria-selected="false">Jobs</button>
+    </div>
+
+    <p class="err-banner" id="appError" hidden></p>
+
+    <!-- Requests -->
+    <section id="tab-requests">
+      <div class="panel-head">
+        <div>
+          <h2>Booking requests</h2>
+          <p>New assessments from the site form.</p>
+        </div>
+        <div class="toolbar">
+          <select id="statusFilter" aria-label="Filter by status">
+            <option value="all">All statuses</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="done">Done</option>
+            <option value="closed">Closed</option>
+          </select>
+          <button type="button" class="pill ghost" id="refreshRequests">Refresh</button>
+        </div>
+      </div>
+      <div class="list" id="requestsList"><p class="loading">Loading…</p></div>
+    </section>
+
+    <!-- Jobs -->
+    <section id="tab-jobs" hidden>
+      <div class="panel-head">
+        <div>
+          <h2>Jobs</h2>
+          <p>Track work and upload job photos.</p>
+        </div>
+        <div class="toolbar">
+          <button type="button" class="pill ghost" id="refreshJobs">Refresh</button>
+        </div>
+      </div>
+
+      <form class="job-form" id="jobForm">
+        <h3>Add or update job</h3>
+        <input type="hidden" name="id" id="jobId">
+        <div class="job-form-grid">
+          <div class="field">
+            <label for="jobTitle">Title</label>
+            <input id="jobTitle" name="title" required placeholder="e.g. Hardwood — Palmer unit 412">
+          </div>
+          <div class="field">
+            <label for="jobAddress">Address</label>
+            <input id="jobAddress" name="address" placeholder="Job site address">
+          </div>
+          <div class="field">
+            <label for="jobStatus">Status</label>
+            <select id="jobStatus" name="status">
+              <option value="planned">Planned</option>
+              <option value="in_progress">In progress</option>
+              <option value="complete">Complete</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="jobNotes">Notes</label>
+            <input id="jobNotes" name="notes" placeholder="Optional notes">
+          </div>
+        </div>
+        <div class="gate-actions" style="margin-top:4px;">
+          <button class="pill" type="submit" id="jobSaveBtn">Save job</button>
+          <button class="pill ghost" type="button" id="jobResetBtn">Clear</button>
+        </div>
+      </form>
+
+      <div class="list" id="jobsList"><p class="loading">Loading…</p></div>
+    </section>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/supabase-config.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script>
+(function () {
+  var sb = window.rxSupabase;
+  if (!sb) {
+    document.getElementById("gateError").hidden = false;
+    document.getElementById("gateError").textContent = "Supabase client failed to load.";
+    return;
+  }
+
+  var gateView = document.getElementById("gateView");
+  var appView = document.getElementById("appView");
+  var gateError = document.getElementById("gateError");
+  var gateLocked = document.getElementById("gateLocked");
+  var unlockActions = document.getElementById("unlockActions");
+  var passwordField = document.getElementById("passwordField");
+  var appError = document.getElementById("appError");
+  var loginForm = document.getElementById("loginForm");
+  var loginBtn = document.getElementById("loginBtn");
+  var emailLinkBtn = document.getElementById("emailLinkBtn");
+  var userEmail = document.getElementById("userEmail");
+  var requestsList = document.getElementById("requestsList");
+  var jobsList = document.getElementById("jobsList");
+  var statusFilter = document.getElementById("statusFilter");
+  var jobForm = document.getElementById("jobForm");
+
+  function showError(el, msg) {
+    if (!msg) { el.hidden = true; el.textContent = ""; return; }
+    el.hidden = false;
+    el.textContent = msg;
+  }
+
+  function setLockedUI(locked, detail) {
+    unlockActions.hidden = !locked;
+    passwordField.hidden = !!locked;
+    document.getElementById("loginPassword").required = !locked;
+    loginBtn.hidden = !!locked;
+    if (locked) {
+      showError(gateError, "");
+      showError(gateLocked, detail || "Account locked. Verify via the email sign-in link to unlock.");
+    } else {
+      showError(gateLocked, "");
+    }
+  }
+
+  function isLockMessage(msg) {
+    return /LOCKED:/i.test(msg || "") || /too many failed attempts/i.test(msg || "") || /sign-in link/i.test(msg || "");
+  }
+
+  async function sendUnlockEmail(email) {
+    if (!email) {
+      showError(gateError, "Enter your email first.");
+      return;
+    }
+    emailLinkBtn.disabled = true;
+    emailLinkBtn.textContent = "Sending…";
+    var redirectTo = window.location.origin + "/manager/";
+    var res = await sb.auth.signInWithOtp({
+      email: email,
+      options: { emailRedirectTo: redirectTo }
+    });
+    emailLinkBtn.disabled = false;
+    emailLinkBtn.textContent = "Email me a sign-in link";
+    if (res.error) {
+      showError(gateError, res.error.message || "Could not send email link.");
+      return;
+    }
+    showError(gateLocked, "Check your email for a sign-in link. Opening it verifies it’s you and unlocks password sign-in.");
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return "—";
+    try {
+      return new Date(iso).toLocaleString(undefined, {
+        month: "short", day: "numeric", year: "numeric",
+        hour: "numeric", minute: "2-digit"
+      });
+    } catch (e) { return iso; }
+  }
+
+  function fmtDay(d) {
+    if (!d) return "—";
+    try {
+      return new Date(d + "T12:00:00").toLocaleDateString(undefined, {
+        weekday: "short", month: "short", day: "numeric", year: "numeric"
+      });
+    } catch (e) { return d; }
+  }
+
+  async function requireSession() {
+    var res = await sb.auth.getSession();
+    var session = res.data && res.data.session;
+    if (!session) {
+      gateView.hidden = false;
+      appView.hidden = true;
+      return null;
+    }
+    gateView.hidden = true;
+    appView.hidden = false;
+    userEmail.textContent = session.user.email || "";
+    return session;
+  }
+
+  loginForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    showError(gateError, "");
+    showError(gateLocked, "");
+    var email = document.getElementById("loginEmail").value.trim();
+    var password = document.getElementById("loginPassword").value;
+
+    if (unlockActions.hidden === false && loginBtn.hidden) {
+      await sendUnlockEmail(email);
+      return;
+    }
+
+    loginBtn.disabled = true;
+    loginBtn.textContent = "Signing in…";
+    var { error } = await sb.auth.signInWithPassword({ email: email, password: password });
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Sign in";
+    if (error) {
+      var msg = error.message || "Sign-in failed.";
+      if (isLockMessage(msg)) {
+        setLockedUI(true, msg.replace(/^LOCKED:\s*/i, ""));
+        await sendUnlockEmail(email);
+      } else {
+        setLockedUI(false);
+        showError(gateError, msg);
+      }
+      return;
+    }
+    setLockedUI(false);
+    await enterApp();
+  });
+
+  emailLinkBtn.addEventListener("click", async function () {
+    var email = document.getElementById("loginEmail").value.trim();
+    await sendUnlockEmail(email);
+  });
+
+  document.getElementById("signOutBtn").addEventListener("click", async function () {
+    await sb.auth.signOut();
+    gateView.hidden = false;
+    appView.hidden = true;
+    loginForm.reset();
+    setLockedUI(false);
+  });
+
+  /* tabs */
+  document.querySelectorAll(".tab").forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      document.querySelectorAll(".tab").forEach(function (t) {
+        t.classList.toggle("is-active", t === tab);
+        t.setAttribute("aria-selected", t === tab ? "true" : "false");
+      });
+      var name = tab.getAttribute("data-tab");
+      document.getElementById("tab-requests").hidden = name !== "requests";
+      document.getElementById("tab-jobs").hidden = name !== "jobs";
+      if (name === "jobs") loadJobs();
+    });
+  });
+
+  /* ---------- requests ---------- */
+  async function loadRequests() {
+    showError(appError, "");
+    requestsList.innerHTML = '<p class="loading">Loading…</p>';
+    var q = sb.from("assessment_requests")
+      .select("*")
+      .order("created_at", { ascending: false });
+    var filter = statusFilter.value;
+    if (filter && filter !== "all") q = q.eq("status", filter);
+    var { data, error } = await q;
+    if (error) {
+      requestsList.innerHTML = "";
+      showError(appError, error.message + " — did you run supabase/setup.sql?");
+      return;
+    }
+    if (!data || !data.length) {
+      requestsList.innerHTML = '<div class="empty">No booking requests yet.</div>';
+      return;
+    }
+    requestsList.innerHTML = data.map(function (row) {
+      return (
+        '<article class="card" data-id="' + row.id + '">' +
+          '<div class="card-top">' +
+            "<div>" +
+              "<h3>" + esc(row.name) + "</h3>" +
+              '<p class="meta">Received ' + esc(fmtDate(row.created_at)) + "</p>" +
+            "</div>" +
+            '<span class="badge ' + esc(row.status) + '">' + esc(row.status) + "</span>" +
+          "</div>" +
+          '<div class="card-body">' +
+            "<div><strong>Phone</strong> · <a href=\"tel:" + esc(row.phone) + "\">" + esc(row.phone) + "</a></div>" +
+            "<div><strong>Address</strong> · " + esc(row.address) + "</div>" +
+            "<div><strong>Preferred</strong> · " + esc(fmtDay(row.preferred_date)) + " · " + esc(row.preferred_window) + "</div>" +
+            (row.notes ? "<div><strong>Notes</strong> · " + esc(row.notes) + "</div>" : "") +
+          "</div>" +
+          '<div class="card-actions">' +
+            '<label class="meta">Status</label>' +
+            '<select data-status="' + row.id + '">' +
+              opt("new", row.status) + opt("contacted", row.status) + opt("scheduled", row.status) +
+              opt("done", row.status) + opt("closed", row.status) +
+            "</select>" +
+            '<button type="button" class="pill ghost" data-job-from="' + row.id + '" data-title="' + escAttr(row.name) + '" data-address="' + escAttr(row.address) + '">Create job</button>' +
+          "</div>" +
+        "</article>"
+      );
+    }).join("");
+
+    requestsList.querySelectorAll("select[data-status]").forEach(function (sel) {
+      sel.addEventListener("change", async function () {
+        var id = sel.getAttribute("data-status");
+        var { error } = await sb.from("assessment_requests").update({ status: sel.value }).eq("id", id);
+        if (error) showError(appError, error.message);
+        else loadRequests();
+      });
+    });
+
+    requestsList.querySelectorAll("[data-job-from]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        document.querySelector('.tab[data-tab="jobs"]').click();
+        jobForm.elements.id.value = "";
+        jobForm.elements.title.value = "Assessment · " + btn.getAttribute("data-title");
+        jobForm.elements.address.value = btn.getAttribute("data-address") || "";
+        jobForm.elements.status.value = "planned";
+        jobForm.elements.notes.value = "";
+        jobForm.dataset.assessmentId = btn.getAttribute("data-job-from");
+        jobForm.elements.title.focus();
+      });
+    });
+  }
+
+  function opt(value, current) {
+    return '<option value="' + value + '"' + (value === current ? " selected" : "") + ">" + value.replace("_", " ") + "</option>";
+  }
+
+  document.getElementById("refreshRequests").addEventListener("click", loadRequests);
+  statusFilter.addEventListener("change", loadRequests);
+
+  /* ---------- jobs ---------- */
+  async function loadJobs() {
+    showError(appError, "");
+    jobsList.innerHTML = '<p class="loading">Loading…</p>';
+    var { data: jobs, error } = await sb.from("jobs")
+      .select("*, job_photos(*)")
+      .order("created_at", { ascending: false });
+    if (error) {
+      jobsList.innerHTML = "";
+      showError(appError, error.message);
+      return;
+    }
+    if (!jobs || !jobs.length) {
+      jobsList.innerHTML = '<div class="empty">No jobs yet. Save one above.</div>';
+      return;
+    }
+
+    var html = "";
+    for (var i = 0; i < jobs.length; i++) {
+      var job = jobs[i];
+      var photos = job.job_photos || [];
+      photos.sort(function (a, b) { return (a.sort_order || 0) - (b.sort_order || 0); });
+      var photoHtml = "";
+      for (var p = 0; p < photos.length; p++) {
+        var signed = await signedUrl(photos[p].storage_path);
+        if (signed) {
+          photoHtml += '<figure><img src="' + signed + '" alt="" loading="lazy" width="88" height="88"></figure>';
+        }
+      }
+      html +=
+        '<article class="card" data-job="' + job.id + '">' +
+          '<div class="card-top">' +
+            "<div>" +
+              "<h3>" + esc(job.title) + "</h3>" +
+              '<p class="meta">' + esc(job.address || "No address") + " · " + esc(fmtDate(job.created_at)) + "</p>" +
+            "</div>" +
+            '<span class="badge ' + esc(job.status) + '">' + esc(job.status.replace("_", " ")) + "</span>" +
+          "</div>" +
+          (job.notes ? '<div class="card-body"><div>' + esc(job.notes) + "</div></div>" : "") +
+          (photoHtml ? '<div class="photos">' + photoHtml + "</div>" : "") +
+          '<div class="card-actions">' +
+            '<button type="button" class="pill ghost" data-edit-job="' + job.id + '">Edit</button>' +
+            '<label class="photo-upload meta">Add photos <input type="file" accept="image/*" multiple data-upload="' + job.id + '"></label>' +
+          "</div>" +
+        "</article>";
+    }
+    jobsList.innerHTML = html;
+
+    jobsList.querySelectorAll("[data-edit-job]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var job = jobs.find(function (j) { return j.id === btn.getAttribute("data-edit-job"); });
+        if (!job) return;
+        jobForm.elements.id.value = job.id;
+        jobForm.elements.title.value = job.title || "";
+        jobForm.elements.address.value = job.address || "";
+        jobForm.elements.status.value = job.status || "planned";
+        jobForm.elements.notes.value = job.notes || "";
+        delete jobForm.dataset.assessmentId;
+        jobForm.elements.title.focus();
+      });
+    });
+
+    jobsList.querySelectorAll("input[data-upload]").forEach(function (input) {
+      input.addEventListener("change", async function () {
+        var jobId = input.getAttribute("data-upload");
+        var files = Array.prototype.slice.call(input.files || []);
+        if (!files.length) return;
+        showError(appError, "");
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+          var path = jobId + "/" + Date.now() + "-" + sanitizeFile(file.name);
+          var up = await sb.storage.from("job-photos").upload(path, file, { upsert: true, contentType: file.type });
+          if (up.error) { showError(appError, up.error.message); return; }
+          var ins = await sb.from("job_photos").insert({
+            job_id: jobId,
+            storage_path: path,
+            caption: file.name,
+            sort_order: i
+          });
+          if (ins.error) { showError(appError, ins.error.message); return; }
+        }
+        input.value = "";
+        loadJobs();
+      });
+    });
+  }
+
+  async function signedUrl(path) {
+    var { data, error } = await sb.storage.from("job-photos").createSignedUrl(path, 3600);
+    if (error) return "";
+    return data && data.signedUrl;
+  }
+
+  function sanitizeFile(name) {
+    return String(name || "photo.jpg").replace(/[^\w.\-]+/g, "_").slice(0, 80);
+  }
+
+  jobForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    showError(appError, "");
+    var btn = document.getElementById("jobSaveBtn");
+    btn.disabled = true;
+    var payload = {
+      title: jobForm.elements.title.value.trim(),
+      address: jobForm.elements.address.value.trim() || null,
+      status: jobForm.elements.status.value,
+      notes: jobForm.elements.notes.value.trim() || null
+    };
+    if (jobForm.dataset.assessmentId) {
+      payload.assessment_request_id = jobForm.dataset.assessmentId;
+    }
+    var id = jobForm.elements.id.value;
+    var res = id
+      ? await sb.from("jobs").update(payload).eq("id", id).select().single()
+      : await sb.from("jobs").insert(payload).select().single();
+    btn.disabled = false;
+    if (res.error) { showError(appError, res.error.message); return; }
+    jobForm.reset();
+    jobForm.elements.id.value = "";
+    delete jobForm.dataset.assessmentId;
+    loadJobs();
+  });
+
+  document.getElementById("jobResetBtn").addEventListener("click", function () {
+    jobForm.reset();
+    jobForm.elements.id.value = "";
+    delete jobForm.dataset.assessmentId;
+  });
+  document.getElementById("refreshJobs").addEventListener("click", loadJobs);
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  function escAttr(s) { return esc(s).replace(/'/g, "&#39;"); }
+
+  async function enterApp() {
+    var session = await requireSession();
+    if (!session) return;
+    // Magic-link (or successful) sign-in clears the password lockout.
+    try { await sb.rpc("clear_manager_login_lock"); } catch (e) { /* optional until SQL applied */ }
+    setLockedUI(false);
+    await loadRequests();
+  }
+
+  sb.auth.onAuthStateChange(function (event) {
+    if (event === "SIGNED_OUT") {
+      gateView.hidden = false;
+      appView.hidden = true;
+    }
+    if (event === "SIGNED_IN") {
+      // Defer so we don't deadlock auth locks inside the callback
+      setTimeout(function () { enterApp(); }, 0);
+    }
+  });
+
+  enterApp();
+})();
+</script>
+</body>
+</html>

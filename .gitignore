@@ -1,0 +1,6 @@
+.env
+.env.local
+.env.*.local
+.venv/
+.tmp-tray/
+public/services/originals/
