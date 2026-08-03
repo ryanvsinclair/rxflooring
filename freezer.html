@@ -51,7 +51,7 @@ body.embed .chrome p{display:none;}
 body.embed .study-only{display:none;}
 body:not(.embed) .embed-only{display:none;}
 body.embed #canvas-wrap{top:56px;}
-/* Underlay: scene sits behind the main page — no chrome of its own */
+/* Underlay: scene sits behind the main page - no chrome of its own */
 body.underlay .chrome,
 body.underlay .hint{display:none !important;}
 body.underlay #canvas-wrap{top:0;}
@@ -62,7 +62,7 @@ body.inline{overflow:hidden;}
 
 <div class="chrome">
   <div class="brand"><span>℞</span> Services</div>
-  <p class="study-only">Product scene — white room, door, tray slide.</p>
+  <p class="study-only">Product scene - white room, door, tray slide.</p>
   <div class="actions">
     <button type="button" id="btnReplay">Reset</button>
     <button type="button" id="btnDoor" class="study-only">Open door</button>
@@ -119,7 +119,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(wrap.clientWidth, wrap.clientHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-/* No filmic curve — keeps the cyclorama pure white */
+/* No filmic curve - keeps the cyclorama pure white */
 renderer.toneMapping = THREE.NoToneMapping;
 renderer.toneMappingExposure = 1;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -168,7 +168,7 @@ const rim = new THREE.DirectionalLight(0xffffff, 0.35);
 rim.position.set(0.2, 1.5, -3.2);
 scene.add(rim);
 
-/* Pure white floor — unlit, skipped from any remaining tone map */
+/* Pure white floor - unlit, skipped from any remaining tone map */
 const groundMat = new THREE.MeshBasicMaterial({ color:0xffffff });
 groundMat.toneMapped = false;
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), groundMat);
@@ -210,7 +210,7 @@ const blackTrim = new THREE.MeshStandardMaterial({
 const gasket = new THREE.MeshStandardMaterial({
   color:0x2a3036, roughness:0.85, metalness:0.1
 });
-/* Interior — molded plastic, lit only by room light (no env blow-out) */
+/* Interior - molded plastic, lit only by room light (no env blow-out) */
 const liner = new THREE.MeshStandardMaterial({
   color:0xc5ccd4, roughness:0.95, metalness:0, envMapIntensity:0
 });
@@ -258,7 +258,7 @@ function roundedRect(shape, w, h, rad){
   shape.absarc(x0 + rad, y0 + rad, rad, Math.PI, Math.PI * 1.5, false);
 }
 
-/* Seamless outer shell — rounded sides/top; flat front face for the door */
+/* Seamless outer shell - rounded sides/top; flat front face for the door */
 (function buildOuterShell(){
   const hw = bodyW / 2;
   const hh = bodyH / 2;
@@ -275,7 +275,7 @@ function roundedRect(shape, w, h, rad){
   cavity.lineTo(-ihw, -ihh);
   frameShape.holes.push(cavity);
 
-  /* No bevel — front siding stays flat where the door lands */
+  /* No bevel - front siding stays flat where the door lands */
   const frameGeo = new THREE.ExtrudeGeometry(frameShape, {
     depth: bodyD,
     bevelEnabled: false,
@@ -287,7 +287,7 @@ function roundedRect(shape, w, h, rad){
   frame.receiveShadow = true;
   freezer.add(frame);
 
-  /* Fill the open back of the tunnel — liner color so cavity doesn’t show sky */
+  /* Fill the open back of the tunnel - liner color so cavity doesn’t show sky */
   const backPlug = new THREE.Mesh(
     new THREE.BoxGeometry(innerW + 0.002, innerH + 0.002, wall),
     liner
@@ -305,7 +305,7 @@ addBox(0.01, innerH - 0.02, innerD, liner, -innerW / 2 + 0.008, bodyH / 2, wall 
 addBox(0.01, innerH - 0.02, innerD, liner, innerW / 2 - 0.008, bodyH / 2, wall * 0.15, freezer, 0.004);
 addBox(innerW - 0.02, innerH - 0.02, 0.01, liner, 0, bodyH / 2, -bodyD / 2 + wall + 0.014, freezer, 0.004);
 
-/* Shelf rows — wire-style so they read in the cavity */
+/* Shelf rows - wire-style so they read in the cavity */
 const shelfDepth = innerD - 0.06;
 const shelfWidth = innerW - 0.08;
 const rowYs = [wall + 0.28, wall + 0.58];
@@ -335,7 +335,7 @@ function makeShelfRow(y){
 
 rowYs.forEach(makeShelfRow);
 
-/* Black specimen tray — starts on top shelf, slides out, then drops to floor */
+/* Black specimen tray - starts on top shelf, slides out, then drops to floor */
 const trayH = 0.026;
 function createTray(w = 0.64, d = 0.44, h = trayH){
   const tray = new THREE.Group();
@@ -371,7 +371,7 @@ const trayZOut = bodyD / 2 + 1.15; /* well clear of the unit */
 trayAsset.position.set(0, trayYShelf, trayZIn);
 freezer.add(trayAsset);
 
-/* Door — same rounded-rect silhouette as the fridge front */
+/* Door - same rounded-rect silhouette as the fridge front */
 const doorPivot = new THREE.Group();
 doorPivot.position.set(-bodyW / 2, bodyH / 2, bodyD / 2 + 0.002);
 freezer.add(doorPivot);
@@ -419,7 +419,7 @@ const hingeYs = [-bodyH * 0.28, bodyH * 0.28];
 const doorGrab = [door, handle, seal];
 
 hingeYs.forEach((y) => {
-  /* Knuckles straddle the pivot — rotate with the door */
+  /* Knuckles straddle the pivot - rotate with the door */
   const knuckle = new THREE.Group();
   knuckle.position.set(0, y, 0);
   const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.1, 20), hingeMetal);
@@ -442,7 +442,7 @@ hingeYs.forEach((y) => {
   doorPivot.add(knuckle);
   doorGrab.push(barrel, capT, capB, leaf);
 
-  /* Fixed body leaf — stays on the cabinet */
+  /* Fixed body leaf - stays on the cabinet */
   const bodyLeaf = new THREE.Mesh(
     new RoundedBoxGeometry(0.048, 0.07, 0.016, 1, 0.003),
     hingeMetal
@@ -462,7 +462,7 @@ for (const [x, z] of [[-0.3,-0.26],[0.3,-0.26],[-0.3,0.26],[0.3,0.26]]){
   freezer.add(foot);
 }
 
-/* Embossed brand mark — stamped into door face, top-left */
+/* Embossed brand mark - stamped into door face, top-left */
 const embossMat = new THREE.MeshPhysicalMaterial({
   color:0x6a7078, metalness:0.72, roughness:0.3, clearcoat:0.25, clearcoatRoughness:0.4
 });
@@ -472,7 +472,7 @@ const logoBadge = new THREE.Group();
 logoBadge.position.set(0.1, bodyH / 2 - 0.07, doorDepth / 2 + 0.004);
 doorPivot.add(logoBadge);
 
-/* Brand ℞ mark — same prescription glyph + serif stack as the site */
+/* Brand ℞ mark - same prescription glyph + serif stack as the site */
 function makeRxMarkTexture(){
   const size = 1024;
   const canvas = document.createElement("canvas");
@@ -578,7 +578,7 @@ btnDoor.addEventListener("click", () => {
   syncDoorButton();
 });
 
-/* ——— Cinematic sequence ———
+/* --- Cinematic sequence ---
    1) simple lateral pan across white → freezer enters frame
    2) only then dolly in
    3) door → tray slides far out → lowers → smooth crane to overhead */
@@ -610,7 +610,7 @@ const SCENE_END = 17.5;
 const trayLookShelf = [0.0, trayYShelf, trayZOut];
 const trayLook = [0.0, trayYGround, trayZOut];
 
-/* Far locked tripod for the opening — only the look direction pans */
+/* Far locked tripod for the opening - only the look direction pans */
 const openPos = [2.4, 1.35, 5.6];
 
 /*
@@ -628,14 +628,14 @@ const overheadUp = [0, 0, -1];
 const endPos = [0, 1.45, trayZOut];
 
 const shots = [
-  /* 1 — exposition: camera stays put, view angle pans from empty white → freezer */
+  /* 1 - exposition: camera stays put, view angle pans from empty white → freezer */
   { t: 0.0,  pos: openPos, look: [-2.8, 0.55, 0.4], up: worldUp },
   { t: 3.8,  pos: openPos, look: [0.05, 0.48, 0.05], up: worldUp },
   { t: 4.5,  pos: openPos, look: [0.05, 0.48, 0.05], up: worldUp },
-  /* 2 — dolly in */
+  /* 2 - dolly in */
   { t: 7.0,  pos: [1.18, 0.92, 1.58], look: [0.06, 0.48, 0.12], up: worldUp },
   { t: 8.6,  pos: [1.25, 1.05, 1.85], look: [0.06, 0.52, 0.2], up: worldUp },
-  /* Tray emerges — still a front/high angle */
+  /* Tray emerges - still a front/high angle */
   { t: 9.4,  pos: [1.2, 1.4, trayZOut + 1.4], look: [0.0, trayYShelf, trayZOut * 0.4], up: worldUp },
   { t: 11.0, pos: [0.85, 1.35, trayZOut + 1.0], look: trayLookShelf, up: worldUp },
   /* Descend with tray, drift over its center */
@@ -773,7 +773,7 @@ function updateHint(){
 
 function setCinematicMode(on){
   cinematic = on;
-  /* In embed, never hand control to orbit — scene owns the camera */
+  /* In embed, never hand control to orbit - scene owns the camera */
   controls.enabled = !embed && !on;
   if (on) doorDragging = false;
 }
@@ -816,14 +816,14 @@ function maybeCompleteScene(){
 
 btnReplay?.addEventListener("click", startScene);
 
-/* Autoplay — continues from the current (idle) pose; never teleports to t=0 */
+/* Autoplay - continues from the current (idle) pose; never teleports to t=0 */
 let autoplaying = false;
 let autoplayT0 = 0;
 let autoplayFrom = 0;
 const IDLE_TIME = 4.5;
 /* Wall-clock length of the full play-through */
 const AUTOPLAY_MS = 11000;
-/* Scene-time where the final overhead tilt begins — paced slower below */
+/* Scene-time where the final overhead tilt begins - paced slower below */
 const TILT_START = 14.2;
 /* Fraction of wall time spent on the fast body vs. the slow tilt */
 const AUTOPLAY_FAST_SHARE = 0.48;
@@ -977,7 +977,7 @@ let resizeRaf = 0;
 let lastSizeW = 0;
 let lastSizeH = 0;
 function onResize(){
-  /* Ignore resize storms while the cinematic is running — was causing start stutter */
+  /* Ignore resize storms while the cinematic is running - was causing start stutter */
   if (autoplaying) return;
   if (resizeRaf) return;
   resizeRaf = requestAnimationFrame(() => {

@@ -19,7 +19,7 @@ button,input,select,textarea{font:inherit;color:inherit;}
   --accent:#1B4DFF; --accent-hover:#0B3AD6; --on-accent:#FFFFFF; --signal:#00875A;
   --danger:#C0392B;
   --sf:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",system-ui,sans-serif;
-  --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  --mono:var(--sf);
   --rx:"Iowan Old Style","Hoefler Text",Palatino,"Times New Roman",serif;
   --gut:24px; --wide:1080px;
 }
@@ -269,7 +269,7 @@ a:hover{color:var(--accent-hover);}
         <div class="job-form-grid">
           <div class="field">
             <label for="jobTitle">Title</label>
-            <input id="jobTitle" name="title" required placeholder="e.g. Hardwood — Palmer unit 412">
+            <input id="jobTitle" name="title" required placeholder="e.g. Hardwood - Palmer unit 412">
           </div>
           <div class="field">
             <label for="jobAddress">Address</label>
@@ -373,7 +373,7 @@ a:hover{color:var(--accent-hover);}
   }
 
   function fmtDate(iso) {
-    if (!iso) return "—";
+    if (!iso) return "-";
     try {
       return new Date(iso).toLocaleString(undefined, {
         month: "short", day: "numeric", year: "numeric",
@@ -383,7 +383,7 @@ a:hover{color:var(--accent-hover);}
   }
 
   function fmtDay(d) {
-    if (!d) return "—";
+    if (!d) return "-";
     try {
       return new Date(d + "T12:00:00").toLocaleDateString(undefined, {
         weekday: "short", month: "short", day: "numeric", year: "numeric"
@@ -476,7 +476,7 @@ a:hover{color:var(--accent-hover);}
     var { data, error } = await q;
     if (error) {
       requestsList.innerHTML = "";
-      showError(appError, error.message + " — did you run supabase/setup.sql?");
+      showError(appError, error.message + " - did you run supabase/setup.sql?");
       return;
     }
     if (!data || !data.length) {
@@ -497,6 +497,9 @@ a:hover{color:var(--accent-hover);}
             "<div><strong>Phone</strong> · <a href=\"tel:" + esc(row.phone) + "\">" + esc(row.phone) + "</a></div>" +
             "<div><strong>Address</strong> · " + esc(row.address) + "</div>" +
             "<div><strong>Preferred</strong> · " + esc(fmtDay(row.preferred_date)) + " · " + esc(row.preferred_window) + "</div>" +
+            (row.services && row.services.length
+              ? "<div><strong>Services</strong> · " + esc(row.services.join(", ")) + "</div>"
+              : "") +
             (row.notes ? "<div><strong>Notes</strong> · " + esc(row.notes) + "</div>" : "") +
           "</div>" +
           '<div class="card-actions">' +

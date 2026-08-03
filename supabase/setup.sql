@@ -1,4 +1,4 @@
--- RX Flooring — run once in Supabase SQL Editor
+-- RX Flooring - run once in Supabase SQL Editor
 -- https://supabase.com/dashboard/project/xddnrxxlkwlpowieufjf/sql/new
 
 -- ---------------------------------------------------------------------------
@@ -14,9 +14,14 @@ create table if not exists public.assessment_requests (
   preferred_date date not null,
   preferred_window text not null,
   notes text,
+  services text[] not null default '{}',
   status text not null default 'new'
     check (status in ('new', 'contacted', 'scheduled', 'done', 'closed'))
 );
+
+-- Existing projects created before services existed:
+alter table public.assessment_requests
+  add column if not exists services text[] not null default '{}';
 
 create index if not exists assessment_requests_created_at_idx
   on public.assessment_requests (created_at desc);

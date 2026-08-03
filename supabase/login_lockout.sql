@@ -1,4 +1,4 @@
--- RX Flooring — password lockout after 3 failures + email unlock
+-- RX Flooring - password lockout after 3 failures + email unlock
 -- 1) Run this in the SQL Editor
 -- 2) Enable the hook: Authentication → Hooks → Password Verification
 --    → Postgres function → public.hook_password_verification_attempt
