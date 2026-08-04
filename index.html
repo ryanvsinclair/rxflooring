@@ -16,6 +16,17 @@
 *,*::before,*::after{box-sizing:border-box;}
 html{-webkit-text-size-adjust:100%; overflow-x:hidden;}
 body{margin:0; overflow-x:hidden;}
+/* Lock document scroll while the booking modal (or other overlays) are open */
+html.is-scroll-locked,
+html.is-scroll-locked body{
+  overflow:hidden !important;
+  overscroll-behavior:none;
+}
+body.is-scroll-locked{
+  position:fixed;
+  left:0; right:0;
+  width:100%;
+}
 img{max-width:100%;display:block;}
 button,input,select,textarea{font:inherit;color:inherit;}
 
@@ -1480,15 +1491,21 @@ footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; 
   width:100%; max-width:440px; margin:36px auto 0;
 }
 .cta-final-links .pill,
-.cta-final-links .pill.ghost{
-  flex:1 1 0; min-width:0; font-weight:600;
+.cta-final-links .pill.ghost,
+#services .svc-view-all{
+  font-weight:600;
   background:rgba(255,255,255,.06); color:var(--ink);
   border:1px solid rgba(29,36,43,.22);
   -webkit-backdrop-filter:blur(14px) saturate(140%);
   backdrop-filter:blur(14px) saturate(140%);
 }
+.cta-final-links .pill,
+.cta-final-links .pill.ghost{
+  flex:1 1 0; min-width:0;
+}
 .cta-final-links .pill:hover,
-.cta-final-links .pill.ghost:hover{
+.cta-final-links .pill.ghost:hover,
+#services .svc-view-all:hover{
   background:rgba(29,36,43,.06); color:var(--ink);
   border-color:rgba(29,36,43,.4);
 }
@@ -1517,6 +1534,9 @@ footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; 
 .modal-root{
   position:fixed; inset:0; z-index:100;
   display:flex; align-items:center; justify-content:center; padding:24px;
+  overflow:hidden;
+  overscroll-behavior:none;
+  touch-action:none;
 }
 .modal-root[hidden]{display:none;}
 /* Only the card is hidden while measuring: backdrop can start fading on click. */
@@ -1528,17 +1548,109 @@ footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; 
 }
 .modal-card{
   position:relative; width:min(560px,100%);
-  max-height:calc(100dvh - 48px); overflow-y:auto;
-  background:rgba(255,255,255,.08); color:#fff; border-radius:26px; opacity:0;
+  max-width:100%;
+  max-height:calc(100dvh - 48px);
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
+  /* Glass lives on ::before so nested scrollports (services step) don't
+     composite a hard seam through backdrop-filter. */
+  isolation:isolate;
+  background:transparent; color:#fff; border-radius:26px; opacity:0;
   border:1px solid rgba(255,255,255,.85);
-  -webkit-backdrop-filter:blur(18px) saturate(140%);
-  backdrop-filter:blur(18px) saturate(140%);
   box-shadow:0 20px 60px rgba(29,36,43,.18);
   padding:40px 38px 34px; transform-origin:center center;
+  transition:
+    width .55s cubic-bezier(.22,1,.36,1),
+    padding .45s cubic-bezier(.22,1,.36,1);
+}
+.modal-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  border-radius:inherit;
+  background:rgba(255,255,255,.08);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  backdrop-filter:blur(18px) saturate(140%);
+  pointer-events:none;
+}
+.modal-reveal,
+.modal-form,
+.wizard-steps,
+.wizard-step,
+.modal-form .full{
+  min-width:0;
+  max-width:100%;
+}
+@media(min-width:701px){
+  .modal-card.is-svc-wide{
+    width:min(720px, calc(100vw - 48px));
+    padding:36px 40px 32px;
+  }
+}
+/*
+  Services pick layout: the card scrolls (one scrollport = no glass seam).
+  Nav sticks to the bottom without a frosted bar - those painted the grey band.
+*/
+.modal-card.is-svc-focus{
+  display:flex;
+  flex-direction:column;
+  overflow-x:hidden;
+  overflow-y:auto;
+}
+.modal-card.is-svc-focus > .modal-x{z-index:8;}
+.modal-card.is-svc-focus .modal-reveal{
+  display:flex;
+  flex-direction:column;
+  flex:1 1 auto;
+  min-height:min-content;
+  overflow:visible;
+}
+.modal-card.is-svc-focus .modal-reveal > #bookTitle,
+.modal-card.is-svc-focus .modal-reveal > .modal-sub,
+.modal-card.is-svc-focus .modal-reveal > .modal-fine{
+  display:none;
+}
+.modal-card.is-svc-focus .modal-reveal > .mark{
+  flex:0 0 auto;
+  margin:0;
+  padding:0 40px 0 0; /* keep clear of the X */
+}
+.modal-card.is-svc-focus .modal-form{
+  display:flex;
+  flex-direction:column;
+  flex:1 1 auto;
+  min-height:min-content;
+  margin-top:14px;
+  gap:0;
+  overflow:visible;
+}
+.modal-card.is-svc-focus .wizard-status{position:absolute;}
+.modal-card.is-svc-focus .wizard-steps{
+  flex:0 0 auto;
+  overflow:visible;
+  background:transparent;
+  padding-top:6px;
+  padding-bottom:8px;
+}
+.modal-card.is-svc-focus .wizard-nav{
+  position:sticky;
+  bottom:0;
+  z-index:3;
+  flex:0 0 auto;
+  margin-top:8px;
+  padding-top:16px;
+  /* Keep glass continuous - no frosted/opaque bar under the nav. */
+  background:transparent;
 }
 @media(max-width:560px){
   .modal-root{padding:14px;}
   .modal-card{padding:30px 22px 26px; border-radius:22px; max-height:calc(100dvh - 28px);}
+}
+@media (prefers-reduced-motion:reduce){
+  .modal-card{transition:none;}
 }
 .modal-x{
   position:absolute; top:16px; right:16px; width:34px; height:34px;
@@ -1573,25 +1685,59 @@ footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; 
   25%{transform:translateX(-6px);}
   75%{transform:translateX(6px);}
 }
-.wizard-step input.shake,.wizard-step select.shake,.wizard-step textarea.shake{
+.wizard-step input.shake,.wizard-step select.shake,.wizard-step textarea.shake,
+.wizard-step .book-date-strip.shake{
   border-color:rgba(255,163,143,.95); box-shadow:0 0 0 3px rgba(255,138,120,.18);
   animation:wizardShake .34s ease;
 }
-.book-svc-picks{
-  display:flex; flex-wrap:wrap; gap:8px;
-  max-height:min(42vh, 300px); overflow:auto;
-  padding:2px;
-  scrollbar-width:thin;
+.book-svc-lead{
+  margin:0 0 18px;
+  text-align:center;
+  font-size:16px; line-height:1.45; font-weight:500;
+  letter-spacing:-.015em;
+  color:rgba(255,255,255,.86);
+  max-width:34em; margin-left:auto; margin-right:auto;
+}
+.book-svc-picks,
+.book-svc-chosen{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  justify-items:stretch;
+  width:min(100%, 340px);
+  margin:0 auto;
+  padding:0;
+  overflow:visible;
+}
+.modal-card.is-svc-focus .book-svc-picks{
+  /* Extra room so edge blur isn't clipped by the scrollport. */
+  padding:6px 4px 10px;
+}
+@media(min-width:701px){
+  .modal-card.is-svc-wide .book-svc-picks{
+    grid-template-columns:1fr 1fr;
+    width:min(100%, 560px);
+    gap:10px;
+  }
+  .book-svc-chosen{
+    width:min(100%, 360px);
+  }
 }
 .book-svc-chip{
   appearance:none; margin:0; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  width:100%; box-sizing:border-box;
+  min-height:44px;
   border:1px solid rgba(255,255,255,.38);
   background:rgba(255,255,255,.1);
   color:rgba(255,255,255,.92);
-  border-radius:980px;
-  padding:9px 13px;
-  font:inherit; font-size:13px; font-weight:500; letter-spacing:-.01em;
-  transition:background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+  border-radius:999px;
+  padding:10px 16px;
+  font:inherit; font-size:13.5px; font-weight:500; letter-spacing:-.01em;
+  text-align:center; line-height:1.25;
+  will-change:filter, opacity;
+  transition:background .16s ease, border-color .16s ease, color .16s ease,
+    filter .08s linear, opacity .08s linear;
 }
 .book-svc-chip:hover{
   background:rgba(255,255,255,.18);
@@ -1602,10 +1748,23 @@ footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; 
   border-color:rgba(255,255,255,.95);
   color:var(--ink);
 }
+.book-svc-chip.is-static{
+  cursor:default;
+  pointer-events:none;
+}
+@media (prefers-reduced-motion:reduce){
+  .book-svc-chip{
+    filter:none !important;
+    opacity:1 !important;
+    transition:background .16s ease, border-color .16s ease, color .16s ease;
+  }
+}
 .book-svc-hint{
-  margin-top:10px; font-size:13px; line-height:1.4;
+  margin-top:14px; font-size:13px; line-height:1.4;
+  text-align:center;
   color:rgba(255,255,255,.5);
 }
+.book-svc-mode[hidden]{display:none !important;}
 .wizard-nav{display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:22px; flex-wrap:wrap;}
 #wizardBtn.pill{margin-top:0;}
 .wizard-back{
@@ -1623,7 +1782,8 @@ footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; 
 }
 @media (prefers-reduced-motion:reduce){
   .wizard-step.is-active.anim{animation:none;}
-  .wizard-step input.shake,.wizard-step select.shake,.wizard-step textarea.shake{animation:none;}
+  .wizard-step input.shake,.wizard-step select.shake,.wizard-step textarea.shake,
+  .wizard-step .book-date-strip.shake{animation:none;}
 }
 /* Everything inside the card stays hidden until the glass shell opacity
    ramp finishes, then the whole stack slides in. */
@@ -1659,6 +1819,133 @@ footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; 
 }
 .modal-form input[type="date"]{min-height:48px;}
 .modal-form input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(1); opacity:.75; cursor:pointer;}
+
+/* 14-day horizontal date strip */
+.book-date{
+  position:relative;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+}
+.book-date.is-custom .book-date-native{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  opacity:0; pointer-events:none;
+}
+.book-date-rail{
+  position:relative;
+  width:calc(100% + 64px);
+  max-width:none;
+  min-width:0;
+  margin-left:-32px;
+  margin-right:-32px;
+  overflow:hidden;
+}
+@media(max-width:560px){
+  .book-date-rail{
+    width:calc(100% + 36px);
+    margin-left:-18px;
+    margin-right:-18px;
+  }
+}
+.book-date-strip{
+  display:flex; gap:8px;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  overflow-x:auto; overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+  overscroll-behavior-y:none;
+  touch-action:pan-x;
+  /* Proximity keeps mid-fling free; JS settles to a card after coasting. */
+  scroll-snap-type:x proximity;
+  /* Horizontal pad stays 0 so an integer number of cards can fill the width exactly */
+  padding:22px 0 14px;
+  margin:0;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  border-radius:0;
+}
+.book-date-strip::-webkit-scrollbar{display:none; height:0;}
+.book-date-chip{
+  appearance:none; margin:0; cursor:pointer;
+  flex:0 0 auto;
+  position:relative;
+  z-index:0;
+  width:64px; /* fallback before JS measures */
+  min-height:84px;
+  box-sizing:border-box;
+  scroll-snap-align:start;
+  scroll-snap-stop:normal;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:4px;
+  padding:12px 8px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.38);
+  background:rgba(255,255,255,.1);
+  color:rgba(255,255,255,.92);
+  font:inherit;
+  will-change:filter, opacity, transform;
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    color .18s ease,
+    transform .42s cubic-bezier(.22,1,.36,1),
+    box-shadow .42s cubic-bezier(.22,1,.36,1);
+}
+@media (prefers-reduced-motion:reduce){
+  .book-date-chip{filter:none !important; opacity:1 !important; transition:background .16s ease, border-color .16s ease, color .16s ease;}
+  .book-date-chip.is-selected{transform:none; animation:none;}
+}
+.book-date-chip:hover{
+  background:rgba(255,255,255,.18);
+  border-color:rgba(255,255,255,.6);
+}
+.book-date-chip:focus-visible{
+  outline:2px solid rgba(255,255,255,.85);
+  outline-offset:2px;
+}
+.book-date-chip .dow{
+  font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+  color:rgba(255,255,255,.55);
+}
+.book-date-chip .dom{
+  font-size:22px; font-weight:600; letter-spacing:-.03em; line-height:1;
+}
+.book-date-chip .mon{
+  font-size:11px; font-weight:500; letter-spacing:.04em; text-transform:uppercase;
+  color:rgba(255,255,255,.55);
+}
+.book-date-chip.is-today{
+  border-color:rgba(255,255,255,.75);
+}
+@keyframes bookDateLift{
+  0%{transform:translateY(0);}
+  58%{transform:translateY(-16px);}
+  100%{transform:translateY(-12px);}
+}
+.book-date-chip.is-selected{
+  z-index:2;
+  background:rgba(255,255,255,.94);
+  border-color:rgba(255,255,255,.95);
+  color:var(--ink);
+  /* Lift only - no scale, so edge cards stay fully inside the strip */
+  transform:translateY(-12px);
+  box-shadow:
+    0 1px 2px rgba(29,36,43,.06),
+    0 14px 28px rgba(29,36,43,.22);
+}
+.book-date-chip.is-selected.is-lift{
+  animation:bookDateLift .5s cubic-bezier(.22,1,.36,1) both;
+}
+.book-date-chip.is-selected .dow,
+.book-date-chip.is-selected .mon{color:rgba(29,36,43,.55);}
+.book-date-hint{
+  margin:2px 0 0;
+  font-size:12.5px; line-height:1.4;
+  color:rgba(255,255,255,.48);
+}
 .modal-form input::placeholder,
 .modal-form textarea::placeholder{color:rgba(255,255,255,.5);}
 .modal-form input:focus,.modal-form select:focus,.modal-form textarea:focus{
@@ -2186,7 +2473,7 @@ html{scroll-behavior:smooth;}
         <div class="label accent">Services</div>
         <h2 class="big" style="margin-top:16px;">Flooring, and the work around it.</h2>
         <p class="sec-intro">From stretch-in carpet to full strip-outs - assessed, prescribed, and run like a job site.</p>
-        <button type="button" class="pill ghost svc-view-all" id="btnSvcViewAll">
+        <button type="button" class="pill lg svc-view-all" id="btnSvcViewAll">
           View all <span class="chev" aria-hidden="true">→</span>
         </button>
       </div>
@@ -2331,7 +2618,9 @@ html{scroll-behavior:smooth;}
           </div>
           <div class="wizard-step" data-step="4">
             <label class="wizard-label" for="bookDate">Preferred date</label>
-            <input id="bookDate" type="date" name="date" aria-label="Preferred date" required>
+            <div class="book-date" id="bookDateWrap">
+              <input id="bookDate" class="book-date-native" type="date" name="date" aria-label="Preferred date" required>
+            </div>
           </div>
           <div class="wizard-step" data-step="5">
             <label class="wizard-label" for="bookWindow">Preferred time window</label>
@@ -2343,9 +2632,15 @@ html{scroll-behavior:smooth;}
             </select>
           </div>
           <div class="wizard-step" data-step="6">
-            <label class="wizard-label" id="bookServicesLabel">Services <span class="wizard-optional">(optional)</span></label>
-            <div class="book-svc-picks" id="bookSvcPicks" role="group" aria-labelledby="bookServicesLabel"></div>
-            <p class="book-svc-hint">Tap to select. Prefills from the services catalog if you already added any.</p>
+            <div class="book-svc-mode" id="bookSvcPickMode">
+              <p class="book-svc-lead" id="bookServicesLabel">Services are optional. Choosing what you need helps us prepare a sharper on-site assessment.</p>
+              <div class="book-svc-picks" id="bookSvcPicks" role="group" aria-labelledby="bookServicesLabel"></div>
+              <p class="book-svc-hint">Select any that apply, or continue to skip.</p>
+            </div>
+            <div class="book-svc-mode" id="bookSvcConfirmMode" hidden>
+              <p class="book-svc-lead" id="bookServicesConfirmLabel">Confirm the services for your assessment.</p>
+              <div class="book-svc-chosen" id="bookSvcChosen" role="list" aria-labelledby="bookServicesConfirmLabel"></div>
+            </div>
           </div>
           <div class="wizard-step" data-step="7">
             <label class="wizard-label" for="bookNotes">What&rsquo;s going on? <span class="wizard-optional">(optional)</span></label>
@@ -2390,6 +2685,27 @@ var bookForm = document.getElementById("bookForm");
 var dateIn   = bookForm.querySelector("[name=date]");
 var activeRoot = null, activeCard = null, activeBackdrop = null;
 var lastTrigger = null, busy = false, lastSkin = null;
+var pageScrollLockY = 0;
+var pageScrollLocks = 0;
+
+function lockPageScroll(){
+  if (pageScrollLocks === 0){
+    pageScrollLockY = window.scrollY || window.pageYOffset || 0;
+    document.documentElement.classList.add("is-scroll-locked");
+    document.body.classList.add("is-scroll-locked");
+    document.body.style.top = "-" + pageScrollLockY + "px";
+  }
+  pageScrollLocks += 1;
+}
+function unlockPageScroll(){
+  if (pageScrollLocks === 0) return;
+  pageScrollLocks -= 1;
+  if (pageScrollLocks > 0) return;
+  document.documentElement.classList.remove("is-scroll-locked");
+  document.body.classList.remove("is-scroll-locked");
+  document.body.style.top = "";
+  window.scrollTo(0, pageScrollLockY);
+}
 
 /* ---------- booking form: one-field-at-a-time wizard ---------- */
 var wizardSteps  = Array.prototype.slice.call(bookForm.querySelectorAll(".wizard-step"));
@@ -2399,6 +2715,16 @@ var wizardDots   = document.getElementById("wizardDots");
 var wizardStatus = document.getElementById("wizardStatus");
 var TOTAL_STEPS  = wizardSteps.length;
 var currentStep  = 1;
+var SVC_STEP = 6;
+var bookServicesFromLedger = false;
+var bookCard = bookModal.querySelector(".modal-card");
+var bookSvcPickMode = document.getElementById("bookSvcPickMode");
+var bookSvcConfirmMode = document.getElementById("bookSvcConfirmMode");
+var bookSvcChosen = document.getElementById("bookSvcChosen");
+var bookSvcPicks = document.getElementById("bookSvcPicks");
+var SVC_EDGE_PX = 56;
+var SVC_MAX_BLUR = 7;
+var svcEdgeRaf = 0;
 
 wizardSteps.forEach(function(){
   var dot = document.createElement("span");
@@ -2416,18 +2742,131 @@ wizardSteps.forEach(function(step){
   });
 });
 
+function isDesktopBook(){
+  return window.matchMedia("(min-width:701px)").matches;
+}
 function isStepValid(step){
+  var dateNative = step.querySelector('input[type="date"][name="date"]');
+  if (dateNative){
+    if (!dateNative.hasAttribute("required")) return true;
+    return !!dateNative.value && !!dateNative.value.trim();
+  }
   var field = stepField(step);
   if (!field || !field.hasAttribute("required")) return true;
   return !!field.value && !!field.value.trim();
 }
 function markInvalid(step){
-  var field = stepField(step);
+  var dateNative = step.querySelector("#bookDate");
+  var dateStrip = step.querySelector("#bookDateStrip");
+  var field = (dateNative && dateStrip && dateNative.closest(".book-date.is-custom"))
+    ? dateStrip
+    : stepField(step);
   if (!field) return;
   field.classList.remove("shake");
   void field.offsetWidth;
   field.classList.add("shake");
-  field.focus();
+  if (field === dateStrip){
+    var focusChip = dateStrip.querySelector(".book-date-chip.is-selected") ||
+      dateStrip.querySelector(".book-date-chip");
+    if (focusChip) focusChip.focus({ preventScroll: true });
+  } else {
+    field.focus({ preventScroll: true });
+  }
+}
+function clearSvcEdgeBlur(){
+  if (!bookSvcPicks) return;
+  bookSvcPicks.querySelectorAll(".book-svc-chip").forEach(function(chip){
+    chip.style.filter = "";
+    chip.style.opacity = "";
+  });
+}
+function updateSvcEdgeBlur(){
+  svcEdgeRaf = 0;
+  if (reduced()) return;
+  if (!bookCard || !bookCard.classList.contains("is-svc-focus") || !bookSvcPicks){
+    clearSvcEdgeBlur();
+    return;
+  }
+  var cardRect = bookCard.getBoundingClientRect();
+  var markEl = bookCard.querySelector(".modal-reveal > .mark");
+  var navEl = bookCard.querySelector(".wizard-nav");
+  var topEdge = markEl ? markEl.getBoundingClientRect().bottom : cardRect.top;
+  var bottomEdge = navEl ? navEl.getBoundingClientRect().top : cardRect.bottom;
+  var chips = bookSvcPicks.querySelectorAll(".book-svc-chip");
+  for (var i = 0; i < chips.length; i++){
+    var chip = chips[i];
+    /* Selected pills stay crisp - same as the date picker. */
+    if (chip.classList.contains("is-on")){
+      chip.style.filter = "";
+      chip.style.opacity = "";
+      continue;
+    }
+    var r = chip.getBoundingClientRect();
+    var mid = r.top + r.height * 0.5;
+    var distTop = mid - topEdge;
+    var distBottom = bottomEdge - mid;
+    var dist = Math.min(distTop, distBottom);
+    var t = 0;
+    if (dist < SVC_EDGE_PX){
+      t = 1 - Math.max(0, dist) / SVC_EDGE_PX;
+      t = t * t;
+    }
+    if (t <= 0.01){
+      chip.style.filter = "";
+      chip.style.opacity = "";
+    } else {
+      chip.style.filter = "blur(" + (t * SVC_MAX_BLUR).toFixed(2) + "px)";
+      chip.style.opacity = String(Math.max(0.28, 1 - t * 0.55).toFixed(3));
+    }
+  }
+}
+function scheduleSvcEdgeBlur(){
+  if (reduced()) return;
+  if (!svcEdgeRaf) svcEdgeRaf = requestAnimationFrame(updateSvcEdgeBlur);
+}
+function clearSvcShell(){
+  if (!bookCard) return;
+  bookCard.classList.remove("is-svc-wide", "is-svc-focus");
+  clearSvcEdgeBlur();
+}
+function renderChosenServices(){
+  if (!bookSvcChosen) return;
+  var titles = getBookServices();
+  bookSvcChosen.innerHTML = titles.map(function(t){
+    return '<span class="book-svc-chip is-on is-static" role="listitem">' +
+      String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") +
+    "</span>";
+  }).join("");
+}
+function syncSvcStepLayout(){
+  var onSvc = currentStep === SVC_STEP;
+  var fromLedger = bookServicesFromLedger && getBookServices().length > 0;
+
+  if (!onSvc){
+    if (bookSvcPickMode) bookSvcPickMode.hidden = false;
+    if (bookSvcConfirmMode) bookSvcConfirmMode.hidden = true;
+    clearSvcShell();
+    return;
+  }
+
+  if (fromLedger){
+    if (bookSvcPickMode) bookSvcPickMode.hidden = true;
+    if (bookSvcConfirmMode) bookSvcConfirmMode.hidden = false;
+    renderChosenServices();
+    clearSvcShell();
+    wizardBtn.textContent = "Confirm";
+    return;
+  }
+
+  if (bookSvcPickMode) bookSvcPickMode.hidden = false;
+  if (bookSvcConfirmMode) bookSvcConfirmMode.hidden = true;
+  if (!bookCard) return;
+  /* Expand on desktop; hide title/sub + lock chrome on all viewports. */
+  bookCard.classList.remove("is-svc-wide", "is-svc-focus");
+  void bookCard.offsetWidth;
+  if (isDesktopBook()) bookCard.classList.add("is-svc-wide");
+  bookCard.classList.add("is-svc-focus");
+  scheduleSvcEdgeBlur();
 }
 function renderStep(animate){
   var step = wizardSteps[currentStep - 1];
@@ -2441,20 +2880,50 @@ function renderStep(animate){
   wizardBtn.textContent = currentStep === TOTAL_STEPS ? "Request assessment" : "Continue";
   wizardDotEls.forEach(function(d, i){ d.classList.toggle("is-active", i === currentStep - 1); });
   wizardStatus.textContent = "Step " + currentStep + " of " + TOTAL_STEPS;
+  syncSvcStepLayout();
+  if (bookCard) bookCard.scrollLeft = 0;
+  var dateStrip = step.querySelector("#bookDateStrip");
   var field = stepField(step);
-  if (field) field.focus({ preventScroll:true });
+  if (dateStrip && step.querySelector(".book-date.is-custom")){
+    var chip = dateStrip.querySelector(".book-date-chip.is-selected") ||
+      dateStrip.querySelector(".book-date-chip");
+    if (chip) chip.focus({ preventScroll:true });
+    if (typeof window.rxUpdateBookDateBlur === "function"){
+      requestAnimationFrame(window.rxUpdateBookDateBlur);
+    }
+  } else if (field){
+    field.focus({ preventScroll:true });
+  } else if (currentStep === SVC_STEP){
+    wizardBtn.focus({ preventScroll:true });
+    scheduleSvcEdgeBlur();
+  }
+}
+if (bookCard){
+  bookCard.addEventListener("scroll", function(){
+    if (bookCard.classList.contains("is-svc-focus")) scheduleSvcEdgeBlur();
+  }, { passive: true });
+}
+window.addEventListener("resize", function(){
+  if (bookCard && bookCard.classList.contains("is-svc-focus")) scheduleSvcEdgeBlur();
+});
+if (bookSvcPicks){
+  bookSvcPicks.addEventListener("click", function(){
+    scheduleSvcEdgeBlur();
+  });
 }
 function goToStep(n, animate){
   currentStep = n;
   renderStep(animate);
 }
 function resetBookServices(){
+  bookServicesFromLedger = false;
   var host = document.getElementById("bookSvcPicks");
   if (!host) return;
   host.querySelectorAll(".book-svc-chip.is-on").forEach(function(chip){
     chip.classList.remove("is-on");
     chip.setAttribute("aria-pressed", "false");
   });
+  if (bookSvcChosen) bookSvcChosen.innerHTML = "";
 }
 function getBookServices(){
   var host = document.getElementById("bookSvcPicks");
@@ -2467,8 +2936,12 @@ function getBookServices(){
 function applyBookServices(slugs){
   var host = document.getElementById("bookSvcPicks");
   if (!host) return;
-  resetBookServices();
-  if (!slugs || !slugs.length) return;
+  host.querySelectorAll(".book-svc-chip.is-on").forEach(function(chip){
+    chip.classList.remove("is-on");
+    chip.setAttribute("aria-pressed", "false");
+  });
+  bookServicesFromLedger = !!(slugs && slugs.length);
+  if (!bookServicesFromLedger) return;
   var want = {};
   for (var i = 0; i < slugs.length; i++) want[slugs[i]] = true;
   host.querySelectorAll(".book-svc-chip").forEach(function(chip){
@@ -2483,6 +2956,7 @@ window.rxApplyBookServices = applyBookServices;
 function resetWizard(){
   currentStep = 1;
   resetBookServices();
+  clearSvcShell();
   renderStep(false);
 }
 wizardBack.addEventListener("click", function(){
@@ -2498,8 +2972,332 @@ function setDateMin(){
   var mm = String(d.getMonth() + 1).padStart(2, "0");
   var dd = String(d.getDate()).padStart(2, "0");
   dateIn.min = yyyy + "-" + mm + "-" + dd;
+  if (typeof window.rxRefreshBookDatePicker === "function"){
+    window.rxRefreshBookDatePicker();
+  }
 }
 setDateMin();
+
+/* Next-14-days horizontal date strip (all platforms, including iOS). */
+(function initBookDatePicker(){
+  var wrap = document.getElementById("bookDateWrap");
+  var input = document.getElementById("bookDate");
+  if (!wrap || !input) return;
+
+  wrap.classList.add("is-custom");
+  input.setAttribute("tabindex", "-1");
+  input.setAttribute("aria-hidden", "true");
+
+  var rail = document.createElement("div");
+  rail.className = "book-date-rail";
+
+  var strip = document.createElement("div");
+  strip.className = "book-date-strip";
+  strip.id = "bookDateStrip";
+  strip.setAttribute("role", "listbox");
+  strip.setAttribute("aria-label", "Preferred date - next 14 days");
+
+  var hint = document.createElement("p");
+  hint.className = "book-date-hint";
+  hint.textContent = "Scroll and pick any day in the next two weeks.";
+
+  rail.appendChild(strip);
+  wrap.appendChild(rail);
+  wrap.appendChild(hint);
+
+  var DAYS = 14;
+  var DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var GAP = 8;
+  var MIN_CARD = 52;
+  var MAX_CARD = 68;
+  var MIN_VISIBLE = 4;
+  var MAX_VISIBLE = 7;
+  var EDGE_PX = 56;
+  var MAX_BLUR = 7;
+  var edgeRaf = 0;
+  var snapTimer = 0;
+  var scrollingProgrammatic = false;
+  var visibleCount = 5;
+  var cardWidth = 64;
+  var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function pad(n){ return String(n).padStart(2, "0"); }
+  function toKey(d){
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  }
+  function parseKey(s){
+    if (!s) return null;
+    var p = s.split("-");
+    if (p.length !== 3) return null;
+    var d = new Date(+p[0], +p[1] - 1, +p[2]);
+    d.setHours(0, 0, 0, 0);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  function startDate(){
+    var d = parseKey(input.min);
+    if (!d){
+      d = new Date();
+      d.setHours(0, 0, 0, 0);
+    }
+    return d;
+  }
+  function formatLabel(d){
+    try {
+      return d.toLocaleDateString(undefined, {
+        weekday: "long", month: "long", day: "numeric", year: "numeric"
+      });
+    } catch (err){
+      return toKey(d);
+    }
+  }
+  function updateEdgeBlur(){
+    edgeRaf = 0;
+    if (reducedMotion) return;
+    var stripRect = strip.getBoundingClientRect();
+    var leftEdge = stripRect.left;
+    var rightEdge = stripRect.right;
+    var chips = strip.querySelectorAll(".book-date-chip");
+    for (var i = 0; i < chips.length; i++){
+      var chip = chips[i];
+      /* Selected card stays crisp - lifted out of the edge blur. */
+      if (chip.classList.contains("is-selected")){
+        chip.style.filter = "";
+        chip.style.opacity = "";
+        continue;
+      }
+      var r = chip.getBoundingClientRect();
+      var mid = r.left + r.width * 0.5;
+      var distLeft = mid - leftEdge;
+      var distRight = rightEdge - mid;
+      var dist = Math.min(distLeft, distRight);
+      var t = 0;
+      if (dist < EDGE_PX){
+        t = 1 - Math.max(0, dist) / EDGE_PX;
+        /* Ease in so blur ramps harder near the border */
+        t = t * t;
+      }
+      if (t <= 0.01){
+        chip.style.filter = "";
+        chip.style.opacity = "";
+      } else {
+        chip.style.filter = "blur(" + (t * MAX_BLUR).toFixed(2) + "px)";
+        chip.style.opacity = String(Math.max(0.28, 1 - t * 0.55).toFixed(3));
+      }
+    }
+  }
+  function scheduleEdgeBlur(){
+    if (reducedMotion) return;
+    if (!edgeRaf) edgeRaf = requestAnimationFrame(updateEdgeBlur);
+  }
+  function syncSelection(opts){
+    opts = opts || {};
+    var key = input.value || "";
+    var chips = strip.querySelectorAll(".book-date-chip");
+    var picked = null;
+    for (var i = 0; i < chips.length; i++){
+      var on = chips[i].getAttribute("data-date") === key;
+      chips[i].classList.toggle("is-selected", on);
+      chips[i].setAttribute("aria-selected", on ? "true" : "false");
+      chips[i].classList.remove("is-lift");
+      if (on) picked = chips[i];
+    }
+    strip.classList.remove("shake");
+    if (opts.animate && picked && !reducedMotion){
+      void picked.offsetWidth;
+      picked.classList.add("is-lift");
+    }
+    scheduleEdgeBlur();
+  }
+  function stepSize(){
+    var chip = strip.querySelector(".book-date-chip");
+    var w = chip ? chip.offsetWidth : cardWidth;
+    return w + GAP;
+  }
+  function padLeft(){
+    return parseFloat(getComputedStyle(strip).paddingLeft) || 0;
+  }
+  function clampScroll(left){
+    var max = Math.max(0, strip.scrollWidth - strip.clientWidth);
+    if (left < 0) return 0;
+    if (left > max) return max;
+    return left;
+  }
+  function maxStartIndex(){
+    return Math.max(0, DAYS - visibleCount);
+  }
+  function layoutChips(){
+    strip.style.paddingLeft = "0px";
+    strip.style.paddingRight = "0px";
+    var w = strip.clientWidth;
+    if (w < 80) return;
+    var n = Math.floor((w + GAP) / (MIN_CARD + GAP));
+    n = Math.min(MAX_VISIBLE, Math.max(MIN_VISIBLE, n));
+    var width = Math.floor((w - GAP * (n - 1)) / n);
+    while (width > MAX_CARD && n < MAX_VISIBLE){
+      n += 1;
+      width = Math.floor((w - GAP * (n - 1)) / n);
+    }
+    while (width < MIN_CARD && n > MIN_VISIBLE){
+      n -= 1;
+      width = Math.floor((w - GAP * (n - 1)) / n);
+    }
+    var used = width * n + GAP * (n - 1);
+    var leftover = Math.max(0, w - used);
+    var padL = Math.floor(leftover / 2);
+    var padR = leftover - padL;
+    strip.style.paddingLeft = padL + "px";
+    strip.style.paddingRight = padR + "px";
+    visibleCount = n;
+    cardWidth = width;
+    var chips = strip.querySelectorAll(".book-date-chip");
+    for (var i = 0; i < chips.length; i++){
+      chips[i].style.flex = "0 0 " + width + "px";
+      chips[i].style.width = width + "px";
+      chips[i].style.maxWidth = width + "px";
+    }
+    strip.style.setProperty("--book-date-card", width + "px");
+    scheduleEdgeBlur();
+  }
+  function scrollToStartIndex(index, behavior){
+    var chips = strip.querySelectorAll(".book-date-chip");
+    index = Math.max(0, Math.min(maxStartIndex(), index));
+    var chip = chips[index];
+    if (!chip) return;
+    var target = clampScroll(Math.round(chip.offsetLeft - padLeft()));
+    if (Math.abs(target - strip.scrollLeft) < 0.5){
+      strip.scrollLeft = target;
+      scheduleEdgeBlur();
+      return;
+    }
+    scrollingProgrammatic = true;
+    window.clearTimeout(snapTimer);
+    if (typeof strip.scrollTo === "function"){
+      strip.scrollTo({ left: target, behavior: behavior || "smooth" });
+    } else {
+      strip.scrollLeft = target;
+    }
+    window.setTimeout(function(){
+      /* Lock exact pixel so pick/lift never leaves edge cards half-clipped */
+      strip.scrollLeft = target;
+      scrollingProgrammatic = false;
+      scheduleEdgeBlur();
+    }, behavior === "auto" || reducedMotion ? 40 : 440);
+    scheduleEdgeBlur();
+  }
+  function scrollChipToCenter(chip, behavior){
+    if (!chip) return;
+    layoutChips();
+    var chips = strip.querySelectorAll(".book-date-chip");
+    var idx = Array.prototype.indexOf.call(chips, chip);
+    if (idx < 0) return;
+    var mid = Math.floor((visibleCount - 1) / 2);
+    scrollToStartIndex(idx - mid, behavior);
+  }
+  function snapToNearestChip(){
+    if (scrollingProgrammatic) return;
+    var step = stepSize();
+    if (step <= 0) return;
+    var index = Math.round((strip.scrollLeft) / step);
+    scrollToStartIndex(index, reducedMotion ? "auto" : "smooth");
+  }
+  function scheduleSnap(){
+    if (scrollingProgrammatic) return;
+    window.clearTimeout(snapTimer);
+    /* Wait a beat after the last scroll tick so flings can coast before snap. */
+    snapTimer = window.setTimeout(snapToNearestChip, 260);
+  }
+  function scrollSelectedIntoView(){
+    scrollChipToCenter(
+      strip.querySelector(".book-date-chip.is-selected"),
+      reducedMotion ? "auto" : "smooth"
+    );
+  }
+  function render(){
+    var start = startDate();
+    var end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + (DAYS - 1));
+    input.max = toKey(end);
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var todayKey = toKey(today);
+    var selectedKey = input.value || "";
+    var html = "";
+    for (var i = 0; i < DAYS; i++){
+      var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      d.setHours(0, 0, 0, 0);
+      var key = toKey(d);
+      var cls = "book-date-chip";
+      if (key === todayKey) cls += " is-today";
+      if (key === selectedKey) cls += " is-selected";
+      html +=
+        '<button type="button" class="' + cls + '" role="option" data-date="' + key + '"' +
+          ' aria-label="' + formatLabel(d) + '"' +
+          ' aria-selected="' + (key === selectedKey ? "true" : "false") + '">' +
+          '<span class="dow">' + DOW[d.getDay()] + "</span>" +
+          '<span class="dom">' + d.getDate() + "</span>" +
+          '<span class="mon">' + MON[d.getMonth()] + "</span>" +
+        "</button>";
+    }
+    strip.innerHTML = html;
+    layoutChips();
+
+    /* If a previously chosen date fell outside the window, clear it. */
+    if (selectedKey){
+      var still = strip.querySelector('.book-date-chip[data-date="' + selectedKey + '"]');
+      if (!still){
+        input.value = "";
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+        syncSelection();
+      }
+    }
+    scheduleEdgeBlur();
+  }
+
+  strip.addEventListener("click", function(e){
+    var chip = e.target.closest(".book-date-chip[data-date]");
+    if (!chip || !strip.contains(chip)) return;
+    input.value = chip.getAttribute("data-date");
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+    syncSelection({ animate: true });
+    scrollChipToCenter(chip, reducedMotion ? "auto" : "smooth");
+    chip.focus({ preventScroll: true });
+  });
+  strip.addEventListener("scroll", function(){
+    scheduleEdgeBlur();
+    scheduleSnap();
+  }, { passive: true });
+  strip.addEventListener("scrollend", function(){
+    window.clearTimeout(snapTimer);
+    snapToNearestChip();
+  });
+  window.addEventListener("resize", function(){
+    layoutChips();
+    snapToNearestChip();
+    scheduleEdgeBlur();
+  });
+  if (typeof ResizeObserver === "function"){
+    var ro = new ResizeObserver(function(){
+      layoutChips();
+      scheduleSnap();
+    });
+    ro.observe(strip);
+  }
+
+  input.addEventListener("change", function(){ syncSelection(); });
+  render();
+
+  window.rxRefreshBookDatePicker = function(){
+    render();
+    syncSelection();
+    scrollSelectedIntoView();
+  };
+  window.rxUpdateBookDateBlur = function(){
+    layoutChips();
+    scheduleEdgeBlur();
+  };
+})();
 
 function reduced(){ return window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
 
@@ -2634,7 +3432,7 @@ function hardHide(root){
   var b = root.querySelector(".modal-backdrop");
   clearAnims(c);
   clearAnims(b);
-  c.classList.remove("fields-in");
+  c.classList.remove("fields-in", "is-svc-wide", "is-svc-focus");
   c.style.opacity = "";
   c.style.visibility = "";
   b.style.opacity = "";
@@ -2659,7 +3457,7 @@ function openModal(trigger, root){
   modal.hidden = false;
   modal.classList.add("measuring");
   card.classList.remove("fields-in");
-  document.body.style.overflow = "hidden";
+  lockPageScroll();
   card.style.opacity = "0";
   backdrop.style.opacity = "0";
 
@@ -2730,7 +3528,7 @@ function closeModal(){
   function cleanup(){
     resetMorph();
     hardHide(modal);
-    document.body.style.overflow = "";
+    unlockPageScroll();
     busy = false;
     if (t) t.style.visibility = "";
     if (modal === bookModal && !doneEl.hidden){
