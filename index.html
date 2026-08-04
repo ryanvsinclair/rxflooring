@@ -155,8 +155,9 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 }
 .hero-video{position:absolute; inset:0; width:100%; height:100%;
   object-fit:cover; object-position:center;
-  opacity:0; visibility:hidden;}
-.hero-video.in{opacity:1; visibility:visible;}
+  /* Opacity only - visibility:hidden stops iOS from loading/autoplaying. */
+  opacity:0;}
+.hero-video.in{opacity:1;}
 .hero .wrap{position:relative; z-index:2; width:100%;}
 
 @media(min-width:861px){
@@ -275,9 +276,9 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 }
 .trusted-track{
   display:flex; width:max-content; align-items:center;
-  animation:trustedMarquee 32s linear infinite;
+  will-change:transform;
+  /* JS drives the marquee - CSS animation is unreliable on iOS Low Power Mode. */
 }
-.trusted-track.is-paused{ animation-play-state:paused; }
 .trusted-group{
   display:flex; align-items:center; flex-shrink:0;
   gap:72px; padding-inline:36px;
@@ -290,10 +291,6 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 .trusted-group img.caivan{height:28px; max-width:210px;}
 .trusted-group img.claridge{height:46px; max-width:210px;}
 .trusted-group img.demarco{height:36px; max-width:220px;}
-@keyframes trustedMarquee{
-  from{ transform:translateX(0); }
-  to{ transform:translateX(-50%); }
-}
 @media(max-width:700px){
   .trusted-group{gap:48px; padding-inline:24px;}
   .trusted-group img{height:32px; max-width:150px;}
@@ -301,14 +298,13 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
   .trusted-group img.caivan{height:22px; max-width:160px;}
   .trusted-group img.claridge{height:36px; max-width:160px;}
   .trusted-group img.demarco{height:28px; max-width:170px;}
-  .trusted-track{animation-duration:24s;}
   .trusted-carousel{
     -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
     mask-image:linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
   }
 }
 @media (prefers-reduced-motion:reduce){
-  .trusted-track{animation:none; width:100%; justify-content:center; flex-wrap:wrap;}
+  .trusted-track{width:100%; justify-content:center; flex-wrap:wrap; transform:none !important;}
   .trusted-group{flex-wrap:wrap; justify-content:center; padding-inline:0; gap:40px 52px;}
   .trusted-group[aria-hidden="true"]{display:none;}
   .trusted-carousel{
@@ -1307,22 +1303,33 @@ body.is-svc-drawer-open{overflow:hidden;}
 }
 .job-split.is-on .job-split-pane img{transform:scale(1);}
 .job-split-pane:first-child{
+  -webkit-clip-path: inset(0 100% 0 0);
   clip-path: inset(0 100% 0 0);
-  transition:clip-path .7s cubic-bezier(.22,1,.36,1);
+  transition:clip-path .7s cubic-bezier(.22,1,.36,1),
+    -webkit-clip-path .7s cubic-bezier(.22,1,.36,1);
 }
 .job-split-pane:last-child{
+  -webkit-clip-path: inset(0 0 0 100%);
   clip-path: inset(0 0 0 100%);
-  transition:clip-path .7s cubic-bezier(.22,1,.36,1);
+  transition:clip-path .7s cubic-bezier(.22,1,.36,1),
+    -webkit-clip-path .7s cubic-bezier(.22,1,.36,1);
 }
 .job-split.is-on .job-split-pane:first-child,
-.job-split.is-on .job-split-pane:last-child{clip-path: inset(0 0 0 0);}
+.job-split.is-on .job-split-pane:last-child{
+  -webkit-clip-path: inset(0 0 0 0);
+  clip-path: inset(0 0 0 0);
+}
 .job-split.is-closing .job-split-pane:first-child,
 .job-split.is-swapping .job-split-pane:first-child{
-  clip-path: inset(0 100% 0 0); transition-duration:.38s;
+  -webkit-clip-path: inset(0 100% 0 0);
+  clip-path: inset(0 100% 0 0);
+  transition-duration:.38s;
 }
 .job-split.is-closing .job-split-pane:last-child,
 .job-split.is-swapping .job-split-pane:last-child{
-  clip-path: inset(0 0 0 100%); transition-duration:.38s;
+  -webkit-clip-path: inset(0 0 0 100%);
+  clip-path: inset(0 0 0 100%);
+  transition-duration:.38s;
 }
 .job-split-label{
   position:absolute; left:14px; bottom:14px; z-index:2;
@@ -1363,12 +1370,29 @@ body.is-svc-drawer-open{overflow:hidden;}
 .job-split-dock .svc b{color:var(--ink); font-weight:600;}
 @media(max-width:700px){
   .job-split-panes{grid-template-columns:1fr; grid-template-rows:1fr 1fr;}
-  .job-split-pane:first-child{clip-path: inset(0 0 100% 0);}
-  .job-split-pane:last-child{clip-path: inset(100% 0 0 0);}
+  .job-split-pane:first-child{
+    -webkit-clip-path: inset(0 0 100% 0);
+    clip-path: inset(0 0 100% 0);
+  }
+  .job-split-pane:last-child{
+    -webkit-clip-path: inset(100% 0 0 0);
+    clip-path: inset(100% 0 0 0);
+  }
+  .job-split.is-on .job-split-pane:first-child,
+  .job-split.is-on .job-split-pane:last-child{
+    -webkit-clip-path: inset(0 0 0 0);
+    clip-path: inset(0 0 0 0);
+  }
   .job-split.is-closing .job-split-pane:first-child,
-  .job-split.is-swapping .job-split-pane:first-child{clip-path: inset(0 0 100% 0);}
+  .job-split.is-swapping .job-split-pane:first-child{
+    -webkit-clip-path: inset(0 0 100% 0);
+    clip-path: inset(0 0 100% 0);
+  }
   .job-split.is-closing .job-split-pane:last-child,
-  .job-split.is-swapping .job-split-pane:last-child{clip-path: inset(100% 0 0 0);}
+  .job-split.is-swapping .job-split-pane:last-child{
+    -webkit-clip-path: inset(100% 0 0 0);
+    clip-path: inset(100% 0 0 0);
+  }
   .job-split-dock{bottom:16px; padding:14px 16px;}
   .job-split-dock h3{font-size:18px;}
   .job-carousel .job-slip{cursor:pointer;}
@@ -2021,7 +2045,7 @@ html{scroll-behavior:smooth;}
       <img class="hero-poster" src="assets/hero-poster.jpg?v=4" alt=""
            width="1920" height="1080" fetchpriority="high" decoding="async" aria-hidden="true">
       <!-- src set from data-src only on good connections; otherwise poster-only. -->
-      <video class="hero-video" muted playsinline preload="none"
+      <video class="hero-video" muted playsinline webkit-playsinline autoplay preload="metadata"
              data-src="assets/hero.mp4?v=4" aria-hidden="true"></video>
     </div>
     <div class="wrap">
@@ -3656,9 +3680,12 @@ bookForm.addEventListener("submit", async function(e){
   var hv = document.querySelector(".hero-video");
   var sub = document.querySelector(".hero .sub");
   var links = document.querySelector(".hero .links");
+  var finished = false;
   var showLinks = function(){ if (links) links.classList.add("in"); };
   var showSub = function(){ if (sub) sub.classList.add("in"); };
   var afterVideo = function(){
+    if (finished) return;
+    finished = true;
     showSub();
     setTimeout(showLinks, 1000);
   };
@@ -3669,6 +3696,7 @@ bookForm.addEventListener("submit", async function(e){
     if (c){
       if (c.saveData) return false;
       var t = c.effectiveType;
+      /* Only skip truly slow links - mobile often reports "3g" on Wi‑Fi. */
       if (t === "slow-2g" || t === "2g") return false;
     }
     return true;
@@ -3679,16 +3707,49 @@ bookForm.addEventListener("submit", async function(e){
     return;
   }
 
+  hv.muted = true;
+  hv.defaultMuted = true;
+  hv.setAttribute("muted", "");
+  hv.setAttribute("playsinline", "");
+  hv.setAttribute("webkit-playsinline", "");
+  hv.playsInline = true;
+  hv.preload = "auto";
   hv.src = hv.dataset.src;
   hv.load();
+
   var reveal = function(){ hv.classList.add("in"); };
-  var start = function(){
+  var tryPlay = function(){
     var p = hv.play();
-    if (p && p.catch) p.catch(function(){ reveal(); afterVideo(); });
+    if (p && p.catch){
+      p.catch(function(err){
+        /* AbortError is usually a race before the media is ready. */
+        if (err && err.name === "AbortError") return;
+      });
+    }
   };
-  hv.addEventListener("loadeddata", start, { once:true });
-  hv.addEventListener("playing", reveal, { once:true });
+
+  hv.addEventListener("loadeddata", tryPlay);
+  hv.addEventListener("canplay", tryPlay);
+  hv.addEventListener("playing", reveal);
   hv.addEventListener("ended", afterVideo, { once:true });
+  tryPlay();
+
+  /* iOS Low Power Mode often needs a gesture before muted autoplay sticks. */
+  var kick = function(){
+    if (finished || !hv.paused) return;
+    tryPlay();
+  };
+  document.addEventListener("touchstart", kick, { passive: true, once: true });
+  document.addEventListener("click", kick, { once: true });
+
+  /* If iOS never delivers media events, don't leave the CTAs hidden. */
+  setTimeout(function(){
+    if (hv.classList.contains("in") && !hv.paused) return;
+    tryPlay();
+    setTimeout(function(){
+      if (!hv.classList.contains("in") || hv.paused) afterVideo();
+    }, 900);
+  }, 3000);
 })();
 
 /* ---------- 750 units counter ---------- */
@@ -3942,44 +4003,8 @@ function initCoverflowCarousel(root, opts){
 
   root.addEventListener("touchstart", function(){ pauseAuto(); }, { passive: true });
 
-  /* Touch keeps native overflow scroll. Desktop: no click-drag scroll -
-     wheel + autoplay move the track; card clicks stay clean. */
-  var DRAG_THRESHOLD = 8;
-  var drag = null;
-  root.addEventListener("pointerdown", function(e){
-    if (desktopOnly && !window.matchMedia("(min-width:701px)").matches) return;
-    if (isDesktopPointer()) return;
-    if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
-    pauseAuto();
-    drag = {
-      id: e.pointerId,
-      x: e.clientX,
-      y: e.clientY,
-      left: root.scrollLeft,
-      active: false
-    };
-  });
-  root.addEventListener("pointermove", function(e){
-    if (!drag || e.pointerId !== drag.id) return;
-    var dx = e.clientX - drag.x;
-    var dy = e.clientY - drag.y;
-    if (!drag.active){
-      if (Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD) return;
-      drag.active = true;
-      try { root.setPointerCapture(e.pointerId); } catch (err){}
-    }
-    pauseAuto();
-    root.scrollLeft = drag.left - dx;
-  });
-  function endDrag(e){
-    if (!drag || e.pointerId !== drag.id) return;
-    if (drag.active){
-      try { root.releasePointerCapture(e.pointerId); } catch (err){}
-    }
-    drag = null;
-  }
-  root.addEventListener("pointerup", endDrag);
-  root.addEventListener("pointercancel", endDrag);
+  /* Touch/pen: native overflow scroll only. JS drag + pointer capture was
+     eating taps (jobs focus / services) after a few pixels of finger jitter. */
 
   function tick(now){
     rafId = 0;
@@ -4042,21 +4067,80 @@ function initCoverflowCarousel(root, opts){
   };
 }
 
-/* Pause trusted-by CSS marquee while off-screen */
+/* Trusted-by logo marquee (rAF - CSS animation stalls on iOS Low Power Mode) */
 (function(){
   var shell = document.querySelector(".trusted-carousel");
   var track = shell && shell.querySelector(".trusted-track");
-  if (!track) return;
+  if (!shell || !track) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  if (!("IntersectionObserver" in window)) return;
-  track.classList.add("is-paused");
-  var tio = new IntersectionObserver(function(entries){
-    for (var i = 0; i < entries.length; i++){
-      if (entries[i].target !== shell) continue;
-      track.classList.toggle("is-paused", !entries[i].isIntersecting);
+
+  var group = track.querySelector(".trusted-group");
+  if (!group) return;
+
+  var x = 0;
+  var half = 0;
+  var inView = true;
+  var rafId = 0;
+  var last = performance.now();
+  /* ~full loop in 32s on desktop, a bit quicker on narrow screens */
+  var loopSeconds = window.matchMedia("(max-width:700px)").matches ? 24 : 32;
+
+  function measure(){
+    half = group.offsetWidth || 0;
+  }
+  function pxPerSec(){
+    return half > 0 ? half / loopSeconds : 40;
+  }
+  function frame(now){
+    rafId = 0;
+    var dt = Math.min(64, now - last);
+    last = now;
+    if (inView && half > 0){
+      x -= pxPerSec() * (dt / 1000);
+      if (x <= -half) x += half;
+      if (x > 0) x -= half;
+      track.style.transform = "translate3d(" + x.toFixed(2) + "px,0,0)";
     }
-  }, { root: null, rootMargin: "12% 0px", threshold: 0 });
-  tio.observe(shell);
+    rafId = requestAnimationFrame(frame);
+  }
+  function start(){
+    if (rafId) return;
+    last = performance.now();
+    rafId = requestAnimationFrame(frame);
+  }
+  function stop(){
+    if (!rafId) return;
+    cancelAnimationFrame(rafId);
+    rafId = 0;
+  }
+
+  measure();
+  start();
+
+  window.addEventListener("resize", function(){
+    loopSeconds = window.matchMedia("(max-width:700px)").matches ? 24 : 32;
+    measure();
+    if (half > 0 && x <= -half) x = x % half;
+  });
+
+  if ("IntersectionObserver" in window){
+    var tio = new IntersectionObserver(function(entries){
+      for (var i = 0; i < entries.length; i++){
+        if (entries[i].target !== shell) continue;
+        inView = entries[i].isIntersecting;
+        if (inView){
+          measure();
+          start();
+        }
+      }
+    }, { root: null, rootMargin: "20% 0px", threshold: 0 });
+    tio.observe(shell);
+  }
+
+  if ("ResizeObserver" in window){
+    var ro = new ResizeObserver(function(){ measure(); });
+    ro.observe(group);
+  }
 })();
 
 /* ---------- Services: glass card carousel ---------- */
@@ -4487,7 +4571,8 @@ function initCoverflowCarousel(root, opts){
   var settleTimer = null;
   var navTimer = null;
   var scrollRaf = 0;
-  var CLICK_SLOP = 8;
+  var coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+  var CLICK_SLOP = coarsePointer ? 28 : 10;
   var CLOSE_MS = reducedMq.matches ? 40 : 380;
   var SWAP_EXIT_MS = reducedMq.matches ? 0 : 320;
   var NAV_BEAT_MS = reducedMq.matches ? 0 : 180;
@@ -4648,9 +4733,15 @@ function initCoverflowCarousel(root, opts){
     document.body.style.overflow = "hidden";
     if (carousel && carousel.holdPause) carousel.holdPause();
 
+    /* Double rAF so iOS paints the closed clip-path before opening. */
     void split.offsetWidth;
-    split.classList.add("is-on", "is-blurred");
-    markSettled();
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        if (!open) return;
+        split.classList.add("is-on", "is-blurred");
+        markSettled();
+      });
+    });
   }
 
   function closeSplit(immediate){
@@ -4709,9 +4800,14 @@ function initCoverflowCarousel(root, opts){
           fillSplit(job);
           split.classList.remove("is-closing", "is-swapping");
           void split.offsetWidth;
-          split.classList.add("is-on", "is-blurred");
-          navBusy = false;
-          markSettled();
+          requestAnimationFrame(function(){
+            requestAnimationFrame(function(){
+              if (!open){ navBusy = false; return; }
+              split.classList.add("is-on", "is-blurred");
+              navBusy = false;
+              markSettled();
+            });
+          });
         }, NAV_BEAT_MS);
       });
     }, SWAP_EXIT_MS);
@@ -4726,7 +4822,10 @@ function initCoverflowCarousel(root, opts){
   }, true);
   root.addEventListener("pointermove", function(e){
     if (!pendingSlip) return;
-    if (Math.abs(e.clientX - downX) > CLICK_SLOP || Math.abs(e.clientY - downY) > CLICK_SLOP){
+    var dx = Math.abs(e.clientX - downX);
+    var dy = Math.abs(e.clientY - downY);
+    /* Only treat intentional horizontal skims as cancels - not tap jitter. */
+    if (dx > CLICK_SLOP && dx > dy){
       suppressOpen = true;
       pendingSlip = null;
     }
