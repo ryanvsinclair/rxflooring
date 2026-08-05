@@ -7,33 +7,46 @@
 <title>RX Flooring · Manager</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;}
-html{-webkit-text-size-adjust:100%;}
+html{
+  -webkit-text-size-adjust:100%;
+  height:100%;
+  overflow:hidden;
+  overscroll-behavior:none;
+}
 body{margin:0;}
 img{max-width:100%;display:block;}
 button,input,select,textarea{font:inherit;color:inherit;}
 :root{
-  color-scheme:light;
-  --bg:#FFFFFF; --bg-alt:#F5F6F8; --panel:#FFFFFF; --panel-alt:#EDF0F2;
-  --ink:#1D242B; --body:#4A535C; --muted:#79828B;
-  --rule:#E3E6EA; --rule-soft:#EDEFF2;
-  --accent:#1B4DFF; --accent-hover:#0B3AD6; --on-accent:#FFFFFF; --signal:#00875A;
-  --danger:#C0392B;
+  color-scheme:dark;
+  --bg:#1A1F26; --bg-alt:#222932; --panel:#242B34; --panel-alt:#2C343E;
+  --ink:#F2F4F6; --body:#C2C8CF; --muted:#8B949E;
+  --rule:rgba(255,255,255,.14); --rule-soft:rgba(255,255,255,.08);
+  --accent:#4B7CFF; --accent-hover:#6B94FF; --on-accent:#FFFFFF; --signal:#2BB673;
+  --danger:#E57368;
   --sf:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",system-ui,sans-serif;
   --mono:var(--sf);
   --rx:"Iowan Old Style","Hoefler Text",Palatino,"Times New Roman",serif;
   --gut:24px; --wide:1080px;
+  --bottom-nav-h:56px;
 }
 body{
-  background:var(--bg); color:var(--body);
+  background:
+    radial-gradient(90% 60% at 50% -10%, rgba(75,124,255,.14) 0%, transparent 55%),
+    radial-gradient(70% 50% at 100% 30%, rgba(43,182,115,.06) 0%, transparent 50%),
+    var(--bg);
+  color:var(--body);
   font-family:var(--sf); font-size:16px; line-height:1.5;
   letter-spacing:-.011em;
   -webkit-font-smoothing:antialiased;
-  min-height:100dvh;
+  height:100%;
+  overflow:hidden;
+  overscroll-behavior:none;
 }
 a{color:var(--accent); text-decoration:none;}
 a:hover{color:var(--accent-hover);}
-:focus-visible{outline:2px solid var(--accent); outline-offset:3px; border-radius:4px;}
-.wrap{max-width:var(--wide); margin:0 auto; padding:0 var(--gut);}
+:focus,:focus-visible{outline:none;}
+button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparent;}
+.wrap{max-width:var(--wide); margin:0 auto; padding:0 var(--gut); width:100%; box-sizing:border-box;}
 [hidden]{display:none !important;}
 
 .pill{
@@ -45,17 +58,18 @@ a:hover{color:var(--accent-hover);}
 }
 .pill:hover{background:var(--accent-hover);}
 .pill:disabled{opacity:.55; cursor:not-allowed;}
-.pill.ghost{background:transparent; color:var(--accent); border:1px solid var(--rule);}
-.pill.ghost:hover{background:var(--panel-alt);}
-.pill.danger{background:transparent; color:var(--danger); border:1px solid rgba(192,57,43,.28);}
-.pill.danger:hover{background:rgba(192,57,43,.06);}
+.pill.ghost{background:transparent; color:var(--ink); border:1px solid rgba(255,255,255,.35);}
+.pill.ghost:hover{background:rgba(255,255,255,.08); color:var(--ink);}
+.pill.danger{background:transparent; color:var(--danger); border:1px solid rgba(229,115,104,.4);}
+.pill.danger:hover{background:rgba(229,115,104,.1);}
 
 /* ---------- gate / login ---------- */
 .gate{
   min-height:100dvh; display:flex; align-items:center; justify-content:center;
   padding:48px var(--gut);
   background:
-    radial-gradient(90% 70% at 50% 0%, rgba(27,77,255,.06) 0%, transparent 55%),
+    radial-gradient(90% 70% at 50% 0%, rgba(75,124,255,.16) 0%, transparent 55%),
+    radial-gradient(60% 45% at 10% 80%, rgba(43,182,115,.07) 0%, transparent 50%),
     var(--bg);
 }
 .gate-card{width:min(400px,100%);}
@@ -64,7 +78,7 @@ a:hover{color:var(--accent-hover);}
   color:var(--ink); font-weight:600; font-size:22px; letter-spacing:-.025em;
   margin-bottom:8px;
 }
-.gate-brand .mark{font-family:var(--rx); font-size:28px; color:var(--accent); line-height:1;}
+.gate-brand .mark{font-family:var(--rx); font-size:28px; color:#fff; line-height:1;}
 .gate-card h1{
   margin:0 0 8px; color:var(--ink);
   font-size:28px; letter-spacing:-.03em; font-weight:600;
@@ -74,16 +88,17 @@ a:hover{color:var(--accent-hover);}
 .field label{font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:var(--muted);}
 .field input,.field select,.field textarea{
   width:100%; border:1px solid var(--rule); border-radius:12px;
-  background:var(--bg); color:var(--ink); padding:12px 14px;
+  background:rgba(255,255,255,.06); color:var(--ink); padding:12px 14px;
 }
 .field textarea{min-height:96px; resize:vertical;}
 .field input:focus,.field select:focus,.field textarea:focus{
-  outline:none; border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(27,77,255,.12);
+  outline:none; border-color:rgba(255,255,255,.55);
+  box-shadow:0 0 0 3px rgba(75,124,255,.22);
 }
+.field input::placeholder,.field textarea::placeholder{color:var(--muted);}
 .gate-error{
   margin:0 0 14px; padding:10px 12px; border-radius:10px;
-  background:rgba(192,57,43,.06); color:var(--danger); font-size:14px;
+  background:rgba(229,115,104,.12); color:var(--danger); font-size:14px;
 }
 .gate-actions{display:flex; gap:10px; margin-top:8px;}
 .gate-actions .pill{flex:1;}
@@ -91,64 +106,113 @@ a:hover{color:var(--accent-hover);}
 
 /* ---------- app shell ---------- */
 .app-bar{
-  position:sticky; top:0; z-index:20;
-  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  position:relative; z-index:20; flex-shrink:0;
+  background:color-mix(in srgb, var(--bg) 55%, transparent);
   -webkit-backdrop-filter:saturate(180%) blur(16px);
   backdrop-filter:saturate(180%) blur(16px);
-  border-bottom:1px solid var(--rule-soft);
+  border-bottom:1px solid rgba(255,255,255,.06);
 }
 .app-bar-in{
   max-width:var(--wide); margin:0 auto; padding:0 var(--gut);
-  height:56px; display:flex; align-items:center; gap:18px;
+  height:52px; display:flex; align-items:center; gap:12px;
 }
 .app-bar .brand{
   display:flex; align-items:baseline; gap:8px;
   color:var(--ink); font-weight:600; font-size:15px; letter-spacing:-.02em;
   margin-right:auto;
 }
-.app-bar .brand .mark{font-family:var(--rx); font-size:20px; color:var(--accent); line-height:1;}
+.app-bar .brand .mark{font-family:var(--rx); font-size:20px; color:#fff; line-height:1;}
 .app-bar .who{font-size:13px; color:var(--muted); max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-.tabs{display:flex; gap:4px; margin:28px 0 22px;}
+#appView{
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  overscroll-behavior:none;
+  padding-bottom:calc(var(--bottom-nav-h) + env(safe-area-inset-bottom,0px));
+}
+#appView > main.wrap{
+  flex:1 1 auto;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  padding-top:22px;
+  padding-bottom:16px;
+}
+#appView > main.wrap > section{
+  flex:1 1 auto;
+  min-height:0;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.bottom-nav{
+  position:fixed; left:0; right:0; bottom:0; z-index:30;
+  background:color-mix(in srgb, var(--bg) 55%, transparent);
+  -webkit-backdrop-filter:saturate(180%) blur(16px);
+  backdrop-filter:saturate(180%) blur(16px);
+  border-top:1px solid rgba(255,255,255,.06);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.bottom-nav-in{
+  max-width:var(--wide); margin:0 auto;
+  height:var(--bottom-nav-h);
+  display:flex; align-items:stretch;
+}
 .tab{
+  flex:1 1 0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px;
   border:0; background:transparent; color:var(--muted);
-  padding:8px 14px; border-radius:980px; cursor:pointer; font-weight:600; font-size:14px;
+  padding:6px 8px; cursor:pointer;
+  font-weight:600; font-size:11px; letter-spacing:-.005em;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  transition:color .16s ease;
 }
-.tab.is-active{background:var(--panel-alt); color:var(--ink);}
+.tab svg{
+  width:22px; height:22px; display:block;
+  stroke:currentColor; fill:none;
+  stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round;
+}
+.tab.is-active{color:var(--accent);}
 .tab:hover{color:var(--ink);}
-.panel-head{
-  display:flex; align-items:end; justify-content:space-between; gap:16px;
-  margin-bottom:18px; flex-wrap:wrap;
-}
-.panel-head h2{margin:0; color:var(--ink); font-size:26px; letter-spacing:-.03em;}
-.panel-head p{margin:6px 0 0; color:var(--muted); font-size:14px;}
-.toolbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
-.toolbar select{
-  border:1px solid var(--rule); border-radius:980px; padding:8px 14px;
-  background:var(--bg); color:var(--ink);
-}
+.tab.is-active:hover{color:var(--accent);}
 
-.list{display:grid; gap:12px; padding-bottom:64px;}
+.list{
+  display:flex; flex-direction:column; gap:12px; padding-bottom:16px;
+  flex:1 1 auto; min-height:0; min-width:0;
+  width:100%; align-self:stretch;
+  overflow-x:hidden; overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.list > .empty{width:100%; box-sizing:border-box;}
 .card{
-  border:1px solid var(--rule); border-radius:16px; padding:18px 18px 16px;
-  background:var(--panel);
+  border:1px solid rgba(255,255,255,.14); border-radius:16px; padding:18px 18px 16px;
+  background:rgba(255,255,255,.06);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  backdrop-filter:blur(14px) saturate(140%);
 }
 .card-top{display:flex; justify-content:space-between; gap:12px; align-items:start;}
 .card h3{margin:0; color:var(--ink); font-size:17px; letter-spacing:-.02em;}
 .meta{margin-top:4px; font-size:13px; color:var(--muted);}
 .meta strong{color:var(--body); font-weight:500;}
 .badge{
-  display:inline-flex; align-items:center;
+  display:inline-flex; align-items:center; flex-shrink:0;
   font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
   padding:5px 9px; border-radius:980px; background:var(--panel-alt); color:var(--muted);
 }
-.badge.new{background:rgba(27,77,255,.08); color:var(--accent);}
-.badge.contacted,.badge.scheduled{background:rgba(0,135,90,.08); color:var(--signal);}
-.badge.done,.badge.closed,.badge.complete{background:var(--panel-alt); color:var(--muted);}
-.badge.in_progress{background:rgba(27,77,255,.08); color:var(--accent);}
+.badge.new{background:rgba(75,124,255,.18); color:var(--accent);}
+.badge.contacted,.badge.scheduled{background:rgba(43,182,115,.16); color:var(--signal);}
+.badge.done,.badge.closed,.badge.complete,.badge.archived{background:var(--panel-alt); color:var(--muted);}
+.badge.in_progress{background:rgba(75,124,255,.18); color:var(--accent);}
 .card-body{margin-top:12px; display:grid; gap:6px; font-size:14.5px; color:var(--body);}
 .card-actions{margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
 .card-actions select{
-  border:1px solid var(--rule); border-radius:10px; padding:8px 10px; background:var(--bg);
+  border:1px solid var(--rule); border-radius:10px; padding:8px 10px; background:rgba(255,255,255,.06); color:var(--ink);
 }
 .empty{
   border:1px dashed var(--rule); border-radius:16px; padding:36px 20px;
@@ -156,28 +220,545 @@ a:hover{color:var(--accent-hover);}
 }
 .err-banner{
   margin:0 0 16px; padding:12px 14px; border-radius:12px;
-  background:rgba(192,57,43,.06); color:var(--danger); font-size:14px;
+  background:rgba(229,115,104,.12); color:var(--danger); font-size:14px;
+  flex-shrink:0;
 }
 .loading{color:var(--muted); padding:24px 0;}
 
+/* ---------- booking requests: Book CTA / floating morph card ----------
+   Compact glass lines. Click morphs to a centered card (same WAAPI pattern as
+   index.html Book: flying .morph → .modal-card). No inline drawer expand.
+   Page wash lives on body only — do not paint fills on .wrap (max-width seam). */
+.req-list{
+  display:flex; flex-direction:column; gap:10px; padding-bottom:16px;
+  flex:1 1 auto; min-height:0; min-width:0;
+  width:100%; align-self:stretch;
+  overflow-x:hidden; overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.req-list > .empty{width:100%; box-sizing:border-box;}
+.req-row{
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.85);
+  background:rgba(255,255,255,.08);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:
+    0 0 0 1px rgba(29,36,43,.08),
+    0 12px 36px rgba(29,36,43,.1);
+  overflow:hidden;
+}
+.req-line{
+  display:flex;
+  align-items:stretch;
+  gap:2px;
+  padding-right:4px;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.req-summary{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:8px;
+  flex:1 1 auto;
+  min-width:0;
+  min-height:48px;
+  padding:10px 8px 10px 14px;
+  margin:0;
+  border:0;
+  background:transparent;
+  text-align:left;
+  cursor:pointer;
+  color:inherit;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.req-line:hover .req-summary{background:rgba(255,255,255,.12);}
+.req-summary:focus,.req-summary:focus-visible{outline:none;}
+.req-main{
+  min-width:0;
+  display:flex; flex-direction:column; gap:1px;
+}
+.req-name{
+  margin:0; color:var(--ink);
+  font-size:15px; font-weight:600; letter-spacing:-.02em;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.req-snip{
+  margin:0; font-size:12.5px; color:var(--muted); line-height:1.3;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.req-call{
+  flex:0 0 auto;
+  align-self:center;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:40px;
+  height:40px;
+  min-width:40px;
+  min-height:40px;
+  padding:0;
+  border-radius:50%;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.85);
+  box-shadow:0 0 0 1px rgba(29,36,43,.08);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  backdrop-filter:blur(14px) saturate(140%);
+  color:var(--ink);
+  text-decoration:none;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  cursor:pointer;
+  transition:background .16s ease, border-color .16s ease;
+}
+.req-call:hover{background:rgba(255,255,255,.14); color:var(--ink); border-color:#fff;}
+.req-call:focus,.req-call:focus-visible{outline:none;}
+.req-call svg{flex-shrink:0; display:block;}
+.req-chev-btn{
+  flex:0 0 auto;
+  align-self:center;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:44px;
+  height:44px;
+  margin:0;
+  padding:0;
+  border:0;
+  border-radius:12px;
+  background:transparent;
+  color:var(--muted);
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.req-chev-btn:hover{background:rgba(255,255,255,.12); color:var(--ink);}
+.req-chev-btn:focus,.req-chev-btn:focus-visible{outline:none;}
+.req-chev{width:18px; height:18px; flex-shrink:0; color:inherit;}
+
+/* Morph shell — copy of Book .morph (index.html) */
+.req-morph{
+  position:fixed; z-index:101; pointer-events:none; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  box-sizing:border-box; background:transparent; border:1px solid transparent;
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  backdrop-filter:blur(18px) saturate(140%);
+}
+.req-morph span{
+  font-weight:600; font-size:15px; color:var(--ink);
+  white-space:nowrap; letter-spacing:-.005em; padding:0 12px;
+  overflow:hidden; text-overflow:ellipsis; max-width:100%;
+}
+
+/* Centered request card — Book .modal-root / .modal-card over dark wash */
+.req-modal-root{
+  position:fixed; inset:0; z-index:100;
+  display:flex; align-items:center; justify-content:center; padding:24px;
+}
+.req-modal-root.measuring .req-modal-card{visibility:hidden;}
+.req-modal-backdrop{
+  position:absolute; inset:0; opacity:0;
+  background:rgba(29,36,43,.34);
+  -webkit-backdrop-filter:blur(7px); backdrop-filter:blur(7px);
+}
+.req-modal-card{
+  position:relative; width:min(560px,100%);
+  max-height:calc(100dvh - 48px); overflow-y:auto;
+  background:rgba(255,255,255,.08); color:var(--ink); border-radius:26px; opacity:0;
+  border:1px solid rgba(255,255,255,.85);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:
+    0 0 0 1px rgba(29,36,43,.08),
+    0 20px 60px rgba(29,36,43,.18);
+  padding:32px 28px 26px; transform-origin:center center;
+}
+@media(max-width:560px){
+  .req-modal-root{padding:14px;}
+  .req-modal-card{padding:26px 18px 22px; border-radius:22px; max-height:calc(100dvh - 28px);}
+}
+.req-modal-x{
+  position:absolute; top:14px; right:14px; width:34px; height:34px;
+  border:1px solid rgba(255,255,255,.85); border-radius:50%;
+  background:rgba(255,255,255,.1); color:var(--ink);
+  box-shadow:0 0 0 1px rgba(29,36,43,.08);
+  font-size:19px; line-height:1; cursor:pointer;
+  transition:background .18s ease, border-color .18s ease;
+}
+.req-modal-x:hover{background:rgba(255,255,255,.2); border-color:#fff;}
+.req-modal-head{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  padding-right:40px;
+}
+.req-modal-card h2{
+  margin:0;
+  font-size:24px; letter-spacing:-.03em; color:var(--ink); font-weight:600;
+}
+.req-modal-sub{
+  margin:8px 0 0; font-size:14px; line-height:1.45; color:var(--muted);
+}
+@keyframes reqFieldIn{
+  from{opacity:0; transform:translateY(8px);}
+  to{opacity:1; transform:none;}
+}
+.req-modal-reveal > *,
+.req-modal-card > .req-modal-x{opacity:0;}
+.req-modal-card.fields-in .req-modal-reveal > *,
+.req-modal-card.fields-in > .req-modal-x{
+  animation:reqFieldIn .28s cubic-bezier(.22,.55,.3,1) forwards;
+}
+.req-modal-card.fields-in > .req-modal-x{animation-delay:.02s;}
+.req-modal-card.fields-in .req-modal-reveal > *:nth-child(1){animation-delay:.02s;}
+.req-modal-card.fields-in .req-modal-reveal > *:nth-child(2){animation-delay:.05s;}
+.req-modal-card.fields-in .req-modal-reveal > *:nth-child(3){animation-delay:.08s;}
+.req-modal-card.fields-in .req-modal-reveal > *:nth-child(4){animation-delay:.11s;}
+.req-modal-card.fields-in .req-modal-reveal > *:nth-child(5){animation-delay:.14s;}
+.req-fields{
+  display:grid; gap:10px;
+  margin-top:20px;
+  font-size:14px; color:var(--body);
+}
+.req-field{display:grid; gap:2px;}
+.req-field .lbl{
+  font-size:11px; font-weight:600; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--muted);
+}
+.req-field .val{color:var(--ink); word-break:break-word;}
+.req-field a{color:var(--accent); font-weight:500;}
+.req-actions{
+  margin-top:18px;
+  display:flex; gap:8px; flex-wrap:wrap; align-items:center;
+}
+.req-actions select{
+  border:1px solid rgba(255,255,255,.85);
+  border-radius:12px;
+  padding:10px 12px;
+  background:rgba(255,255,255,.1);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  backdrop-filter:blur(14px) saturate(140%);
+  box-shadow:0 0 0 1px rgba(29,36,43,.08);
+  min-height:44px; flex:1 1 140px;
+  color:var(--ink);
+}
+.req-actions .pill{
+  min-height:44px;
+  background:rgba(255,255,255,.06);
+  color:var(--ink);
+  border:1px solid rgba(255,255,255,.85);
+  box-shadow:0 0 0 1px rgba(29,36,43,.08);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  backdrop-filter:blur(14px) saturate(140%);
+}
+.req-actions .pill:hover{background:rgba(255,255,255,.14); color:var(--ink);}
+.req-actions .pill.ghost{background:rgba(255,255,255,.06);}
+@media(prefers-reduced-motion:reduce){
+  .req-modal-reveal > *,.req-modal-card > .req-modal-x{opacity:1; transform:none; animation:none !important;}
+}
+
+/* Tab toolbars under the manager bar */
+.panel-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  margin-bottom:18px;
+  flex-shrink:0;
+  width:100%;
+}
+.panel-toolbar.is-split{justify-content:space-between;}
+.panel-toolbar .pill,
+.panel-toolbar select{
+  min-height:40px;
+  padding:8px 14px;
+  font-size:13px;
+  color:var(--ink);
+  border:1px solid rgba(255,255,255,.85);
+  border-radius:980px;
+  box-shadow:0 0 0 1px rgba(29,36,43,.08);
+  background:rgba(255,255,255,.08);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  backdrop-filter:blur(14px) saturate(140%);
+}
+.panel-toolbar .pill:hover{background:rgba(255,255,255,.14); color:var(--ink);}
+.panel-toolbar .pill.ghost{background:rgba(255,255,255,.06);}
+.panel-toolbar select{
+  max-width:min(100%,220px);
+  appearance:none;
+  -webkit-appearance:none;
+  background-color:rgba(255,255,255,.06);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath stroke='%238B949E' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='m1.5 1.5 4.5 4.5 4.5-4.5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  padding-right:34px;
+}
+.panel-toolbar .jobs-add{
+  width:40px; height:40px; min-height:40px; padding:0;
+  border-radius:50%;
+  font-size:22px; font-weight:500; line-height:1;
+  letter-spacing:0;
+}
+
+/* Job / prescription wizard — lives in morph modal card (no inline glass shell) */
 .job-form{
-  border:1px solid var(--rule); border-radius:16px; padding:18px;
-  margin-bottom:18px; background:var(--bg-alt);
+  position:relative;
+  width:100%;
+  margin:0;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:var(--ink);
+  box-shadow:none;
 }
-.job-form h3{margin:0 0 14px; color:var(--ink); font-size:16px;}
-.job-form-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.job-form h2{
+  margin:0;
+  padding-right:40px;
+  color:var(--ink);
+  font-size:24px;
+  letter-spacing:-.03em;
+  font-weight:600;
+}
+.job-form-reveal > *{opacity:0;}
+.job-modal-card.fields-in .job-form-reveal > *,
+.job-modal-card.fields-in > .req-modal-x{
+  animation:reqFieldIn 1.05s cubic-bezier(.22,.55,.3,1) forwards;
+}
+.job-modal-card.fields-in > .req-modal-x{animation-delay:.04s;}
+.job-modal-card.fields-in .job-form-reveal > *:nth-child(1){animation-delay:.08s;}
+.job-modal-card.fields-in .job-form-reveal > *:nth-child(2){animation-delay:.18s;}
+.job-modal-card.fields-in .job-form-reveal > *:nth-child(3){animation-delay:.28s;}
+.job-modal-card.fields-in .job-form-reveal > *:nth-child(4){animation-delay:.40s;}
+.job-modal-card.fields-in .job-form-reveal > *:nth-child(5){animation-delay:.52s;}
+.job-wizard-status{
+  position:absolute; width:1px; height:1px; overflow:hidden;
+  clip:rect(0 0 0 0); white-space:nowrap;
+}
+.job-wizard-steps{margin-top:22px;}
+.job-wizard-step{display:none;}
+.job-wizard-step.is-active{display:block;}
+@keyframes jobWizardStepIn{
+  from{opacity:0; transform:translateY(10px);}
+  to{opacity:1; transform:none;}
+}
+.job-wizard-step.is-active.anim{
+  animation:jobWizardStepIn .36s cubic-bezier(.22,.55,.3,1) both;
+}
+.job-wizard-label{
+  display:block;
+  font-size:12.5px; font-weight:600; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:9px;
+}
+.job-wizard-label .wizard-optional{
+  text-transform:none; letter-spacing:0; font-weight:400; color:var(--muted);
+}
+.job-form input:not([type=checkbox]):not([type=file]):not([type=hidden]),
+.job-form select,
+.job-form textarea{
+  width:100%;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.85);
+  border-radius:12px;
+  padding:13px 14px;
+  font-size:16px;
+  color:var(--ink);
+  letter-spacing:-.01em;
+  box-shadow:0 0 0 1px rgba(29,36,43,.08);
+  transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
+}
+.job-form input[type="date"]{min-height:48px;}
+.job-form input::placeholder,
+.job-form textarea::placeholder{color:var(--muted);}
+.job-form input:focus,
+.job-form select:focus,
+.job-form textarea:focus{
+  outline:none;
+  border-color:#fff;
+  background:rgba(255,255,255,.18);
+  box-shadow:0 0 0 1px rgba(29,36,43,.08), 0 0 0 3px rgba(27,77,255,.12);
+}
+.job-form textarea{min-height:110px; resize:vertical;}
+.job-form select{
+  appearance:none; -webkit-appearance:none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position:calc(100% - 19px) 22px, calc(100% - 14px) 22px;
+  background-size:5px 5px, 5px 5px;
+  background-repeat:no-repeat;
+  padding-right:38px;
+}
+@keyframes jobWizardShake{
+  0%,100%{transform:translateX(0);}
+  25%{transform:translateX(-6px);}
+  75%{transform:translateX(6px);}
+}
+.job-wizard-step input.shake,
+.job-wizard-step select.shake,
+.job-wizard-step textarea.shake,
+.job-wizard-step .shot-slot.shake{
+  border-color:rgba(192,57,43,.7);
+  box-shadow:0 0 0 3px rgba(192,57,43,.12);
+  animation:jobWizardShake .34s ease;
+}
+.job-step-stack{display:grid; gap:14px;}
+.job-check{
+  display:flex; align-items:flex-start; gap:10px;
+  margin:4px 0 0; font-size:15px; color:var(--ink); cursor:pointer;
+  line-height:1.4;
+}
+.job-check input{width:18px; height:18px; margin-top:2px; accent-color:var(--accent); flex-shrink:0;}
+.shot-slot{
+  border:1px dashed rgba(255,255,255,.85);
+  border-radius:16px;
+  background:rgba(255,255,255,.06);
+  box-shadow:0 0 0 1px rgba(29,36,43,.06);
+  padding:14px;
+  min-height:160px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.shot-slot input[type=file]{
+  width:100%;
+  font-size:14px;
+  min-height:48px;
+  color:var(--ink);
+}
+.shot-preview{
+  width:100%;
+  aspect-ratio:4/3;
+  border-radius:12px;
+  object-fit:cover;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.55);
+}
+.shot-preview[hidden]{display:none !important;}
+.shot-current{font-size:12.5px; color:var(--muted); line-height:1.4; margin:0;}
+.job-review{
+  display:grid; gap:10px;
+  padding:14px 14px 12px;
+  border-radius:14px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.65);
+  box-shadow:0 0 0 1px rgba(29,36,43,.06);
+  font-size:14px;
+  color:var(--body);
+}
+.job-review-row{display:grid; gap:2px;}
+.job-review-row .lbl{
+  font-size:11px; font-weight:600; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--muted);
+}
+.job-review-row .val{color:var(--ink); word-break:break-word;}
+.job-review-row .val.is-empty{color:var(--muted);}
+.job-wizard-nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-top:22px;
+  flex-wrap:wrap;
+}
+.job-wizard-nav .pill{
+  margin-top:0;
+  padding:14px 26px;
+  font-size:16px;
+  font-weight:600;
+  background:rgba(255,255,255,.06);
+  color:var(--ink);
+  border:1px solid rgba(255,255,255,.85);
+  box-shadow:0 0 0 1px rgba(29,36,43,.08);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  backdrop-filter:blur(14px) saturate(140%);
+  min-height:48px;
+}
+.job-wizard-nav .pill:hover{background:rgba(255,255,255,.14); color:var(--ink);}
+.job-wizard-back{
+  background:none; border:0;
+  color:var(--muted);
+  font-size:14px; font-weight:500;
+  letter-spacing:-.01em;
+  cursor:pointer;
+  padding:8px 4px;
+  transition:color .16s ease;
+  min-height:44px;
+}
+.job-wizard-back:hover{color:var(--ink);}
+.job-wizard-back[hidden]{visibility:hidden; display:inline-block !important;}
+.job-wizard-dots{display:flex; gap:6px; align-items:center;}
+.job-wizard-dot{
+  width:6px; height:6px; border-radius:50%;
+  background:rgba(255,255,255,.22);
+  transition:background .2s ease, transform .2s ease;
+}
+.job-wizard-dot.is-active{
+  background:var(--accent);
+  transform:scale(1.3);
+}
+.job-form-clear{
+  display:block;
+  margin:14px auto 0;
+  background:none; border:0;
+  color:var(--muted);
+  font-size:13px; font-weight:500;
+  cursor:pointer;
+  padding:8px;
+  transition:color .16s ease;
+}
+.job-form-clear:hover{color:var(--ink);}
+.job-form-fine{
+  margin:12px 0 0;
+  font-size:12.5px;
+  line-height:1.55;
+  color:var(--muted);
+  text-align:center;
+}
 @media(max-width:700px){
-  .job-form-grid{grid-template-columns:1fr;}
+  :root{--gut:12px;}
   .app-bar .who{display:none;}
+  .app-bar-in{gap:10px; height:48px;}
+  #appView > main.wrap{padding-top:16px; padding-bottom:20px;}
+  .req-summary{padding:11px 6px 11px 12px; min-height:52px;}
+  .req-line{padding-right:4px;}
+  .req-name{font-size:15.5px;}
+  .req-call{width:38px; height:38px; min-width:38px; min-height:38px;}
+  .panel-toolbar{margin-bottom:14px; gap:6px;}
+  .panel-toolbar .pill,
+  .panel-toolbar select{min-height:38px; padding:7px 12px; font-size:12.5px;}
+  .panel-toolbar select{padding-right:32px; background-position:right 12px center; max-width:none; flex:1 1 auto;}
+  .panel-toolbar .jobs-add{width:38px; height:38px; min-height:38px; font-size:20px;}
+  .job-form h2{font-size:22px;}
+  .job-wizard-dots{order:3; flex-basis:100%; justify-content:center; margin-top:2px;}
+  .job-wizard-nav .pill{flex:1 1 auto;}
+  .gate-actions .pill{min-height:48px;}
 }
+@media(prefers-reduced-motion:reduce){
+  .job-form-reveal > *,
+  .job-modal-card > .req-modal-x{opacity:1; transform:none; animation:none !important;}
+  .job-wizard-step.is-active.anim{animation:none;}
+  .job-wizard-step input.shake,
+  .job-wizard-step select.shake,
+  .job-wizard-step textarea.shake,
+  .job-wizard-step .shot-slot.shake{animation:none;}
+}
+.empty .empty-sub{display:block; margin-top:6px; font-size:13.5px;}
 .photos{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
 .photos figure{
   margin:0; width:88px; border-radius:10px; overflow:hidden;
-  border:1px solid var(--rule); background:var(--panel-alt);
+  border:1px solid var(--rule); background:var(--panel-alt); position:relative;
 }
 .photos img{width:88px; height:88px; object-fit:cover;}
+.photos figcaption{
+  position:absolute; left:4px; bottom:4px;
+  font-size:9px; letter-spacing:.08em; text-transform:uppercase;
+  color:#fff; background:rgba(29,36,43,.55); padding:2px 5px; border-radius:6px;
+}
 .photo-upload{margin-top:10px;}
 .photo-upload input[type=file]{font-size:13px;}
+.badge.live{background:rgba(43,182,115,.16); color:var(--signal);}
 </style>
 </head>
 <body>
@@ -189,7 +770,7 @@ a:hover{color:var(--accent-hover);}
     <h1>Manager</h1>
     <p class="sub">Sign in to view booking requests and manage jobs.</p>
     <p class="gate-error" id="gateError" hidden></p>
-    <p class="gate-error" id="gateLocked" hidden style="background:rgba(27,77,255,.06);color:var(--accent);"></p>
+    <p class="gate-error" id="gateLocked" hidden style="background:rgba(75,124,255,.14);color:var(--accent);"></p>
     <form id="loginForm" novalidate>
       <div class="field">
         <label for="loginEmail">Email</label>
@@ -216,88 +797,164 @@ a:hover{color:var(--accent-hover);}
     <div class="app-bar-in">
       <a class="brand" href="/manager"><span class="mark" aria-hidden="true">℞</span> Manager</a>
       <span class="who" id="userEmail"></span>
-      <a class="pill ghost" href="/">Site</a>
-      <button type="button" class="pill danger" id="signOutBtn">Sign out</button>
     </div>
   </header>
 
   <main class="wrap">
-    <div class="tabs" role="tablist">
-      <button type="button" class="tab is-active" data-tab="requests" role="tab" aria-selected="true">Requests</button>
-      <button type="button" class="tab" data-tab="jobs" role="tab" aria-selected="false">Jobs</button>
-    </div>
-
     <p class="err-banner" id="appError" hidden></p>
 
-    <!-- Requests -->
+    <!-- Requests: list only; detail opens via morph modal -->
     <section id="tab-requests">
-      <div class="panel-head">
-        <div>
-          <h2>Booking requests</h2>
-          <p>New assessments from the site form.</p>
-        </div>
-        <div class="toolbar">
-          <select id="statusFilter" aria-label="Filter by status">
-            <option value="all">All statuses</option>
-            <option value="new">New</option>
-            <option value="contacted">Contacted</option>
-            <option value="scheduled">Scheduled</option>
-            <option value="done">Done</option>
-            <option value="closed">Closed</option>
-          </select>
-          <button type="button" class="pill ghost" id="refreshRequests">Refresh</button>
-        </div>
+      <div class="panel-toolbar is-split">
+        <select id="statusFilter" aria-label="Filter by status">
+          <option value="active" selected>Active</option>
+          <option value="all">All statuses</option>
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="done">Done</option>
+          <option value="closed">Closed</option>
+          <option value="archived">Archived</option>
+        </select>
+        <button type="button" class="pill ghost" id="refreshRequests">Refresh</button>
       </div>
-      <div class="list" id="requestsList"><p class="loading">Loading…</p></div>
+      <div class="req-list" id="requestsList"><p class="loading">Loading…</p></div>
     </section>
 
-    <!-- Jobs -->
+    <!-- Jobs: list only; post/edit opens via morph modal (+) -->
     <section id="tab-jobs" hidden>
-      <div class="panel-head">
-        <div>
-          <h2>Jobs</h2>
-          <p>Track work and upload job photos.</p>
-        </div>
-        <div class="toolbar">
-          <button type="button" class="pill ghost" id="refreshJobs">Refresh</button>
-        </div>
+      <div class="panel-toolbar">
+        <button type="button" class="pill ghost" id="refreshJobs">Refresh</button>
+        <button type="button" class="pill jobs-add" id="jobAddBtn" aria-label="Post a prescription" title="Post a prescription">+</button>
       </div>
-
-      <form class="job-form" id="jobForm">
-        <h3>Add or update job</h3>
-        <input type="hidden" name="id" id="jobId">
-        <div class="job-form-grid">
-          <div class="field">
-            <label for="jobTitle">Title</label>
-            <input id="jobTitle" name="title" required placeholder="e.g. Hardwood - Palmer unit 412">
-          </div>
-          <div class="field">
-            <label for="jobAddress">Address</label>
-            <input id="jobAddress" name="address" placeholder="Job site address">
-          </div>
-          <div class="field">
-            <label for="jobStatus">Status</label>
-            <select id="jobStatus" name="status">
-              <option value="planned">Planned</option>
-              <option value="in_progress">In progress</option>
-              <option value="complete">Complete</option>
-              <option value="archived">Archived</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="jobNotes">Notes</label>
-            <input id="jobNotes" name="notes" placeholder="Optional notes">
-          </div>
-        </div>
-        <div class="gate-actions" style="margin-top:4px;">
-          <button class="pill" type="submit" id="jobSaveBtn">Save job</button>
-          <button class="pill ghost" type="button" id="jobResetBtn">Clear</button>
-        </div>
-      </form>
-
       <div class="list" id="jobsList"><p class="loading">Loading…</p></div>
     </section>
   </main>
+
+  <nav class="bottom-nav" aria-label="Manager sections">
+    <div class="bottom-nav-in" role="tablist">
+      <button type="button" class="tab is-active" data-tab="requests" role="tab" aria-selected="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h10"/>
+          <circle cx="19" cy="18" r="1.25" fill="currentColor" stroke="none"/>
+        </svg>
+        <span>Requests</span>
+      </button>
+      <button type="button" class="tab" data-tab="jobs" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 4h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+          <path d="M9 4V3.5A1.5 1.5 0 0 1 10.5 2h3A1.5 1.5 0 0 1 15 3.5V4"/>
+          <path d="M9 11h6M9 15h4"/>
+        </svg>
+        <span>Jobs</span>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<!-- Request morph: line stand-in while it grows into the centered card (Book pattern). -->
+<div class="req-morph" id="reqMorph" hidden aria-hidden="true"><span></span></div>
+
+<div class="req-modal-root" id="reqModal" hidden>
+  <div class="req-modal-backdrop" data-req-close></div>
+  <div class="req-modal-card" id="reqModalDialog" role="dialog" aria-modal="true" aria-labelledby="reqModalTitle" tabindex="-1">
+    <button class="req-modal-x" type="button" data-req-close aria-label="Close">&times;</button>
+    <div class="req-modal-reveal" id="reqModalBody"></div>
+  </div>
+</div>
+
+<!-- Job morph: + / Edit → centered glass wizard (same WAAPI pattern as requests). -->
+<div class="req-morph" id="jobMorph" hidden aria-hidden="true"><span></span></div>
+
+<div class="req-modal-root" id="jobModal" hidden>
+  <div class="req-modal-backdrop" data-job-close></div>
+  <div class="req-modal-card job-modal-card" id="jobModalDialog" role="dialog" aria-modal="true" aria-labelledby="jobFormHeading" tabindex="-1">
+    <button class="req-modal-x" type="button" data-job-close aria-label="Close">&times;</button>
+    <form class="job-form" id="jobForm" novalidate>
+      <div class="job-form-reveal">
+        <h2 id="jobFormHeading">Post a prescription</h2>
+        <input type="hidden" name="id" id="jobId">
+        <p class="err-banner" id="jobFormError" hidden style="margin-top:14px;"></p>
+
+        <p class="job-wizard-status" id="jobWizardStatus" aria-live="polite"></p>
+        <div class="job-wizard-steps" id="jobWizardSteps">
+          <div class="job-wizard-step is-active" data-step="1" data-key="title">
+            <label class="job-wizard-label" for="jobTitle">Title</label>
+            <input id="jobTitle" name="title" required placeholder="e.g. Peaking LVP" autocomplete="off">
+          </div>
+          <div class="job-wizard-step" data-step="2" data-key="description">
+            <label class="job-wizard-label" for="jobDescription">Description</label>
+            <textarea id="jobDescription" name="description" rows="4" placeholder="e.g. Moisture under the old floor. Pulled, dried, levelled, re-laid."></textarea>
+          </div>
+          <div class="job-wizard-step" data-step="3" data-key="prescribed">
+            <label class="job-wizard-label" for="jobPrescribed">Prescribed</label>
+            <input id="jobPrescribed" name="prescribed" placeholder="e.g. Removal · Subfloor · LVP" autocomplete="off">
+          </div>
+          <div class="job-wizard-step" data-step="4" data-key="completed">
+            <div class="job-step-stack">
+              <div>
+                <label class="job-wizard-label" for="jobCompletedAt">Completed</label>
+                <input id="jobCompletedAt" name="completed_at" type="date">
+              </div>
+              <div>
+                <label class="job-wizard-label" for="jobStatus">Status</label>
+                <select id="jobStatus" name="status">
+                  <option value="complete" selected>Complete</option>
+                  <option value="planned">Planned</option>
+                  <option value="in_progress">In progress</option>
+                  <option value="archived">Archived</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="job-wizard-step" data-step="5" data-key="before">
+            <label class="job-wizard-label" for="jobBefore">Before photo</label>
+            <div class="shot-slot" id="jobBeforeSlot">
+              <img class="shot-preview" id="jobBeforePreview" alt="" hidden>
+              <p class="shot-current" id="jobBeforeCurrent" hidden>Current photo on file — pick a new one to replace.</p>
+              <input id="jobBefore" name="before" type="file" accept="image/*" capture="environment">
+            </div>
+          </div>
+          <div class="job-wizard-step" data-step="6" data-key="after">
+            <label class="job-wizard-label" for="jobAfter">After photo</label>
+            <div class="shot-slot" id="jobAfterSlot">
+              <img class="shot-preview" id="jobAfterPreview" alt="" hidden>
+              <p class="shot-current" id="jobAfterCurrent" hidden>Current photo on file — pick a new one to replace.</p>
+              <input id="jobAfter" name="after" type="file" accept="image/*" capture="environment">
+            </div>
+          </div>
+          <div class="job-wizard-step" data-step="7" data-key="private">
+            <div class="job-step-stack">
+              <div>
+                <label class="job-wizard-label" for="jobAddress">Address <span class="wizard-optional">(private)</span></label>
+                <input id="jobAddress" name="address" placeholder="Job site address" autocomplete="street-address">
+              </div>
+              <div>
+                <label class="job-wizard-label" for="jobNotes">Internal notes <span class="wizard-optional">(optional)</span></label>
+                <input id="jobNotes" name="notes" placeholder="Managers only — not on the site">
+              </div>
+            </div>
+          </div>
+          <div class="job-wizard-step" data-step="8" data-key="review">
+            <label class="job-wizard-label">Review &amp; publish</label>
+            <div class="job-review" id="jobReviewSummary" aria-live="polite"></div>
+            <label class="job-check" style="margin-top:16px;">
+              <input type="checkbox" id="jobPublished" name="published" checked>
+              <span>Show on public Recent prescriptions</span>
+            </label>
+            <p class="job-form-fine">Publish needs title, description, prescribed, and before &amp; after photos.</p>
+          </div>
+        </div>
+
+        <div class="job-wizard-nav">
+          <button type="button" class="job-wizard-back" id="jobWizardBack" hidden>Back</button>
+          <div class="job-wizard-dots" id="jobWizardDots" aria-hidden="true"></div>
+          <button class="pill" type="submit" id="jobSaveBtn">Continue</button>
+        </div>
+        <button class="job-form-clear" type="button" id="jobResetBtn">Clear form</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -382,6 +1039,23 @@ a:hover{color:var(--accent-hover);}
     } catch (e) { return iso; }
   }
 
+  function fmtRel(iso) {
+    if (!iso) return "";
+    try {
+      var t = new Date(iso).getTime();
+      if (isNaN(t)) return "";
+      var sec = Math.round((Date.now() - t) / 1000);
+      if (sec < 60) return "just now";
+      var min = Math.round(sec / 60);
+      if (min < 60) return min + "m";
+      var hr = Math.round(min / 60);
+      if (hr < 24) return hr + "h";
+      var day = Math.round(hr / 24);
+      if (day < 7) return day + "d";
+      return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+    } catch (e) { return ""; }
+  }
+
   function fmtDay(d) {
     if (!d) return "-";
     try {
@@ -389,6 +1063,23 @@ a:hover{color:var(--accent-hover);}
         weekday: "short", month: "short", day: "numeric", year: "numeric"
       });
     } catch (e) { return d; }
+  }
+
+  function phoneShort(phone) {
+    var s = String(phone == null ? "" : phone).trim();
+    if (!s) return "";
+    var digits = s.replace(/\D/g, "");
+    if (digits.length >= 10) return "···" + digits.slice(-4);
+    return s.length > 14 ? s.slice(0, 12) + "…" : s;
+  }
+
+  function telHref(phone) {
+    var s = String(phone == null ? "" : phone).trim();
+    if (!s) return "";
+    var hasPlus = s.charAt(0) === "+";
+    var digits = s.replace(/\D/g, "");
+    if (!digits) return "";
+    return (hasPlus ? "+" : "") + digits;
   }
 
   async function requireSession() {
@@ -442,37 +1133,516 @@ a:hover{color:var(--accent-hover);}
     await sendUnlockEmail(email);
   });
 
-  document.getElementById("signOutBtn").addEventListener("click", async function () {
-    await sb.auth.signOut();
-    gateView.hidden = false;
-    appView.hidden = true;
-    loginForm.reset();
-    setLockedUI(false);
-  });
-
-  /* tabs */
-  document.querySelectorAll(".tab").forEach(function (tab) {
+  /* bottom nav tabs */
+  document.querySelectorAll(".bottom-nav .tab").forEach(function (tab) {
     tab.addEventListener("click", function () {
-      document.querySelectorAll(".tab").forEach(function (t) {
+      document.querySelectorAll(".bottom-nav .tab").forEach(function (t) {
         t.classList.toggle("is-active", t === tab);
         t.setAttribute("aria-selected", t === tab ? "true" : "false");
       });
       var name = tab.getAttribute("data-tab");
       document.getElementById("tab-requests").hidden = name !== "requests";
       document.getElementById("tab-jobs").hidden = name !== "jobs";
+      if (name !== "jobs") {
+        var jm = document.getElementById("jobModal");
+        if (jm && !jm.hidden && typeof closeJobModal === "function") closeJobModal();
+      }
       if (name === "jobs") loadJobs();
     });
   });
 
-  /* ---------- requests ---------- */
+  /* ---------- requests: Book-style floating morph → centered card ----------
+     Ports index.html openModal/closeModal:
+     - Flying .req-morph copies the line rect + glass skin
+     - WAAPI grow to centered .req-modal-card (~220ms)
+     - Backdrop dims; fields-in after handoff
+     - Close shrinks back to the line (~160ms)
+     - Call is tel: icon (stopPropagation); one open at a time
+     - Focus day (today, or tomorrow after 8pm); past preferred_date → archived */
+  var reqMorph = document.getElementById("reqMorph");
+  var reqMorphLabel = reqMorph.firstElementChild;
+  var reqModal = document.getElementById("reqModal");
+  var reqCard = reqModal.querySelector(".req-modal-card");
+  var reqBackdrop = reqModal.querySelector(".req-modal-backdrop");
+  var reqModalBody = document.getElementById("reqModalBody");
+  var REQ_CARD_RADIUS = 26;
+  var REQ_SHADOW_ON = "0 0 0 1px rgba(29,36,43,.08), 0 20px 60px rgba(29,36,43,.18)";
+  var REQ_SHADOW_OFF = "0 0 0 1px rgba(29,36,43,.08), 0 12px 36px rgba(29,36,43,.1)";
+  var REQ_GLASS_BG = "rgba(255, 255, 255, 0.08)";
+  var REQ_GLASS_BORDER = "rgba(255, 255, 255, 0.85)";
+  var REQ_GLASS_BORDER_W = "1px";
+  var reqBusy = false;
+  var reqLastTrigger = null;
+  var reqLastSkin = null;
+  var reqLastRow = null;
+  var requestsById = {};
+
+  function reqReduced() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+  function reqFadeDur() { return reqReduced() ? 1 : 180; }
+  function reqExpandDur() { return reqReduced() ? 1 : 220; }
+  function reqCloseDur() { return reqReduced() ? 1 : 160; }
+  function pad2(n) { return String(n).padStart(2, "0"); }
+  function ymdLocal(d) {
+    return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate());
+  }
+  /** Today before 8pm; tomorrow from 8pm onward (next day's book moves to top). */
+  function requestFocusYmd() {
+    var now = new Date();
+    var d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (now.getHours() >= 20) d.setDate(d.getDate() + 1);
+    return ymdLocal(d);
+  }
+  async function archivePastRequests(focusYmd) {
+    var res = await sb.from("assessment_requests")
+      .update({ status: "archived" })
+      .lt("preferred_date", focusYmd)
+      .neq("status", "archived");
+    if (res.error && /archived|check|constraint/i.test(res.error.message || "")) {
+      showError(appError, res.error.message + " — run the assessment_requests status update in supabase/setup.sql.");
+    }
+  }
+  function sortRequestsForFocus(rows, focusYmd) {
+    return rows.slice().sort(function (a, b) {
+      var ad = a.preferred_date || "";
+      var bd = b.preferred_date || "";
+      var aFocus = ad === focusYmd ? 0 : 1;
+      var bFocus = bd === focusYmd ? 0 : 1;
+      if (aFocus !== bFocus) return aFocus - bFocus;
+      if (ad !== bd) return ad < bd ? -1 : 1;
+      var at = a.created_at || "";
+      var bt = b.created_at || "";
+      return at < bt ? 1 : at > bt ? -1 : 0;
+    });
+  }
+  function reqClearAnims(el) {
+    if (!el || !el.getAnimations) return;
+    el.getAnimations().forEach(function (a) { a.cancel(); });
+  }
+  function reqSettle(anim, dur, fn) {
+    var done = false;
+    function go() { if (done) return; done = true; fn(); }
+    if (anim) anim.onfinish = go;
+    setTimeout(go, dur + 80);
+  }
+  function reqRectOf(el) {
+    var r = el.getBoundingClientRect();
+    return { l: r.left, t: r.top, w: r.width, h: r.height };
+  }
+  function reqSkinOf(el) {
+    var cs = getComputedStyle(el);
+    var r = el.getBoundingClientRect();
+    return {
+      bg: cs.backgroundColor,
+      fg: cs.color,
+      borderWidth: cs.borderTopWidth,
+      borderColor: cs.borderTopColor,
+      radius: parseFloat(cs.borderRadius) || (r.height / 2)
+    };
+  }
+  function reqPlaceMorph(r, radius, skin) {
+    reqMorph.style.left = r.l + "px";
+    reqMorph.style.top = r.t + "px";
+    reqMorph.style.width = r.w + "px";
+    reqMorph.style.height = r.h + "px";
+    reqMorph.style.borderRadius = radius + "px";
+    if (skin) {
+      reqMorph.style.backgroundColor = skin.bg;
+      reqMorph.style.borderWidth = skin.borderWidth;
+      reqMorph.style.borderColor = skin.borderColor;
+      reqMorph.style.borderStyle = "solid";
+      reqMorphLabel.style.color = skin.fg || "var(--ink)";
+    }
+  }
+  function reqFrame(r, radius, bg, shadow, borderColor, borderWidth) {
+    return {
+      left: r.l + "px", top: r.t + "px", width: r.w + "px", height: r.h + "px",
+      borderRadius: radius + "px", backgroundColor: bg, boxShadow: shadow,
+      borderTopColor: borderColor, borderRightColor: borderColor,
+      borderBottomColor: borderColor, borderLeftColor: borderColor,
+      borderTopWidth: borderWidth, borderRightWidth: borderWidth,
+      borderBottomWidth: borderWidth, borderLeftWidth: borderWidth
+    };
+  }
+  function reqResetMorph() {
+    reqMorph.style.opacity = "1";
+    reqClearAnims(reqMorph);
+    reqClearAnims(reqMorphLabel);
+    reqMorph.hidden = true;
+    reqMorph.style.opacity = "";
+    reqMorphLabel.style.opacity = "";
+  }
+  function reqHardHide() {
+    reqModal.hidden = true;
+    reqModal.classList.remove("measuring");
+    reqClearAnims(reqCard);
+    reqClearAnims(reqBackdrop);
+    reqCard.classList.remove("fields-in");
+    reqCard.style.opacity = "";
+    reqCard.style.visibility = "";
+    reqBackdrop.style.opacity = "";
+    reqModalBody.innerHTML = "";
+  }
+  function reqRevealFields() {
+    reqCard.classList.remove("fields-in");
+    void reqCard.offsetWidth;
+    requestAnimationFrame(function () {
+      if (reqModal.hidden) return;
+      reqCard.classList.add("fields-in");
+    });
+  }
+  function reqHandoffMorphToCard(onReady) {
+    reqModal.classList.remove("measuring");
+    reqClearAnims(reqCard);
+    reqCard.style.visibility = "";
+    reqCard.style.opacity = "1";
+    reqMorph.style.opacity = "1";
+    reqClearAnims(reqMorph);
+    reqClearAnims(reqMorphLabel);
+    reqMorph.hidden = true;
+    reqMorph.style.opacity = "";
+    reqMorphLabel.style.opacity = "";
+    if (onReady) onReady();
+  }
+  function reqShowCard(onFaded) {
+    reqClearAnims(reqCard);
+    reqClearAnims(reqBackdrop);
+    reqCard.style.visibility = "";
+    reqCard.style.opacity = "0";
+    reqBackdrop.style.opacity = "0";
+    var fade = reqFadeDur();
+    var cardFade = reqCard.animate(
+      [{ opacity: 0 }, { opacity: 1 }],
+      { duration: fade, easing: "cubic-bezier(.22,.45,.3,1)", fill: "forwards" }
+    );
+    reqBackdrop.animate(
+      [{ opacity: 0 }, { opacity: 1 }],
+      { duration: fade, easing: "ease-out", fill: "forwards" }
+    );
+    reqSettle(cardFade, fade, function () { if (onFaded) onFaded(); });
+  }
+  function setRequestAria(row, open) {
+    if (!row) return;
+    row.querySelectorAll("[aria-controls]").forEach(function (btn) {
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+  }
+  function reqFocusables() {
+    return Array.prototype.filter.call(
+      reqCard.querySelectorAll("a[href],button:not([disabled]),input,select,textarea"),
+      function (el) { return el.offsetParent !== null; }
+    );
+  }
+  function bindReqModalActions(rowData) {
+    var sel = reqModalBody.querySelector("select[data-status]");
+    if (sel) {
+      sel.addEventListener("change", async function () {
+        var id = sel.getAttribute("data-status");
+        var { error } = await sb.from("assessment_requests").update({ status: sel.value }).eq("id", id);
+        if (error) {
+          showError(appError, error.message);
+          return;
+        }
+        if (requestsById[id]) requestsById[id].status = sel.value;
+        var srcBadge = reqLastRow && reqLastRow.querySelector(".badge");
+        if (srcBadge) {
+          srcBadge.className = "badge " + sel.value;
+          srcBadge.textContent = sel.value;
+        }
+        var modalBadge = reqModalBody.querySelector(".badge");
+        if (modalBadge) {
+          modalBadge.className = "badge " + sel.value;
+          modalBadge.textContent = sel.value;
+        }
+      });
+    }
+    var jobBtn = reqModalBody.querySelector("[data-job-from]");
+    if (jobBtn) {
+      jobBtn.addEventListener("click", function () {
+        closeRequestModal(function () {
+          document.querySelector('.bottom-nav .tab[data-tab="jobs"]').click();
+          resetJobForm();
+          jobForm.elements.title.value = "Assessment · " + (jobBtn.getAttribute("data-title") || "");
+          jobForm.elements.address.value = jobBtn.getAttribute("data-address") || "";
+          jobForm.elements.status.value = "planned";
+          jobPublished.checked = false;
+          jobForm.dataset.assessmentId = jobBtn.getAttribute("data-job-from");
+          setJobFormMode(false);
+          goToJobStep(1, false);
+          openJobModal(document.getElementById("jobAddBtn"), { label: "Post a prescription" });
+        });
+      });
+    }
+  }
+  function fillRequestModal(row) {
+    var tel = telHref(row.phone);
+    var phoneVal = tel
+      ? '<a href="tel:' + escAttr(tel) + '">' + esc(row.phone) + "</a>"
+      : "—";
+    var snipParts = [];
+    if (row.phone) snipParts.push(phoneShort(row.phone));
+    if (row.preferred_date) snipParts.push(fmtDay(row.preferred_date).replace(/,.*/, ""));
+    else if (row.address) snipParts.push(String(row.address).split(",")[0]);
+    var sub = snipParts.join(" · ");
+    reqModalBody.innerHTML =
+      '<div class="req-modal-head">' +
+        "<h2 id=\"reqModalTitle\">" + esc(row.name || "Request") + "</h2>" +
+        '<span class="badge ' + esc(row.status) + '">' + esc(row.status) + "</span>" +
+      "</div>" +
+      (sub ? '<p class="req-modal-sub">' + esc(sub) + "</p>" : "") +
+      '<div class="req-fields">' +
+        '<div class="req-field"><span class="lbl">Phone</span><span class="val">' + phoneVal + "</span></div>" +
+        '<div class="req-field"><span class="lbl">Address</span><span class="val">' + esc(row.address || "—") + "</span></div>" +
+        '<div class="req-field"><span class="lbl">Preferred</span><span class="val">' +
+          esc(fmtDay(row.preferred_date)) +
+          (row.preferred_window ? " · " + esc(row.preferred_window) : "") +
+        "</span></div>" +
+        (row.services && row.services.length
+          ? '<div class="req-field"><span class="lbl">Services</span><span class="val">' + esc(row.services.join(", ")) + "</span></div>"
+          : "") +
+        (row.notes
+          ? '<div class="req-field"><span class="lbl">Notes</span><span class="val">' + esc(row.notes) + "</span></div>"
+          : "") +
+        '<div class="req-field"><span class="lbl">Received</span><span class="val">' + esc(fmtDate(row.created_at)) + "</span></div>" +
+      "</div>" +
+      '<div class="req-actions">' +
+        '<select data-status="' + row.id + '" aria-label="Status">' +
+          opt("new", row.status) + opt("contacted", row.status) + opt("scheduled", row.status) +
+          opt("done", row.status) + opt("closed", row.status) + opt("archived", row.status) +
+        "</select>" +
+        '<button type="button" class="pill ghost" data-job-from="' + row.id +
+          '" data-title="' + escAttr(row.name) +
+          '" data-address="' + escAttr(row.address) + '">Create job</button>' +
+      "</div>";
+    bindReqModalActions(row);
+  }
+  function openRequestModal(triggerRow) {
+    if (reqBusy || !triggerRow) return;
+    if (!reqModal.hidden && reqLastRow === triggerRow) return;
+    var id = triggerRow.getAttribute("data-id");
+    var data = requestsById[id];
+    if (!data) return;
+
+    reqBusy = true;
+    var trigger = triggerRow;
+    reqLastTrigger = trigger;
+    reqLastRow = trigger;
+    reqLastSkin = reqSkinOf(trigger);
+    reqResetMorph();
+    fillRequestModal(data);
+    setRequestAria(trigger, true);
+
+    var expand = reqExpandDur();
+    var fade = reqFadeDur();
+
+    reqClearAnims(reqCard);
+    reqClearAnims(reqBackdrop);
+    reqModal.hidden = false;
+    reqModal.classList.add("measuring");
+    reqCard.classList.remove("fields-in");
+    document.body.style.overflow = "hidden";
+    reqCard.style.opacity = "0";
+    reqBackdrop.style.opacity = "0";
+
+    if (reqReduced()) {
+      reqModal.classList.remove("measuring");
+      trigger.style.visibility = "hidden";
+      reqShowCard(function () {
+        reqRevealFields();
+        reqBusy = false;
+        reqCard.focus({ preventScroll: true });
+      });
+      return;
+    }
+
+    var cr = reqRectOf(reqCard);
+    var br = reqRectOf(trigger);
+    var skin = reqLastSkin;
+    var nameEl = trigger.querySelector(".req-name");
+    reqMorphLabel.textContent = (nameEl ? nameEl.textContent : data.name || "Request").trim();
+    reqMorphLabel.style.opacity = "1";
+    reqMorph.style.opacity = "0";
+    reqMorph.hidden = false;
+    reqPlaceMorph(br, skin.radius, skin);
+    trigger.style.visibility = "hidden";
+
+    reqMorph.animate(
+      [
+        reqFrame(br, skin.radius, skin.bg, REQ_SHADOW_OFF, skin.borderColor, skin.borderWidth),
+        reqFrame(cr, REQ_CARD_RADIUS, REQ_GLASS_BG, REQ_SHADOW_ON, REQ_GLASS_BORDER, REQ_GLASS_BORDER_W)
+      ],
+      { duration: expand, easing: "cubic-bezier(.22,.85,.28,1)", fill: "forwards" }
+    );
+    reqMorph.animate(
+      [{ opacity: 0 }, { opacity: 1 }],
+      { duration: fade, easing: "cubic-bezier(.22,.45,.3,1)", fill: "forwards" }
+    );
+    reqMorphLabel.animate(
+      [{ opacity: 1 }, { opacity: 0 }],
+      { duration: Math.round(expand * 0.28), easing: "ease-out", fill: "forwards" }
+    );
+    reqBackdrop.animate(
+      [{ opacity: 0 }, { opacity: 1 }],
+      { duration: fade, easing: "ease-out", fill: "forwards" }
+    );
+
+    reqSettle(null, Math.max(expand, fade), function () {
+      reqHandoffMorphToCard(function () {
+        reqRevealFields();
+        reqBusy = false;
+        reqCard.focus({ preventScroll: true });
+      });
+    });
+  }
+  function closeRequestModal(afterClose) {
+    if (reqBusy || reqModal.hidden) {
+      if (afterClose) afterClose();
+      return;
+    }
+    reqBusy = true;
+
+    var dur = reqCloseDur();
+    var t = reqLastTrigger;
+    setRequestAria(t, false);
+    if (t) t.style.visibility = "";
+    var live = !!(t && document.contains(t));
+    var skin = reqLastSkin || (live ? reqSkinOf(t) : null);
+
+    function cleanup() {
+      reqResetMorph();
+      reqHardHide();
+      document.body.style.overflow = "";
+      reqBusy = false;
+      if (t) t.style.visibility = "";
+      if (live) {
+        var focusBtn = t.querySelector(".req-summary");
+        if (focusBtn) focusBtn.focus({ preventScroll: true });
+      }
+      reqLastTrigger = null;
+      reqLastRow = null;
+      reqLastSkin = null;
+      if (afterClose) afterClose();
+    }
+
+    if (!live || reqReduced() || !skin) {
+      reqClearAnims(reqCard);
+      reqClearAnims(reqBackdrop);
+      var plain = reqCard.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        { duration: dur, fill: "forwards" }
+      );
+      reqBackdrop.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        { duration: dur, fill: "forwards" }
+      );
+      reqSettle(plain, dur, cleanup);
+      return;
+    }
+
+    reqClearAnims(reqCard);
+    reqClearAnims(reqBackdrop);
+    reqClearAnims(reqMorph);
+    reqClearAnims(reqMorphLabel);
+
+    var cr = reqRectOf(reqCard);
+    reqCard.style.visibility = "hidden";
+    reqCard.style.opacity = "0";
+    reqBackdrop.animate(
+      [{ opacity: 1 }, { opacity: 0 }],
+      { duration: Math.round(dur * 0.45), easing: "ease-in", fill: "forwards" }
+    );
+
+    var br = reqRectOf(t);
+    var nameEl = t.querySelector(".req-name");
+    reqMorphLabel.textContent = (nameEl ? nameEl.textContent : "Request").trim();
+    reqMorphLabel.style.opacity = "0";
+    reqMorphLabel.style.color = skin.fg || "var(--ink)";
+    reqMorph.style.opacity = "1";
+    reqMorph.hidden = false;
+    reqPlaceMorph(cr, REQ_CARD_RADIUS, {
+      bg: REQ_GLASS_BG,
+      fg: skin.fg,
+      borderWidth: REQ_GLASS_BORDER_W,
+      borderColor: REQ_GLASS_BORDER,
+      radius: REQ_CARD_RADIUS
+    });
+
+    var anim = reqMorph.animate(
+      [
+        reqFrame(cr, REQ_CARD_RADIUS, REQ_GLASS_BG, REQ_SHADOW_ON, REQ_GLASS_BORDER, REQ_GLASS_BORDER_W),
+        reqFrame(br, skin.radius, skin.bg, REQ_SHADOW_OFF, skin.borderColor, skin.borderWidth)
+      ],
+      { duration: dur, easing: "cubic-bezier(.4,0,.7,.2)", fill: "forwards" }
+    );
+    reqMorphLabel.animate(
+      [{ opacity: 0, offset: 0 }, { opacity: 0, offset: 0.5 }, { opacity: 1, offset: 1 }],
+      { duration: dur, easing: "ease-in", fill: "forwards" }
+    );
+
+    reqSettle(anim, dur, cleanup);
+  }
+
+  reqModal.querySelectorAll("[data-req-close]").forEach(function (el) {
+    el.addEventListener("click", function () { closeRequestModal(); });
+  });
+  document.addEventListener("keydown", function (e) {
+    if (reqModal.hidden) return;
+    if (e.key === "Escape") { closeRequestModal(); return; }
+    if (e.key !== "Tab") return;
+    var f = reqFocusables();
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  function bindRequestOpen() {
+    requestsList.querySelectorAll(".req-line").forEach(function (line) {
+      line.addEventListener("click", function (e) {
+        if (e.target.closest(".req-call")) return;
+        e.preventDefault();
+        var row = line.closest(".req-row");
+        if (!row || reqBusy) return;
+        if (!reqModal.hidden && reqLastRow === row) {
+          closeRequestModal();
+          return;
+        }
+        if (!reqModal.hidden) {
+          closeRequestModal(function () { openRequestModal(row); });
+          return;
+        }
+        openRequestModal(row);
+      });
+    });
+    requestsList.querySelectorAll(".req-call").forEach(function (link) {
+      link.addEventListener("click", function (e) { e.stopPropagation(); });
+    });
+  }
+
   async function loadRequests() {
     showError(appError, "");
+    if (!reqModal.hidden) {
+      reqResetMorph();
+      reqHardHide();
+      document.body.style.overflow = "";
+      reqBusy = false;
+      reqLastTrigger = null;
+      reqLastRow = null;
+      reqLastSkin = null;
+    }
     requestsList.innerHTML = '<p class="loading">Loading…</p>';
+    reqBusy = false;
+    requestsById = {};
+    var focusYmd = requestFocusYmd();
+    await archivePastRequests(focusYmd);
+
     var q = sb.from("assessment_requests")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("preferred_date", { ascending: true });
     var filter = statusFilter.value;
-    if (filter && filter !== "all") q = q.eq("status", filter);
+    if (filter === "active") q = q.neq("status", "archived");
+    else if (filter && filter !== "all") q = q.eq("status", filter);
     var { data, error } = await q;
     if (error) {
       requestsList.innerHTML = "";
@@ -483,58 +1653,48 @@ a:hover{color:var(--accent-hover);}
       requestsList.innerHTML = '<div class="empty">No booking requests yet.</div>';
       return;
     }
+    data = sortRequestsForFocus(data, focusYmd);
+    var phoneIcon =
+      '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">' +
+        '<path fill="currentColor" d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.7 21 3 13.3 3 3.9c0-.5.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1l-2.2 2z"/>' +
+      "</svg>";
     requestsList.innerHTML = data.map(function (row) {
+      requestsById[row.id] = row;
+      var snipParts = [];
+      if (row.preferred_date) snipParts.push(fmtDay(row.preferred_date).replace(/,.*/, ""));
+      else if (row.address) snipParts.push(String(row.address).split(",")[0]);
+      var rel = fmtRel(row.created_at);
+      if (rel) snipParts.push(rel);
+      var snip = snipParts.join(" · ");
+      var dialogId = "reqModalDialog";
+      var tel = telHref(row.phone);
+      var callBtn = tel
+        ? '<a class="req-call" href="tel:' + escAttr(tel) + '" aria-label="Call ' + escAttr(row.name || row.phone) + '" title="Call">' +
+            phoneIcon +
+          "</a>"
+        : "";
       return (
-        '<article class="card" data-id="' + row.id + '">' +
-          '<div class="card-top">' +
-            "<div>" +
-              "<h3>" + esc(row.name) + "</h3>" +
-              '<p class="meta">Received ' + esc(fmtDate(row.created_at)) + "</p>" +
-            "</div>" +
-            '<span class="badge ' + esc(row.status) + '">' + esc(row.status) + "</span>" +
-          "</div>" +
-          '<div class="card-body">' +
-            "<div><strong>Phone</strong> · <a href=\"tel:" + esc(row.phone) + "\">" + esc(row.phone) + "</a></div>" +
-            "<div><strong>Address</strong> · " + esc(row.address) + "</div>" +
-            "<div><strong>Preferred</strong> · " + esc(fmtDay(row.preferred_date)) + " · " + esc(row.preferred_window) + "</div>" +
-            (row.services && row.services.length
-              ? "<div><strong>Services</strong> · " + esc(row.services.join(", ")) + "</div>"
-              : "") +
-            (row.notes ? "<div><strong>Notes</strong> · " + esc(row.notes) + "</div>" : "") +
-          "</div>" +
-          '<div class="card-actions">' +
-            '<label class="meta">Status</label>' +
-            '<select data-status="' + row.id + '">' +
-              opt("new", row.status) + opt("contacted", row.status) + opt("scheduled", row.status) +
-              opt("done", row.status) + opt("closed", row.status) +
-            "</select>" +
-            '<button type="button" class="pill ghost" data-job-from="' + row.id + '" data-title="' + escAttr(row.name) + '" data-address="' + escAttr(row.address) + '">Create job</button>' +
+        '<article class="req-row" data-id="' + row.id + '">' +
+          '<div class="req-line">' +
+            '<button type="button" class="req-summary" aria-expanded="false" aria-controls="' + dialogId + '">' +
+              '<div class="req-main">' +
+                '<p class="req-name">' + esc(row.name) + "</p>" +
+                (snip ? '<p class="req-snip" title="' + escAttr(fmtDate(row.created_at)) + '">' + esc(snip) + "</p>" : "") +
+              "</div>" +
+              '<span class="badge ' + esc(row.status) + '">' + esc(row.status) + "</span>" +
+            "</button>" +
+            callBtn +
+            '<button type="button" class="req-chev-btn" aria-expanded="false" aria-controls="' + dialogId + '" aria-label="Open request details">' +
+              '<svg class="req-chev" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false">' +
+                '<path fill="currentColor" d="M5.2 7.4a1 1 0 0 1 1.4 0L10 10.8l3.4-3.4a1 1 0 1 1 1.4 1.4l-4.1 4.1a1 1 0 0 1-1.4 0L5.2 8.8a1 1 0 0 1 0-1.4z"/>' +
+              "</svg>" +
+            "</button>" +
           "</div>" +
         "</article>"
       );
     }).join("");
 
-    requestsList.querySelectorAll("select[data-status]").forEach(function (sel) {
-      sel.addEventListener("change", async function () {
-        var id = sel.getAttribute("data-status");
-        var { error } = await sb.from("assessment_requests").update({ status: sel.value }).eq("id", id);
-        if (error) showError(appError, error.message);
-        else loadRequests();
-      });
-    });
-
-    requestsList.querySelectorAll("[data-job-from]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        document.querySelector('.tab[data-tab="jobs"]').click();
-        jobForm.elements.id.value = "";
-        jobForm.elements.title.value = "Assessment · " + btn.getAttribute("data-title");
-        jobForm.elements.address.value = btn.getAttribute("data-address") || "";
-        jobForm.elements.status.value = "planned";
-        jobForm.elements.notes.value = "";
-        jobForm.dataset.assessmentId = btn.getAttribute("data-job-from");
-        jobForm.elements.title.focus();
-      });
-    });
+    bindRequestOpen();
   }
 
   function opt(value, current) {
@@ -544,7 +1704,625 @@ a:hover{color:var(--accent-hover);}
   document.getElementById("refreshRequests").addEventListener("click", loadRequests);
   statusFilter.addEventListener("change", loadRequests);
 
-  /* ---------- jobs ---------- */
+  /* ---------- jobs / prescriptions: morph modal wizard (+ / Edit) ---------- */
+  var beforeInput = document.getElementById("jobBefore");
+  var afterInput = document.getElementById("jobAfter");
+  var beforePreview = document.getElementById("jobBeforePreview");
+  var afterPreview = document.getElementById("jobAfterPreview");
+  var beforeCurrent = document.getElementById("jobBeforeCurrent");
+  var afterCurrent = document.getElementById("jobAfterCurrent");
+  var beforeSlot = document.getElementById("jobBeforeSlot");
+  var afterSlot = document.getElementById("jobAfterSlot");
+  var jobPublished = document.getElementById("jobPublished");
+  var jobFormHeading = document.getElementById("jobFormHeading");
+  var jobFormError = document.getElementById("jobFormError");
+  var jobReviewSummary = document.getElementById("jobReviewSummary");
+  function showJobError(msg) {
+    showError(jobFormError, msg);
+    if (msg) showError(appError, msg);
+    else showError(appError, "");
+  }
+  var jobWizardSteps = Array.prototype.slice.call(jobForm.querySelectorAll(".job-wizard-step"));
+  var jobWizardBack = document.getElementById("jobWizardBack");
+  var jobWizardBtn = document.getElementById("jobSaveBtn");
+  var jobWizardDots = document.getElementById("jobWizardDots");
+  var jobWizardStatus = document.getElementById("jobWizardStatus");
+  var jobAddBtn = document.getElementById("jobAddBtn");
+  var jobMorph = document.getElementById("jobMorph");
+  var jobMorphLabel = jobMorph.firstElementChild;
+  var jobModal = document.getElementById("jobModal");
+  var jobCard = jobModal.querySelector(".job-modal-card");
+  var jobBackdrop = jobModal.querySelector(".req-modal-backdrop");
+  var TOTAL_JOB_STEPS = jobWizardSteps.length;
+  var currentJobStep = 1;
+  var cachedJobs = [];
+  var jobBusy = false;
+  var jobLastTrigger = null;
+  var jobLastSkin = null;
+  var JOB_CARD_RADIUS = 26;
+  var JOB_SHADOW_ON = "0 0 0 1px rgba(29,36,43,.08), 0 20px 60px rgba(29,36,43,.18)";
+  var JOB_SHADOW_OFF = "0 0 0 1px rgba(29,36,43,.08), 0 12px 36px rgba(29,36,43,.1)";
+  var JOB_GLASS_BG = "rgba(255, 255, 255, 0.08)";
+  var JOB_GLASS_BORDER = "rgba(255, 255, 255, 0.85)";
+  var JOB_GLASS_BORDER_W = "1px";
+
+  jobWizardSteps.forEach(function () {
+    var dot = document.createElement("span");
+    dot.className = "job-wizard-dot";
+    jobWizardDots.appendChild(dot);
+  });
+  var jobWizardDotEls = Array.prototype.slice.call(jobWizardDots.children);
+
+  function jobReducedMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+  function jobFadeDur() { return jobReducedMotion() ? 1 : 860; }
+  function jobExpandDur() { return jobReducedMotion() ? 1 : 470; }
+  function jobClearAnims(el) {
+    if (!el || !el.getAnimations) return;
+    el.getAnimations().forEach(function (a) { a.cancel(); });
+  }
+  function jobSettle(anim, dur, fn) {
+    var done = false;
+    function go() { if (done) return; done = true; fn(); }
+    if (anim) anim.onfinish = go;
+    setTimeout(go, dur + 80);
+  }
+  function jobRectOf(el) {
+    var r = el.getBoundingClientRect();
+    return { l: r.left, t: r.top, w: r.width, h: r.height };
+  }
+  function jobSkinOf(el) {
+    var cs = getComputedStyle(el);
+    var r = el.getBoundingClientRect();
+    return {
+      bg: cs.backgroundColor,
+      fg: cs.color,
+      borderWidth: cs.borderTopWidth,
+      borderColor: cs.borderTopColor,
+      radius: parseFloat(cs.borderRadius) || (r.height / 2)
+    };
+  }
+  function jobPlaceMorph(r, radius, skin) {
+    jobMorph.style.left = r.l + "px";
+    jobMorph.style.top = r.t + "px";
+    jobMorph.style.width = r.w + "px";
+    jobMorph.style.height = r.h + "px";
+    jobMorph.style.borderRadius = radius + "px";
+    if (skin) {
+      jobMorph.style.backgroundColor = skin.bg;
+      jobMorph.style.borderWidth = skin.borderWidth;
+      jobMorph.style.borderColor = skin.borderColor;
+      jobMorph.style.borderStyle = "solid";
+      jobMorphLabel.style.color = skin.fg || "var(--ink)";
+    }
+  }
+  function jobFrame(r, radius, bg, shadow, borderColor, borderWidth) {
+    return {
+      left: r.l + "px", top: r.t + "px", width: r.w + "px", height: r.h + "px",
+      borderRadius: radius + "px", backgroundColor: bg, boxShadow: shadow,
+      borderTopColor: borderColor, borderRightColor: borderColor,
+      borderBottomColor: borderColor, borderLeftColor: borderColor,
+      borderTopWidth: borderWidth, borderRightWidth: borderWidth,
+      borderBottomWidth: borderWidth, borderLeftWidth: borderWidth
+    };
+  }
+  function jobResetMorph() {
+    jobMorph.style.opacity = "1";
+    jobClearAnims(jobMorph);
+    jobClearAnims(jobMorphLabel);
+    jobMorph.hidden = true;
+    jobMorph.style.opacity = "";
+    jobMorphLabel.style.opacity = "";
+  }
+  function jobHardHide() {
+    jobModal.hidden = true;
+    jobModal.classList.remove("measuring");
+    jobClearAnims(jobCard);
+    jobClearAnims(jobBackdrop);
+    jobCard.classList.remove("fields-in");
+    jobCard.style.opacity = "";
+    jobCard.style.visibility = "";
+    jobBackdrop.style.opacity = "";
+  }
+  function jobRevealFields() {
+    jobCard.classList.remove("fields-in");
+    jobForm.querySelectorAll(".job-form-reveal > *").forEach(function (el) {
+      el.style.opacity = "";
+    });
+    var closeX = jobCard.querySelector(".req-modal-x");
+    if (closeX) closeX.style.opacity = "";
+    void jobCard.offsetWidth;
+    requestAnimationFrame(function () {
+      if (jobModal.hidden) return;
+      if (jobReducedMotion()) {
+        jobForm.querySelectorAll(".job-form-reveal > *").forEach(function (el) {
+          el.style.opacity = "1";
+        });
+        if (closeX) closeX.style.opacity = "1";
+        return;
+      }
+      jobCard.classList.add("fields-in");
+    });
+  }
+  function jobHandoffMorphToCard(onReady) {
+    jobModal.classList.remove("measuring");
+    jobClearAnims(jobCard);
+    jobCard.style.visibility = "";
+    jobCard.style.opacity = "1";
+    jobMorph.style.opacity = "1";
+    jobClearAnims(jobMorph);
+    jobClearAnims(jobMorphLabel);
+    jobMorph.hidden = true;
+    jobMorph.style.opacity = "";
+    jobMorphLabel.style.opacity = "";
+    if (onReady) onReady();
+  }
+  function jobShowCard(onFaded) {
+    jobClearAnims(jobCard);
+    jobClearAnims(jobBackdrop);
+    jobCard.style.visibility = "";
+    jobCard.style.opacity = "0";
+    jobBackdrop.style.opacity = "0";
+    var fade = jobFadeDur();
+    var cardFade = jobCard.animate(
+      [{ opacity: 0 }, { opacity: 1 }],
+      { duration: fade, easing: "cubic-bezier(.22,.45,.3,1)", fill: "forwards" }
+    );
+    jobBackdrop.animate(
+      [{ opacity: 0 }, { opacity: 1 }],
+      { duration: fade + 140, easing: "ease-out", fill: "forwards" }
+    );
+    jobSettle(cardFade, fade, function () { if (onFaded) onFaded(); });
+  }
+  function jobFocusables() {
+    return Array.prototype.filter.call(
+      jobCard.querySelectorAll("a[href],button:not([disabled]),input,select,textarea"),
+      function (el) { return el.offsetParent !== null; }
+    );
+  }
+  function openJobModal(trigger, opts) {
+    opts = opts || {};
+    if (jobBusy) return;
+    if (!jobModal.hidden) return;
+    if (!reqModal.hidden) return;
+    var triggerEl = trigger || jobAddBtn;
+    if (!triggerEl) return;
+
+    jobBusy = true;
+    jobLastTrigger = triggerEl;
+    jobLastSkin = jobSkinOf(triggerEl);
+    jobResetMorph();
+
+    var expand = jobExpandDur();
+    var fade = jobFadeDur();
+    var label = opts.label || jobFormHeading.textContent || "Prescription";
+
+    jobClearAnims(jobCard);
+    jobClearAnims(jobBackdrop);
+    jobModal.hidden = false;
+    jobModal.classList.add("measuring");
+    jobCard.classList.remove("fields-in");
+    document.body.style.overflow = "hidden";
+    jobCard.style.opacity = "0";
+    jobBackdrop.style.opacity = "0";
+
+    if (jobReducedMotion()) {
+      jobModal.classList.remove("measuring");
+      triggerEl.style.visibility = "hidden";
+      jobShowCard(function () {
+        jobRevealFields();
+        jobBusy = false;
+        goToJobStep(currentJobStep, false);
+        jobCard.focus({ preventScroll: true });
+      });
+      return;
+    }
+
+    var cr = jobRectOf(jobCard);
+    var br = jobRectOf(triggerEl);
+    var skin = jobLastSkin;
+    jobMorphLabel.textContent = label;
+    jobMorphLabel.style.opacity = "1";
+    jobMorph.style.opacity = "0";
+    jobMorph.hidden = false;
+    jobPlaceMorph(br, skin.radius, skin);
+    triggerEl.style.visibility = "hidden";
+
+    jobMorph.animate(
+      [
+        jobFrame(br, skin.radius, skin.bg, JOB_SHADOW_OFF, skin.borderColor, skin.borderWidth),
+        jobFrame(cr, JOB_CARD_RADIUS, JOB_GLASS_BG, JOB_SHADOW_ON, JOB_GLASS_BORDER, JOB_GLASS_BORDER_W)
+      ],
+      { duration: expand, easing: "cubic-bezier(.22,.85,.28,1)", fill: "forwards" }
+    );
+    jobMorph.animate(
+      [{ opacity: 0 }, { opacity: 1 }],
+      { duration: fade, easing: "cubic-bezier(.22,.45,.3,1)", fill: "forwards" }
+    );
+    jobMorphLabel.animate(
+      [{ opacity: 1 }, { opacity: 0 }],
+      { duration: Math.round(expand * 0.28), easing: "ease-out", fill: "forwards" }
+    );
+    jobBackdrop.animate(
+      [{ opacity: 0 }, { opacity: 1 }],
+      { duration: fade + 140, easing: "ease-out", fill: "forwards" }
+    );
+
+    jobSettle(null, Math.max(expand, fade), function () {
+      jobHandoffMorphToCard(function () {
+        jobRevealFields();
+        jobBusy = false;
+        goToJobStep(currentJobStep, false);
+        jobCard.focus({ preventScroll: true });
+      });
+    });
+  }
+  function closeJobModal(afterClose) {
+    if (jobBusy || jobModal.hidden) {
+      if (afterClose) afterClose();
+      return;
+    }
+    jobBusy = true;
+
+    var dur = jobReducedMotion() ? 1 : 330;
+    var t = jobLastTrigger;
+    if (t) t.style.visibility = "";
+    var live = !!(t && document.contains(t));
+    var skin = jobLastSkin || (live ? jobSkinOf(t) : null);
+
+    function cleanup() {
+      jobResetMorph();
+      jobHardHide();
+      document.body.style.overflow = "";
+      jobBusy = false;
+      if (t) t.style.visibility = "";
+      if (live && t.focus) t.focus({ preventScroll: true });
+      jobLastTrigger = null;
+      jobLastSkin = null;
+      if (afterClose) afterClose();
+    }
+
+    if (!live || jobReducedMotion() || !skin) {
+      jobClearAnims(jobCard);
+      jobClearAnims(jobBackdrop);
+      var plain = jobCard.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        { duration: dur, fill: "forwards" }
+      );
+      jobBackdrop.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        { duration: dur, fill: "forwards" }
+      );
+      jobSettle(plain, dur, cleanup);
+      return;
+    }
+
+    jobClearAnims(jobCard);
+    jobClearAnims(jobBackdrop);
+    jobClearAnims(jobMorph);
+    jobClearAnims(jobMorphLabel);
+
+    var cr = jobRectOf(jobCard);
+    jobCard.style.visibility = "hidden";
+    jobCard.style.opacity = "0";
+    jobBackdrop.animate(
+      [{ opacity: 1 }, { opacity: 0 }],
+      { duration: Math.round(dur * 0.45), easing: "ease-in", fill: "forwards" }
+    );
+
+    var br = jobRectOf(t);
+    jobMorphLabel.textContent = jobFormHeading.textContent || "Prescription";
+    jobMorphLabel.style.opacity = "0";
+    jobMorphLabel.style.color = skin.fg || "var(--ink)";
+    jobMorph.style.opacity = "1";
+    jobMorph.hidden = false;
+    jobPlaceMorph(cr, JOB_CARD_RADIUS, {
+      bg: JOB_GLASS_BG,
+      fg: skin.fg,
+      borderWidth: JOB_GLASS_BORDER_W,
+      borderColor: JOB_GLASS_BORDER,
+      radius: JOB_CARD_RADIUS
+    });
+
+    var anim = jobMorph.animate(
+      [
+        jobFrame(cr, JOB_CARD_RADIUS, JOB_GLASS_BG, JOB_SHADOW_ON, JOB_GLASS_BORDER, JOB_GLASS_BORDER_W),
+        jobFrame(br, skin.radius, skin.bg, JOB_SHADOW_OFF, skin.borderColor, skin.borderWidth)
+      ],
+      { duration: dur, easing: "cubic-bezier(.4,0,.7,.2)", fill: "forwards" }
+    );
+    jobMorphLabel.animate(
+      [{ opacity: 0, offset: 0 }, { opacity: 0, offset: 0.5 }, { opacity: 1, offset: 1 }],
+      { duration: dur, easing: "ease-in", fill: "forwards" }
+    );
+
+    jobSettle(anim, dur, cleanup);
+  }
+
+  jobModal.querySelectorAll("[data-job-close]").forEach(function (el) {
+    el.addEventListener("click", function () { closeJobModal(); });
+  });
+  document.addEventListener("keydown", function (e) {
+    if (jobModal.hidden) return;
+    if (e.key === "Escape") { closeJobModal(); return; }
+    if (e.key !== "Tab") return;
+    var f = jobFocusables();
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  function jobStepKey(step) {
+    return step ? step.getAttribute("data-key") || "" : "";
+  }
+
+  function jobStepField(step) {
+    if (!step) return null;
+    return step.querySelector(
+      "input:not([type=hidden]):not([type=checkbox]):not([type=file]),select,textarea"
+    );
+  }
+
+  function stepIndexByKey(key) {
+    for (var i = 0; i < jobWizardSteps.length; i++) {
+      if (jobStepKey(jobWizardSteps[i]) === key) return i + 1;
+    }
+    return 1;
+  }
+
+  function setJobFormMode(editing) {
+    jobFormHeading.textContent = editing ? "Edit prescription" : "Post a prescription";
+  }
+
+  function fillJobFormFromJob(job) {
+    clearShotUi();
+    jobForm.elements.id.value = job.id;
+    jobForm.elements.title.value = job.title || "";
+    jobForm.elements.description.value = job.description || "";
+    jobForm.elements.prescribed.value = job.prescribed || "";
+    jobForm.elements.address.value = job.address || "";
+    jobForm.elements.status.value = job.status || "complete";
+    jobForm.elements.notes.value = job.notes || "";
+    jobForm.elements.completed_at.value = toDateInput(job.completed_at || job.created_at);
+    jobPublished.checked = !!job.published;
+    var hasBefore = !!photoByKind(job.job_photos, "before");
+    var hasAfter = !!photoByKind(job.job_photos, "after");
+    beforeCurrent.hidden = !hasBefore;
+    afterCurrent.hidden = !hasAfter;
+    if (hasBefore) {
+      beforePreview.src = publicPhotoUrl(photoByKind(job.job_photos, "before").storage_path);
+      beforePreview.hidden = !beforePreview.src;
+    }
+    if (hasAfter) {
+      afterPreview.src = publicPhotoUrl(photoByKind(job.job_photos, "after").storage_path);
+      afterPreview.hidden = !afterPreview.src;
+    }
+    delete jobForm.dataset.assessmentId;
+    setJobFormMode(true);
+    goToJobStep(1, false);
+  }
+
+  function updateJobReviewSummary() {
+    function row(label, value) {
+      var empty = !value;
+      return (
+        '<div class="job-review-row">' +
+          '<span class="lbl">' + esc(label) + "</span>" +
+          '<span class="val' + (empty ? " is-empty" : "") + '">' +
+            esc(empty ? "—" : value) +
+          "</span>" +
+        "</div>"
+      );
+    }
+    var id = jobForm.elements.id.value;
+    var existing = id
+      ? cachedJobs.find(function (j) { return j.id === id; })
+      : null;
+    var beforeFile = beforeInput.files && beforeInput.files[0];
+    var afterFile = afterInput.files && afterInput.files[0];
+    var beforeOk = !!(beforeFile || (existing && photoByKind(existing.job_photos, "before")));
+    var afterOk = !!(afterFile || (existing && photoByKind(existing.job_photos, "after")));
+    var statusLabel = (jobForm.elements.status.options[jobForm.elements.status.selectedIndex] || {}).text || "";
+    jobReviewSummary.innerHTML =
+      row("Title", jobForm.elements.title.value.trim()) +
+      row("Description", jobForm.elements.description.value.trim()) +
+      row("Prescribed", jobForm.elements.prescribed.value.trim()) +
+      row("Completed", jobForm.elements.completed_at.value || "") +
+      row("Status", statusLabel) +
+      row("Before", beforeOk ? "Ready" : "Missing") +
+      row("After", afterOk ? "Ready" : "Missing") +
+      row("Address", jobForm.elements.address.value.trim()) +
+      row("Notes", jobForm.elements.notes.value.trim());
+  }
+
+  function updateJobWizardBtn() {
+    if (currentJobStep < TOTAL_JOB_STEPS) {
+      jobWizardBtn.textContent = "Continue";
+      return;
+    }
+    if (jobPublished.checked) {
+      jobWizardBtn.textContent = jobForm.elements.id.value ? "Save & publish" : "Publish prescription";
+    } else {
+      jobWizardBtn.textContent = "Save prescription";
+    }
+  }
+
+  function renderJobStep(animate) {
+    var step = jobWizardSteps[currentJobStep - 1];
+    jobWizardSteps.forEach(function (s) { s.classList.remove("is-active", "anim"); });
+    step.classList.add("is-active");
+    if (animate && !jobReducedMotion()) {
+      void step.offsetWidth;
+      step.classList.add("anim");
+    }
+    jobWizardBack.hidden = currentJobStep === 1;
+    jobWizardDotEls.forEach(function (d, i) {
+      d.classList.toggle("is-active", i === currentJobStep - 1);
+    });
+    jobWizardStatus.textContent = "Step " + currentJobStep + " of " + TOTAL_JOB_STEPS;
+    updateJobWizardBtn();
+    if (jobStepKey(step) === "review") updateJobReviewSummary();
+    var field = jobStepField(step);
+    if (field) field.focus({ preventScroll: true });
+  }
+
+  function goToJobStep(n, animate) {
+    currentJobStep = Math.max(1, Math.min(TOTAL_JOB_STEPS, n));
+    renderJobStep(animate);
+  }
+
+  function isJobStepValid(step) {
+    var key = jobStepKey(step);
+    if (key === "title") {
+      return !!(jobForm.elements.title.value && jobForm.elements.title.value.trim());
+    }
+    return true;
+  }
+
+  function markJobInvalid(step) {
+    var key = jobStepKey(step);
+    var target = null;
+    if (key === "before") target = beforeSlot;
+    else if (key === "after") target = afterSlot;
+    else target = jobStepField(step);
+    if (!target) return;
+    target.classList.remove("shake");
+    void target.offsetWidth;
+    target.classList.add("shake");
+    var field = jobStepField(step) || (key === "before" ? beforeInput : key === "after" ? afterInput : null);
+    if (field) field.focus({ preventScroll: true });
+  }
+
+  jobWizardSteps.forEach(function (step) {
+    var field = jobStepField(step);
+    if (!field) return;
+    ["input", "change"].forEach(function (evt) {
+      field.addEventListener(evt, function () { field.classList.remove("shake"); });
+    });
+  });
+  beforeInput.addEventListener("change", function () { beforeSlot.classList.remove("shake"); });
+  afterInput.addEventListener("change", function () { afterSlot.classList.remove("shake"); });
+  jobPublished.addEventListener("change", updateJobWizardBtn);
+
+  jobWizardBack.addEventListener("click", function () {
+    if (currentJobStep === 1) return;
+    goToJobStep(currentJobStep - 1, true);
+  });
+
+  function todayInputValue() {
+    var d = new Date();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+
+  function toDateInput(iso) {
+    if (!iso) return todayInputValue();
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return todayInputValue();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+
+  function completedAtIso(dateStr) {
+    if (!dateStr) return new Date().toISOString();
+    return new Date(dateStr + "T12:00:00").toISOString();
+  }
+
+  function publicPhotoUrl(path) {
+    if (!path) return "";
+    var { data } = sb.storage.from("job-photos").getPublicUrl(path);
+    return (data && data.publicUrl) || "";
+  }
+
+  function photoByKind(photos, kind) {
+    photos = photos || [];
+    for (var i = 0; i < photos.length; i++) {
+      if (photos[i].kind === kind) return photos[i];
+    }
+    return null;
+  }
+
+  function bindShotPreview(input, img) {
+    input.addEventListener("change", function () {
+      var file = input.files && input.files[0];
+      if (!file) {
+        img.hidden = true;
+        img.removeAttribute("src");
+        return;
+      }
+      var url = URL.createObjectURL(file);
+      img.src = url;
+      img.hidden = false;
+    });
+  }
+  bindShotPreview(beforeInput, beforePreview);
+  bindShotPreview(afterInput, afterPreview);
+
+  function clearShotUi() {
+    beforeInput.value = "";
+    afterInput.value = "";
+    beforePreview.hidden = true;
+    afterPreview.hidden = true;
+    beforePreview.removeAttribute("src");
+    afterPreview.removeAttribute("src");
+    beforeCurrent.hidden = true;
+    afterCurrent.hidden = true;
+    beforeSlot.classList.remove("shake");
+    afterSlot.classList.remove("shake");
+  }
+
+  function resetJobForm() {
+    jobForm.reset();
+    jobForm.elements.id.value = "";
+    jobForm.elements.status.value = "complete";
+    jobForm.elements.completed_at.value = todayInputValue();
+    jobPublished.checked = true;
+    delete jobForm.dataset.assessmentId;
+    clearShotUi();
+    showJobError("");
+    setJobFormMode(false);
+    goToJobStep(1, false);
+  }
+
+  resetJobForm();
+
+  async function uploadKindPhoto(jobId, file, kind) {
+    var path = jobId + "/" + kind + "-" + Date.now() + "-" + sanitizeFile(file.name);
+    var up = await sb.storage.from("job-photos").upload(path, file, {
+      upsert: true,
+      contentType: file.type || "image/jpeg"
+    });
+    if (up.error) return { error: up.error };
+
+    var existing = await sb.from("job_photos")
+      .select("id, storage_path")
+      .eq("job_id", jobId)
+      .eq("kind", kind);
+    if (existing.error) return { error: existing.error };
+
+    if (existing.data && existing.data.length) {
+      for (var i = 0; i < existing.data.length; i++) {
+        var old = existing.data[i];
+        await sb.storage.from("job-photos").remove([old.storage_path]);
+        await sb.from("job_photos").delete().eq("id", old.id);
+      }
+    }
+
+    var ins = await sb.from("job_photos").insert({
+      job_id: jobId,
+      storage_path: path,
+      caption: kind,
+      kind: kind,
+      sort_order: kind === "before" ? 0 : 1
+    });
+    if (ins.error) return { error: ins.error };
+    return { path: path };
+  }
+
   async function loadJobs() {
     showError(appError, "");
     jobsList.innerHTML = '<p class="loading">Loading…</p>';
@@ -553,40 +2331,59 @@ a:hover{color:var(--accent-hover);}
       .order("created_at", { ascending: false });
     if (error) {
       jobsList.innerHTML = "";
-      showError(appError, error.message);
+      showError(appError, error.message + (error.message.indexOf("description") >= 0 || error.message.indexOf("published") >= 0
+        ? " — run supabase/prescription_jobs.sql in the SQL Editor."
+        : ""));
       return;
     }
-    if (!jobs || !jobs.length) {
-      jobsList.innerHTML = '<div class="empty">No jobs yet. Save one above.</div>';
+    cachedJobs = jobs || [];
+    if (!cachedJobs.length) {
+      jobsList.innerHTML =
+        '<div class="empty">No prescriptions yet.' +
+        '<span class="empty-sub">Tap + to post one.</span></div>';
       return;
     }
 
     var html = "";
-    for (var i = 0; i < jobs.length; i++) {
-      var job = jobs[i];
+    for (var i = 0; i < cachedJobs.length; i++) {
+      var job = cachedJobs[i];
       var photos = job.job_photos || [];
       photos.sort(function (a, b) { return (a.sort_order || 0) - (b.sort_order || 0); });
       var photoHtml = "";
       for (var p = 0; p < photos.length; p++) {
-        var signed = await signedUrl(photos[p].storage_path);
-        if (signed) {
-          photoHtml += '<figure><img src="' + signed + '" alt="" loading="lazy" width="88" height="88"></figure>';
-        }
+        var url = publicPhotoUrl(photos[p].storage_path);
+        if (!url) continue;
+        var label = photos[p].kind && photos[p].kind !== "other" ? photos[p].kind : "";
+        photoHtml +=
+          "<figure>" +
+            '<img src="' + escAttr(url) + '" alt="" loading="lazy" width="88" height="88">' +
+            (label ? "<figcaption>" + esc(label) + "</figcaption>" : "") +
+          "</figure>";
       }
+      var metaBits = [];
+      if (job.published) metaBits.push("On site");
+      if (job.completed_at) metaBits.push(fmtDate(job.completed_at));
+      else metaBits.push(fmtDate(job.created_at));
+      if (job.address) metaBits.push(job.address);
       html +=
         '<article class="card" data-job="' + job.id + '">' +
           '<div class="card-top">' +
             "<div>" +
               "<h3>" + esc(job.title) + "</h3>" +
-              '<p class="meta">' + esc(job.address || "No address") + " · " + esc(fmtDate(job.created_at)) + "</p>" +
+              '<p class="meta">' + esc(metaBits.join(" · ")) + "</p>" +
             "</div>" +
-            '<span class="badge ' + esc(job.status) + '">' + esc(job.status.replace("_", " ")) + "</span>" +
+            (job.published
+              ? '<span class="badge live">Live</span>'
+              : '<span class="badge ' + esc(job.status) + '">' + esc(job.status.replace("_", " ")) + "</span>") +
           "</div>" +
-          (job.notes ? '<div class="card-body"><div>' + esc(job.notes) + "</div></div>" : "") +
+          (job.description ? '<div class="card-body"><div>' + esc(job.description) + "</div></div>" : "") +
+          (job.prescribed ? '<div class="card-body"><div><b>Prescribed:</b> ' + esc(job.prescribed) + "</div></div>" : "") +
           (photoHtml ? '<div class="photos">' + photoHtml + "</div>" : "") +
           '<div class="card-actions">' +
             '<button type="button" class="pill ghost" data-edit-job="' + job.id + '">Edit</button>' +
-            '<label class="photo-upload meta">Add photos <input type="file" accept="image/*" multiple data-upload="' + job.id + '"></label>' +
+            '<button type="button" class="pill ghost" data-toggle-pub="' + job.id + '">' +
+              (job.published ? "Unpublish" : "Publish") +
+            "</button>" +
           "</div>" +
         "</article>";
     }
@@ -594,47 +2391,42 @@ a:hover{color:var(--accent-hover);}
 
     jobsList.querySelectorAll("[data-edit-job]").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        var job = jobs.find(function (j) { return j.id === btn.getAttribute("data-edit-job"); });
-        if (!job) return;
-        jobForm.elements.id.value = job.id;
-        jobForm.elements.title.value = job.title || "";
-        jobForm.elements.address.value = job.address || "";
-        jobForm.elements.status.value = job.status || "planned";
-        jobForm.elements.notes.value = job.notes || "";
-        delete jobForm.dataset.assessmentId;
-        jobForm.elements.title.focus();
+        var job = cachedJobs.find(function (j) { return j.id === btn.getAttribute("data-edit-job"); });
+        if (!job || jobBusy) return;
+        if (!jobModal.hidden) {
+          closeJobModal(function () {
+            fillJobFormFromJob(job);
+            openJobModal(btn, { label: job.title || "Edit prescription" });
+          });
+          return;
+        }
+        fillJobFormFromJob(job);
+        openJobModal(btn, { label: job.title || "Edit prescription" });
       });
     });
 
-    jobsList.querySelectorAll("input[data-upload]").forEach(function (input) {
-      input.addEventListener("change", async function () {
-        var jobId = input.getAttribute("data-upload");
-        var files = Array.prototype.slice.call(input.files || []);
-        if (!files.length) return;
-        showError(appError, "");
-        for (var i = 0; i < files.length; i++) {
-          var file = files[i];
-          var path = jobId + "/" + Date.now() + "-" + sanitizeFile(file.name);
-          var up = await sb.storage.from("job-photos").upload(path, file, { upsert: true, contentType: file.type });
-          if (up.error) { showError(appError, up.error.message); return; }
-          var ins = await sb.from("job_photos").insert({
-            job_id: jobId,
-            storage_path: path,
-            caption: file.name,
-            sort_order: i
-          });
-          if (ins.error) { showError(appError, ins.error.message); return; }
+    jobsList.querySelectorAll("[data-toggle-pub]").forEach(function (btn) {
+      btn.addEventListener("click", async function () {
+        var job = cachedJobs.find(function (j) { return j.id === btn.getAttribute("data-toggle-pub"); });
+        if (!job) return;
+        var next = !job.published;
+        if (next) {
+          var b = photoByKind(job.job_photos, "before");
+          var a = photoByKind(job.job_photos, "after");
+          if (!b || !a) {
+            showError(appError, "Add before and after photos before publishing.");
+            return;
+          }
         }
-        input.value = "";
+        var res = await sb.from("jobs").update({
+          published: next,
+          status: next ? "complete" : job.status,
+          completed_at: job.completed_at || new Date().toISOString()
+        }).eq("id", job.id);
+        if (res.error) { showError(appError, res.error.message); return; }
         loadJobs();
       });
     });
-  }
-
-  async function signedUrl(path) {
-    var { data, error } = await sb.storage.from("job-photos").createSignedUrl(path, 3600);
-    if (error) return "";
-    return data && data.signedUrl;
   }
 
   function sanitizeFile(name) {
@@ -643,36 +2435,139 @@ a:hover{color:var(--accent-hover);}
 
   jobForm.addEventListener("submit", async function (e) {
     e.preventDefault();
-    showError(appError, "");
-    var btn = document.getElementById("jobSaveBtn");
+    showJobError("");
+    var step = jobWizardSteps[currentJobStep - 1];
+    if (!isJobStepValid(step)) {
+      markJobInvalid(step);
+      return;
+    }
+    if (currentJobStep < TOTAL_JOB_STEPS) {
+      goToJobStep(currentJobStep + 1, true);
+      return;
+    }
+
+    var btn = jobWizardBtn;
+    var id = jobForm.elements.id.value;
+    var beforeFile = beforeInput.files && beforeInput.files[0];
+    var afterFile = afterInput.files && afterInput.files[0];
+    var editing = !!id;
+    var existing = editing
+      ? cachedJobs.find(function (j) { return j.id === id; })
+      : null;
+    var hasBefore = !!(beforeFile || (existing && photoByKind(existing.job_photos, "before")));
+    var hasAfter = !!(afterFile || (existing && photoByKind(existing.job_photos, "after")));
+    var publish = !!jobPublished.checked;
+    var title = jobForm.elements.title.value.trim();
+    var description = jobForm.elements.description.value.trim();
+    var prescribed = jobForm.elements.prescribed.value.trim();
+
+    if (!title) {
+      showJobError("Title is required.");
+      goToJobStep(stepIndexByKey("title"), true);
+      markJobInvalid(jobWizardSteps[stepIndexByKey("title") - 1]);
+      return;
+    }
+    if (publish) {
+      if (!description) {
+        showJobError("Description is required to show on the site.");
+        goToJobStep(stepIndexByKey("description"), true);
+        markJobInvalid(jobWizardSteps[stepIndexByKey("description") - 1]);
+        return;
+      }
+      if (!prescribed) {
+        showJobError("Prescribed line is required to show on the site.");
+        goToJobStep(stepIndexByKey("prescribed"), true);
+        markJobInvalid(jobWizardSteps[stepIndexByKey("prescribed") - 1]);
+        return;
+      }
+      if (!hasBefore) {
+        showJobError("Before photo is required to show on the site.");
+        goToJobStep(stepIndexByKey("before"), true);
+        markJobInvalid(jobWizardSteps[stepIndexByKey("before") - 1]);
+        return;
+      }
+      if (!hasAfter) {
+        showJobError("After photo is required to show on the site.");
+        goToJobStep(stepIndexByKey("after"), true);
+        markJobInvalid(jobWizardSteps[stepIndexByKey("after") - 1]);
+        return;
+      }
+    }
+
     btn.disabled = true;
+    var prevLabel = btn.textContent;
+    btn.textContent = publish ? "Publishing…" : "Saving…";
     var payload = {
-      title: jobForm.elements.title.value.trim(),
+      title: title,
+      description: description || null,
+      prescribed: prescribed || null,
       address: jobForm.elements.address.value.trim() || null,
       status: jobForm.elements.status.value,
-      notes: jobForm.elements.notes.value.trim() || null
+      notes: jobForm.elements.notes.value.trim() || null,
+      completed_at: jobForm.elements.completed_at.value
+        ? completedAtIso(jobForm.elements.completed_at.value)
+        : (publish ? new Date().toISOString() : null),
+      published: publish
     };
+    if (publish) payload.status = "complete";
     if (jobForm.dataset.assessmentId) {
       payload.assessment_request_id = jobForm.dataset.assessmentId;
     }
-    var id = jobForm.elements.id.value;
-    var res = id
+
+    var res = editing
       ? await sb.from("jobs").update(payload).eq("id", id).select().single()
       : await sb.from("jobs").insert(payload).select().single();
+    if (res.error) {
+      btn.disabled = false;
+      btn.textContent = prevLabel;
+      showJobError(res.error.message + (String(res.error.message).indexOf("column") >= 0
+        ? " — run supabase/prescription_jobs.sql in the SQL Editor."
+        : ""));
+      return;
+    }
+
+    var jobId = res.data.id;
+    if (beforeFile) {
+      var upB = await uploadKindPhoto(jobId, beforeFile, "before");
+      if (upB.error) {
+        btn.disabled = false;
+        btn.textContent = prevLabel;
+        showJobError(upB.error.message);
+        return;
+      }
+    }
+    if (afterFile) {
+      var upA = await uploadKindPhoto(jobId, afterFile, "after");
+      if (upA.error) {
+        btn.disabled = false;
+        btn.textContent = prevLabel;
+        showJobError(upA.error.message);
+        return;
+      }
+    }
+
     btn.disabled = false;
-    if (res.error) { showError(appError, res.error.message); return; }
-    jobForm.reset();
-    jobForm.elements.id.value = "";
-    delete jobForm.dataset.assessmentId;
-    loadJobs();
+    resetJobForm();
+    closeJobModal(function () { loadJobs(); });
   });
 
   document.getElementById("jobResetBtn").addEventListener("click", function () {
-    jobForm.reset();
-    jobForm.elements.id.value = "";
-    delete jobForm.dataset.assessmentId;
+    var editing = !!jobForm.elements.id.value;
+    resetJobForm();
+    if (editing) setJobFormMode(false);
+    goToJobStep(1, false);
   });
   document.getElementById("refreshJobs").addEventListener("click", loadJobs);
+  jobAddBtn.addEventListener("click", function () {
+    if (jobBusy) return;
+    if (!jobModal.hidden) {
+      closeJobModal();
+      return;
+    }
+    resetJobForm();
+    setJobFormMode(false);
+    openJobModal(jobAddBtn, { label: "Post a prescription" });
+  });
 
   function esc(s) {
     return String(s == null ? "" : s)

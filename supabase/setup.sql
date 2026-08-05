@@ -16,17 +16,26 @@ create table if not exists public.assessment_requests (
   notes text,
   services text[] not null default '{}',
   status text not null default 'new'
-    check (status in ('new', 'contacted', 'scheduled', 'done', 'closed'))
+    check (status in ('new', 'contacted', 'scheduled', 'done', 'closed', 'archived'))
 );
 
 -- Existing projects created before services existed:
 alter table public.assessment_requests
   add column if not exists services text[] not null default '{}';
 
+-- Existing projects: allow archived inbox status (past preferred_date).
+alter table public.assessment_requests
+  drop constraint if exists assessment_requests_status_check;
+alter table public.assessment_requests
+  add constraint assessment_requests_status_check
+  check (status in ('new', 'contacted', 'scheduled', 'done', 'closed', 'archived'));
+
 create index if not exists assessment_requests_created_at_idx
   on public.assessment_requests (created_at desc);
 create index if not exists assessment_requests_status_idx
   on public.assessment_requests (status);
+create index if not exists assessment_requests_preferred_date_idx
+  on public.assessment_requests (preferred_date);
 
 -- ---------------------------------------------------------------------------
 -- jobs + photos (manager upserts later)
@@ -40,10 +49,23 @@ create table if not exists public.jobs (
   assessment_request_id uuid references public.assessment_requests (id) on delete set null,
   status text not null default 'planned'
     check (status in ('planned', 'in_progress', 'complete', 'archived')),
-  notes text
+  notes text,
+  description text,
+  prescribed text,
+  completed_at timestamptz,
+  published boolean not null default false
 );
 
+-- Existing projects created before prescription fields existed:
+alter table public.jobs add column if not exists description text;
+alter table public.jobs add column if not exists prescribed text;
+alter table public.jobs add column if not exists completed_at timestamptz;
+alter table public.jobs add column if not exists published boolean not null default false;
+
 create index if not exists jobs_created_at_idx on public.jobs (created_at desc);
+create index if not exists jobs_published_completed_at_idx
+  on public.jobs (published, completed_at desc nulls last)
+  where published = true;
 
 create table if not exists public.job_photos (
   id uuid primary key default gen_random_uuid(),
@@ -51,10 +73,15 @@ create table if not exists public.job_photos (
   job_id uuid not null references public.jobs (id) on delete cascade,
   storage_path text not null,
   caption text,
-  sort_order int not null default 0
+  sort_order int not null default 0,
+  kind text not null default 'other'
+    check (kind in ('before', 'after', 'other'))
 );
 
+alter table public.job_photos add column if not exists kind text not null default 'other';
+
 create index if not exists job_photos_job_id_idx on public.job_photos (job_id);
+create index if not exists job_photos_job_id_kind_idx on public.job_photos (job_id, kind);
 
 -- ---------------------------------------------------------------------------
 -- updated_at helper
@@ -80,11 +107,11 @@ create trigger jobs_set_updated_at
   for each row execute function public.set_updated_at();
 
 -- ---------------------------------------------------------------------------
--- Storage bucket for job photos (private; managers only)
+-- Storage bucket for job photos (public read via CDN URL; write = managers)
 -- ---------------------------------------------------------------------------
 insert into storage.buckets (id, name, public)
-values ('job-photos', 'job-photos', false)
-on conflict (id) do nothing;
+values ('job-photos', 'job-photos', true)
+on conflict (id) do update set public = excluded.public;
 
 -- ---------------------------------------------------------------------------
 -- Grants (Data API)
@@ -94,6 +121,8 @@ grant usage on schema public to anon, authenticated;
 grant insert on table public.assessment_requests to anon;
 grant select, update on table public.assessment_requests to authenticated;
 
+grant select on table public.jobs to anon;
+grant select on table public.job_photos to anon;
 grant select, insert, update, delete on table public.jobs to authenticated;
 grant select, insert, update, delete on table public.job_photos to authenticated;
 
@@ -128,7 +157,14 @@ create policy "authenticated_update_assessment_requests"
   using (true)
   with check (true);
 
--- Jobs
+-- Jobs: public can read published prescriptions; managers manage all.
+drop policy if exists "anon_select_published_jobs" on public.jobs;
+create policy "anon_select_published_jobs"
+  on public.jobs
+  for select
+  to anon
+  using (published = true);
+
 drop policy if exists "authenticated_all_jobs" on public.jobs;
 create policy "authenticated_all_jobs"
   on public.jobs
@@ -137,7 +173,21 @@ create policy "authenticated_all_jobs"
   using (true)
   with check (true);
 
--- Job photos metadata
+-- Job photos metadata: public can read photos of published jobs.
+drop policy if exists "anon_select_photos_of_published_jobs" on public.job_photos;
+create policy "anon_select_photos_of_published_jobs"
+  on public.job_photos
+  for select
+  to anon
+  using (
+    exists (
+      select 1
+      from public.jobs j
+      where j.id = job_photos.job_id
+        and j.published = true
+    )
+  );
+
 drop policy if exists "authenticated_all_job_photos" on public.job_photos;
 create policy "authenticated_all_job_photos"
   on public.job_photos
