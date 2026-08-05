@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Icon preview · Rx Manager</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;}
+html,body{margin:0; min-height:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",system-ui,sans-serif;
+  background:
+    radial-gradient(80% 50% at 50% 0%, rgba(75,124,255,.14), transparent 55%),
+    #1A1F26;
+  color:#C2C8CF;
+  padding:48px 24px 80px;
+  -webkit-font-smoothing:antialiased;
+}
+:root{
+  --rx:"Iowan Old Style","Hoefler Text",Palatino,"Times New Roman",serif;
+  --accent:#1B4DFF;
+  --ink:#F2F4F6;
+}
+a{color:#6B94FF; text-decoration:none;}
+a:hover{color:#fff;}
+.wrap{max-width:920px; margin:0 auto;}
+h1{
+  margin:0; color:var(--ink);
+  font-size:28px; letter-spacing:-.03em; font-weight:600;
+}
+.sub{margin:10px 0 0; font-size:15px; line-height:1.5; color:#8B949E; max-width:52ch;}
+.nav-ref{
+  margin-top:28px; display:inline-flex; align-items:baseline; gap:9px;
+  color:var(--ink); font-weight:600; font-size:16px; letter-spacing:-.02em;
+  padding:12px 16px; border-radius:14px;
+  background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14);
+}
+.nav-ref .mark{font-family:var(--rx); font-size:21px; color:var(--accent); line-height:1;}
+
+.grid{
+  margin-top:40px;
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  gap:28px;
+}
+@media(max-width:760px){ .grid{grid-template-columns:1fr;} }
+.card{
+  border-radius:22px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);
+  padding:28px;
+}
+.card h2{
+  margin:0 0 8px; color:var(--ink);
+  font-size:15px; letter-spacing:-.015em; font-weight:600;
+}
+.card p{margin:0 0 22px; font-size:13.5px; line-height:1.45; color:#8B949E;}
+
+.stage{
+  display:flex; align-items:center; justify-content:center;
+  min-height:360px;
+  border-radius:18px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.03), transparent),
+    #12161c;
+  border:1px solid rgba(255,255,255,.08);
+}
+.stage img{
+  width:min(280px,70%);
+  height:auto;
+  border-radius:22%;
+  box-shadow:0 24px 60px rgba(0,0,0,.45);
+}
+
+/* Live CSS mark — same glass stack as service cards (blur rim + sharp inset + sheen) */
+.live-icon{
+  width:180px; height:180px;
+  border-radius:40px;
+  display:grid; place-items:center;
+  position:relative;
+  overflow:hidden;
+  background:#1A1F26;
+  border:1px solid rgba(255,255,255,.55);
+  box-shadow:
+    0 0 0 1px rgba(29,36,43,.1),
+    inset 0 1px 0 rgba(255,255,255,.4),
+    0 18px 40px rgba(0,0,0,.35);
+}
+.live-icon .poster-blur{
+  position:absolute; inset:0; z-index:0;
+  width:100%; height:100%;
+  object-fit:cover; object-position:center;
+  display:block; pointer-events:none;
+  filter:blur(14px); transform:scale(1.1);
+}
+.live-icon .poster{
+  position:absolute; z-index:1;
+  inset:12px; width:calc(100% - 24px); height:calc(100% - 24px);
+  object-fit:cover; object-position:center;
+  display:block; pointer-events:none;
+  border-radius:28px;
+  filter:blur(2px);
+  transform:scale(1.02);
+}
+.live-icon .rim{
+  position:absolute; inset:0; z-index:2; pointer-events:none; border-radius:inherit;
+  box-shadow:inset 0 0 0 12px rgba(255,255,255,.22);
+}
+.live-icon .glass{
+  position:absolute; inset:0; z-index:3; pointer-events:none; border-radius:inherit;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.14) 0%, transparent 22%),
+    linear-gradient(160deg, rgba(255,255,255,.1) 0%, transparent 45%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35);
+}
+.live-icon .mark{
+  position:relative; z-index:4;
+  font-family:var(--rx);
+  font-weight:400;
+  font-size:92px;
+  line-height:1;
+  color:var(--accent);
+  transform:translateY(2px);
+  text-shadow:0 1px 2px rgba(0,0,0,.25);
+}
+
+.sizes{
+  margin-top:28px;
+  display:flex; flex-wrap:wrap; gap:22px; align-items:end;
+}
+.size{
+  display:grid; gap:10px; justify-items:center;
+  font-size:12px; color:#8B949E; letter-spacing:.02em;
+}
+.size img,
+.size .live-icon{
+  display:block;
+  box-shadow:0 10px 28px rgba(0,0,0,.35);
+}
+.size img{border-radius:22%;}
+.size .s60{width:60px; height:60px; border-radius:13px;}
+.size .s60 .mark{font-size:30px;}
+.size .s60 .poster{inset:5px; width:calc(100% - 10px); height:calc(100% - 10px); border-radius:9px;}
+.size .s60 .rim{box-shadow:inset 0 0 0 5px rgba(255,255,255,.22);}
+.size .s76{width:76px; height:76px; border-radius:17px;}
+.size .s76 .mark{font-size:38px;}
+.size .s76 .poster{inset:6px; width:calc(100% - 12px); height:calc(100% - 12px); border-radius:12px;}
+.size .s76 .rim{box-shadow:inset 0 0 0 6px rgba(255,255,255,.22);}
+.size .s120{width:120px; height:120px; border-radius:27px;}
+.size .s120 .mark{font-size:60px;}
+.size .s120 .poster{inset:8px; width:calc(100% - 16px); height:calc(100% - 16px); border-radius:18px;}
+.size .s120 .rim{box-shadow:inset 0 0 0 8px rgba(255,255,255,.22);}
+.size img.s60{width:60px; height:60px;}
+.size img.s76{width:76px; height:76px;}
+.size img.s120{width:120px; height:120px;}
+
+.note{
+  margin-top:36px; font-size:13px; color:#8B949E; line-height:1.5;
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Rx Manager icon preview</h1>
+    <p class="sub">Proposed home-screen mark: nav ℞ on frosted glass, centered. Not applied to the live app icons yet.</p>
+
+    <div class="nav-ref" aria-label="Website nav mark reference">
+      <span class="mark" aria-hidden="true">℞</span> RX Flooring
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Generated preview</h2>
+        <p>Raster concept for the glass tile + cobalt ℞.</p>
+        <div class="stage">
+          <img src="/public/previews/rx-manager-icon-preview.png" alt="Proposed Rx Manager glass app icon">
+        </div>
+        <div class="sizes">
+          <div class="size">
+            <img class="s60" src="/public/previews/rx-manager-icon-preview.png" alt="">
+            <span>60</span>
+          </div>
+          <div class="size">
+            <img class="s76" src="/public/previews/rx-manager-icon-preview.png" alt="">
+            <span>76</span>
+          </div>
+          <div class="size">
+            <img class="s120" src="/public/previews/rx-manager-icon-preview.png" alt="">
+            <span>120</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Live CSS mark</h2>
+        <p>Same unicode ℞ + serif stack as the website nav.</p>
+        <div class="stage">
+          <div class="live-icon" aria-hidden="true">
+            <img class="poster-blur" src="/public/previews/icon-carpet.png" alt="">
+            <img class="poster" src="/public/previews/icon-carpet.png" alt="">
+            <span class="rim"></span>
+            <span class="glass"></span>
+            <span class="mark">℞</span>
+          </div>
+        </div>
+        <div class="sizes">
+          <div class="size">
+            <div class="live-icon s60" aria-hidden="true">
+              <img class="poster-blur" src="/public/previews/icon-carpet.png" alt="">
+              <img class="poster" src="/public/previews/icon-carpet.png" alt="">
+              <span class="rim"></span>
+              <span class="glass"></span>
+              <span class="mark">℞</span>
+            </div>
+            <span>60</span>
+          </div>
+          <div class="size">
+            <div class="live-icon s76" aria-hidden="true">
+              <img class="poster-blur" src="/public/previews/icon-carpet.png" alt="">
+              <img class="poster" src="/public/previews/icon-carpet.png" alt="">
+              <span class="rim"></span>
+              <span class="glass"></span>
+              <span class="mark">℞</span>
+            </div>
+            <span>76</span>
+          </div>
+          <div class="size">
+            <div class="live-icon s120" aria-hidden="true">
+              <img class="poster-blur" src="/public/previews/icon-carpet.png" alt="">
+              <img class="poster" src="/public/previews/icon-carpet.png" alt="">
+              <span class="rim"></span>
+              <span class="glass"></span>
+              <span class="mark">℞</span>
+            </div>
+            <span>120</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <p class="note">Open at <a href="/preview1">/preview1</a>. Say when to bake this into the real apple-touch / PWA icons.</p>
+  </div>
+</body>
+</html>

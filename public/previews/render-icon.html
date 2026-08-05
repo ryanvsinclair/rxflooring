@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+html,body{margin:0; width:512px; height:512px; background:#1A1F26; overflow:hidden;}
+@font-face{
+  font-family:"IconRx";
+  src:local("Iowan Old Style"), local("Hoefler Text"), local("Palatino"), local("Palatino Linotype"), local("Times New Roman");
+}
+:root{ --accent:#1B4DFF; }
+.live-icon{
+  width:512px; height:512px;
+  display:grid; place-items:center;
+  position:relative;
+  overflow:hidden;
+  background:#1A1F26;
+}
+.live-icon .poster-blur{
+  position:absolute; inset:0; z-index:0;
+  width:100%; height:100%;
+  object-fit:cover; object-position:center;
+  display:block;
+  filter:blur(28px); transform:scale(1.12);
+}
+.live-icon .poster{
+  position:absolute; z-index:1;
+  inset:34px; width:calc(100% - 68px); height:calc(100% - 68px);
+  object-fit:cover; object-position:center;
+  display:block;
+  border-radius:80px;
+  filter:blur(4px);
+  transform:scale(1.02);
+}
+.live-icon .rim{
+  position:absolute; inset:0; z-index:2; pointer-events:none;
+  box-shadow:inset 0 0 0 34px rgba(255,255,255,.22);
+}
+.live-icon .glass{
+  position:absolute; inset:0; z-index:3; pointer-events:none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.14) 0%, transparent 22%),
+    linear-gradient(160deg, rgba(255,255,255,.1) 0%, transparent 45%);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.35);
+  border:2px solid rgba(255,255,255,.35);
+  box-sizing:border-box;
+}
+.live-icon .mark{
+  position:relative; z-index:4;
+  font-family:"IconRx","Iowan Old Style","Hoefler Text",Palatino,"Times New Roman",serif;
+  font-weight:400;
+  font-size:262px;
+  line-height:1;
+  color:var(--accent);
+  transform:translateY(4px);
+  text-shadow:0 2px 4px rgba(0,0,0,.25);
+}
+</style>
+</head>
+<body>
+  <div class="live-icon" id="icon">
+    <img class="poster-blur" src="icon-carpet.png" alt="">
+    <img class="poster" src="icon-carpet.png" alt="">
+    <span class="rim"></span>
+    <span class="glass"></span>
+    <span class="mark">℞</span>
+  </div>
+</body>
+</html>
