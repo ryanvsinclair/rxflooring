@@ -13,11 +13,35 @@
 <link rel="apple-touch-icon" href="/manager/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="/manager/icons/icon-192.png">
 <title>RX Flooring · Manager</title>
+<script>
+/* Run before paint: size shell to the real screen (iOS PWA often reports a short innerHeight). */
+(function () {
+  function standalone() {
+    return (window.navigator && window.navigator.standalone === true)
+      || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches)
+      || (window.matchMedia && window.matchMedia("(display-mode: fullscreen)").matches);
+  }
+  function syncAppHeight() {
+    var h = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0);
+    if (window.visualViewport) {
+      h = Math.max(h, Math.round(window.visualViewport.height + (window.visualViewport.offsetTop || 0)));
+    }
+    if (standalone() && window.screen) {
+      h = Math.max(h, window.screen.availHeight || 0, window.screen.height || 0);
+    }
+    document.documentElement.style.setProperty("--app-height", h + "px");
+  }
+  syncAppHeight();
+  window.__rxSyncAppHeight = syncAppHeight;
+})();
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;}
 html{
   -webkit-text-size-adjust:100%;
   height:100%;
+  height:100lvh;
+  height:var(--app-height, 100lvh);
   background:var(--bg, #0B1220);
   overflow:hidden;
   overscroll-behavior:none;
@@ -38,8 +62,9 @@ button,input,select,textarea{font:inherit;color:inherit;}
   --rx:"Iowan Old Style","Hoefler Text",Palatino,"Times New Roman",serif;
   --gut:24px; --wide:1080px;
   --bottom-nav-h:56px;
-  /* Set by JS from window.innerHeight — avoids iOS PWA gap left by -webkit-fill-available / Safari chrome. */
-  --app-height:100dvh;
+  --bottom-nav-pad:8px;
+  --safe-bottom:env(safe-area-inset-bottom, 0px);
+  --app-height:100lvh;
 }
 body{
   background:
@@ -51,9 +76,10 @@ body{
   letter-spacing:-.011em;
   -webkit-font-smoothing:antialiased;
   position:fixed;
-  top:0; left:0; right:0;
+  inset:0;
   width:100%;
-  height:var(--app-height);
+  height:var(--app-height, 100lvh);
+  min-height:100lvh;
   overflow:hidden;
   overscroll-behavior:none;
 }
@@ -143,6 +169,8 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   flex-direction:column;
   overflow:hidden;
   overscroll-behavior:none;
+  /* Reserve space for fixed bottom nav + home indicator */
+  padding-bottom:calc(var(--bottom-nav-h) + var(--bottom-nav-pad) + var(--safe-bottom) + 8px);
 }
 #appView > main.wrap{
   flex:1 1 auto;
@@ -162,14 +190,17 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   overflow:hidden;
 }
 .bottom-nav{
-  /* In-flow flex footer — shell height is --app-height so this sits on the real bottom. */
-  position:relative;
-  flex:0 0 auto;
+  /* Viewport-fixed — do not depend on flex/shell height (iOS PWA). */
+  position:fixed;
+  left:0; right:0; bottom:0;
   z-index:30;
   background:transparent;
   border:0;
-  /* Home-indicator only; do not reserve Safari toolbar space. */
-  padding:0 var(--gut) max(8px, env(safe-area-inset-bottom, 0px));
+  padding:var(--bottom-nav-pad) var(--gut);
+  padding-bottom:max(var(--bottom-nav-pad), var(--safe-bottom));
+  /* iOS < 11.2 */
+  padding-bottom:max(var(--bottom-nav-pad), constant(safe-area-inset-bottom));
+  padding-bottom:max(var(--bottom-nav-pad), env(safe-area-inset-bottom, 0px));
 }
 .bottom-nav-in{
   /* Same glass as Refresh / + toolbar pills */
@@ -870,27 +901,28 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
       <div class="list" id="jobsList"><p class="loading">Loading…</p></div>
     </section>
   </main>
-
-  <nav class="bottom-nav" aria-label="Manager sections">
-    <div class="bottom-nav-in" role="tablist">
-      <button type="button" class="tab is-active" data-tab="requests" role="tab" aria-selected="true">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 6h16M4 12h16M4 18h10"/>
-          <circle cx="19" cy="18" r="1.25" fill="currentColor" stroke="none"/>
-        </svg>
-        <span>Requests</span>
-      </button>
-      <button type="button" class="tab" data-tab="jobs" role="tab" aria-selected="false">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8 4h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
-          <path d="M9 4V3.5A1.5 1.5 0 0 1 10.5 2h3A1.5 1.5 0 0 1 15 3.5V4"/>
-          <path d="M9 11h6M9 15h4"/>
-        </svg>
-        <span>Jobs</span>
-      </button>
-    </div>
-  </nav>
 </div>
+
+<!-- Outside #appView so position:fixed is viewport-rooted on iOS PWA. -->
+<nav class="bottom-nav" id="bottomNav" hidden aria-label="Manager sections">
+  <div class="bottom-nav-in" role="tablist">
+    <button type="button" class="tab is-active" data-tab="requests" role="tab" aria-selected="true">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 6h16M4 12h16M4 18h10"/>
+        <circle cx="19" cy="18" r="1.25" fill="currentColor" stroke="none"/>
+      </svg>
+      <span>Requests</span>
+    </button>
+    <button type="button" class="tab" data-tab="jobs" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M8 4h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+        <path d="M9 4V3.5A1.5 1.5 0 0 1 10.5 2h3A1.5 1.5 0 0 1 15 3.5V4"/>
+        <path d="M9 11h6M9 15h4"/>
+      </svg>
+      <span>Jobs</span>
+    </button>
+  </div>
+</nav>
 
 <!-- Request morph: line stand-in while it grows into the centered card (Book pattern). -->
 <div class="req-morph" id="reqMorph" hidden aria-hidden="true"><span></span></div>
@@ -1006,24 +1038,54 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 <script src="/js/supabase-client.js"></script>
 <script>
 (function () {
-  /* iOS home-screen / Safari: lock shell to the live viewport height so the
-     bottom nav is not left floating above phantom browser-chrome space. */
-  function syncAppHeight() {
-    var h = window.innerHeight;
-    if (window.visualViewport && window.visualViewport.height) {
-      /* Prefer the larger of the two so standalone doesn't shrink to a stale svh. */
-      h = Math.max(h, Math.round(window.visualViewport.height + (window.visualViewport.offsetTop || 0)));
+  var bottomNav = document.getElementById("bottomNav");
+
+  function setAppChrome(visible) {
+    if (bottomNav) bottomNav.hidden = !visible;
+    if (visible) {
+      requestAnimationFrame(syncShell);
+      setTimeout(syncShell, 50);
+      setTimeout(syncShell, 300);
     }
-    document.documentElement.style.setProperty("--app-height", h + "px");
   }
-  syncAppHeight();
-  window.addEventListener("resize", syncAppHeight);
+
+  function syncShell() {
+    if (typeof window.__rxSyncAppHeight === "function") window.__rxSyncAppHeight();
+    if (!bottomNav || bottomNav.hidden) return;
+    var vv = window.visualViewport;
+    var standalone = (window.navigator && window.navigator.standalone === true)
+      || (window.matchMedia && (
+        window.matchMedia("(display-mode: standalone)").matches
+        || window.matchMedia("(display-mode: fullscreen)").matches
+      ));
+    /* Standalone: CSS bottom:0, plus translate into any letterbox gap iOS leaves
+       under a short layout viewport (classic home-screen toolbar-sized hole). */
+    if (standalone || !vv) {
+      var layoutH = window.innerHeight || 0;
+      var screenH = Math.max(
+        (window.screen && (window.screen.availHeight || window.screen.height)) || 0,
+        layoutH
+      );
+      var gap = Math.max(0, screenH - layoutH);
+      bottomNav.style.top = "";
+      bottomNav.style.bottom = "0px";
+      bottomNav.style.transform = gap ? "translateY(" + gap + "px)" : "";
+      return;
+    }
+    var top = Math.round(vv.offsetTop + vv.height - bottomNav.offsetHeight);
+    bottomNav.style.top = top + "px";
+    bottomNav.style.bottom = "auto";
+    bottomNav.style.transform = "";
+  }
+  syncShell();
+  window.addEventListener("resize", syncShell);
   window.addEventListener("orientationchange", function () {
-    setTimeout(syncAppHeight, 50);
-    setTimeout(syncAppHeight, 300);
+    setTimeout(syncShell, 50);
+    setTimeout(syncShell, 300);
   });
   if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", syncAppHeight);
+    window.visualViewport.addEventListener("resize", syncShell);
+    window.visualViewport.addEventListener("scroll", syncShell);
   }
 
   var sb = window.rxSupabase;
@@ -1151,10 +1213,12 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     if (!session) {
       gateView.hidden = false;
       appView.hidden = true;
+      setAppChrome(false);
       return null;
     }
     gateView.hidden = true;
     appView.hidden = false;
+    setAppChrome(true);
     return session;
   }
 
@@ -2693,6 +2757,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     if (event === "SIGNED_OUT") {
       gateView.hidden = false;
       appView.hidden = true;
+      setAppChrome(false);
     }
     if (event === "SIGNED_IN") {
       // Defer so we don't deadlock auth locks inside the callback
