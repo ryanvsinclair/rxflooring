@@ -1,13 +1,13 @@
 {
   "name": "RX Flooring Manager",
   "short_name": "Rx Manager",
-  "description": "Booking requests and prescriptions for RX Flooring.",
+  "description": "Booking requests and jobs for RX Flooring.",
   "start_url": "/manager/",
   "scope": "/manager/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#1A1F26",
-  "theme_color": "#1A1F26",
+  "background_color": "#0B1220",
+  "theme_color": "#0B1220",
   "icons": [
     {
       "src": "/manager/icons/icon-192.png",

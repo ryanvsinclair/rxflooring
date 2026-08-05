@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#1A1F26">
+<meta name="theme-color" content="#0B1220">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -27,7 +27,7 @@ img{max-width:100%;display:block;}
 button,input,select,textarea{font:inherit;color:inherit;}
 :root{
   color-scheme:dark;
-  --bg:#1A1F26; --bg-alt:#222932; --panel:#242B34; --panel-alt:#2C343E;
+  --bg:#0B1220; --bg-alt:#121A2B; --panel:#162033; --panel-alt:#1C2940;
   --ink:#F2F4F6; --body:#C2C8CF; --muted:#8B949E;
   --rule:rgba(255,255,255,.10); --rule-soft:rgba(255,255,255,.06);
   --edge:rgba(255,255,255,.28); --edge-hover:rgba(255,255,255,.42);
@@ -41,8 +41,8 @@ button,input,select,textarea{font:inherit;color:inherit;}
 }
 body{
   background:
-    radial-gradient(90% 60% at 50% -10%, rgba(75,124,255,.14) 0%, transparent 55%),
-    radial-gradient(70% 50% at 100% 30%, rgba(43,182,115,.06) 0%, transparent 50%),
+    radial-gradient(90% 60% at 50% -10%, rgba(75,124,255,.28) 0%, transparent 55%),
+    radial-gradient(70% 50% at 100% 30%, rgba(75,124,255,.12) 0%, transparent 50%),
     var(--bg);
   color:var(--body);
   font-family:var(--sf); font-size:16px; line-height:1.5;
@@ -84,8 +84,8 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   display:flex; align-items:center; justify-content:center;
   padding:max(48px, env(safe-area-inset-top, 0px)) var(--gut) max(48px, env(safe-area-inset-bottom, 0px));
   background:
-    radial-gradient(90% 70% at 50% 0%, rgba(75,124,255,.16) 0%, transparent 55%),
-    radial-gradient(60% 45% at 10% 80%, rgba(43,182,115,.07) 0%, transparent 50%),
+    radial-gradient(90% 70% at 50% 0%, rgba(75,124,255,.32) 0%, transparent 55%),
+    radial-gradient(60% 45% at 10% 80%, rgba(75,124,255,.14) 0%, transparent 50%),
     var(--bg);
 }
 .gate-card{width:min(400px,100%);}
@@ -123,23 +123,19 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 /* ---------- app shell ---------- */
 .app-bar{
   position:relative; z-index:20; flex-shrink:0;
-  background:color-mix(in srgb, var(--bg) 55%, transparent);
-  -webkit-backdrop-filter:saturate(180%) blur(16px);
-  backdrop-filter:saturate(180%) blur(16px);
-  border-bottom:1px solid rgba(255,255,255,.06);
+  background:transparent;
+  border:0;
   padding-top:env(safe-area-inset-top, 0px);
 }
 .app-bar-in{
   max-width:var(--wide); margin:0 auto; padding:0 var(--gut);
-  height:52px; display:flex; align-items:center; gap:12px;
+  height:48px; display:flex; align-items:center;
 }
 .app-bar .brand{
-  display:flex; align-items:baseline; gap:8px;
-  color:var(--ink); font-weight:600; font-size:15px; letter-spacing:-.02em;
-  margin-right:auto;
+  color:var(--ink); font-weight:600; font-size:17px; letter-spacing:-.025em;
+  text-decoration:none;
 }
-.app-bar .brand .mark{font-family:var(--rx); font-size:20px; color:#fff; line-height:1;}
-.app-bar .who{font-size:13px; color:var(--muted); max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.app-bar .brand:hover{color:var(--ink);}
 #appView{
   position:absolute;
   inset:0;
@@ -154,7 +150,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   display:flex;
   flex-direction:column;
   overflow:hidden;
-  padding-top:22px;
+  padding-top:12px;
   padding-bottom:16px;
 }
 #appView > main.wrap > section{
@@ -170,16 +166,23 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   position:relative;
   flex:0 0 auto;
   z-index:30;
-  background:color-mix(in srgb, var(--bg) 55%, transparent);
-  -webkit-backdrop-filter:saturate(180%) blur(16px);
-  backdrop-filter:saturate(180%) blur(16px);
-  border-top:1px solid rgba(255,255,255,.06);
-  padding-bottom:env(safe-area-inset-bottom,0px);
+  background:transparent;
+  border:0;
+  padding:0 var(--gut) max(10px, env(safe-area-inset-bottom, 0px));
 }
 .bottom-nav-in{
+  /* Same glass as Refresh / + toolbar pills */
   max-width:var(--wide); margin:0 auto;
   height:var(--bottom-nav-h);
   display:flex; align-items:stretch;
+  border-radius:980px;
+  overflow:hidden;
+  color:var(--ink);
+  border:1px solid var(--edge);
+  box-shadow:0 0 0 1px rgba(29,36,43,.08);
+  background:rgba(255,255,255,.06);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  backdrop-filter:blur(14px) saturate(140%);
 }
 .tab{
   flex:1 1 0;
@@ -536,7 +539,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   letter-spacing:0;
 }
 
-/* Job / prescription wizard — lives in morph modal card (no inline glass shell) */
+/* Job wizard — lives in morph modal card (no inline glass shell) */
 .job-form{
   position:relative;
   width:100%;
@@ -752,9 +755,8 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 }
 @media(max-width:700px){
   :root{--gut:12px;}
-  .app-bar .who{display:none;}
-  .app-bar-in{gap:10px; height:48px;}
-  #appView > main.wrap{padding-top:16px; padding-bottom:20px;}
+  .app-bar-in{height:44px;}
+  #appView > main.wrap{padding-top:10px; padding-bottom:12px;}
   .req-summary{padding:11px 6px 11px 12px; min-height:52px;}
   .req-line{padding-right:4px;}
   .req-name{font-size:15.5px;}
@@ -829,8 +831,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 <div id="appView" hidden>
   <header class="app-bar">
     <div class="app-bar-in">
-      <a class="brand" href="/manager"><span class="mark" aria-hidden="true">℞</span> Manager</a>
-      <span class="who" id="userEmail"></span>
+      <a class="brand" href="/manager">Manager</a>
     </div>
   </header>
 
@@ -855,11 +856,15 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
       <div class="req-list" id="requestsList"><p class="loading">Loading…</p></div>
     </section>
 
-    <!-- Jobs: list only; post/edit opens via morph modal (+) -->
+    <!--
+      Jobs tab: manager-facing name for completed / showcase work.
+      A "job" here is essentially a public "prescription" on the landing page —
+      same record; landing copy stays prescription-branded.
+    -->
     <section id="tab-jobs" hidden>
       <div class="panel-toolbar">
         <button type="button" class="pill ghost" id="refreshJobs">Refresh</button>
-        <button type="button" class="pill jobs-add" id="jobAddBtn" aria-label="Post a prescription" title="Post a prescription">+</button>
+        <button type="button" class="pill jobs-add" id="jobAddBtn" aria-label="Post a job" title="Post a job">+</button>
       </div>
       <div class="list" id="jobsList"><p class="loading">Loading…</p></div>
     </section>
@@ -909,7 +914,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     <div class="req-modal-scroll">
     <form class="job-form" id="jobForm" novalidate>
       <div class="job-form-reveal">
-        <h2 id="jobFormHeading">Post a prescription</h2>
+        <h2 id="jobFormHeading">Post a job</h2>
         <input type="hidden" name="id" id="jobId">
         <p class="err-banner" id="jobFormError" hidden style="margin-top:14px;"></p>
 
@@ -977,9 +982,9 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
             <div class="job-review" id="jobReviewSummary" aria-live="polite"></div>
             <label class="job-check" style="margin-top:16px;">
               <input type="checkbox" id="jobPublished" name="published" checked>
-              <span>Show on public Recent prescriptions</span>
+              <span>Show on the public site</span>
             </label>
-            <p class="job-form-fine">Publish needs title, description, prescribed, and before &amp; after photos.</p>
+            <p class="job-form-fine">Publish needs title, description, prescribed line, and before &amp; after photos.</p>
           </div>
         </div>
 
@@ -1017,7 +1022,6 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   var loginForm = document.getElementById("loginForm");
   var loginBtn = document.getElementById("loginBtn");
   var emailLinkBtn = document.getElementById("emailLinkBtn");
-  var userEmail = document.getElementById("userEmail");
   var requestsList = document.getElementById("requestsList");
   var jobsList = document.getElementById("jobsList");
   var statusFilter = document.getElementById("statusFilter");
@@ -1130,7 +1134,6 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     }
     gateView.hidden = true;
     appView.hidden = false;
-    userEmail.textContent = session.user.email || "";
     return session;
   }
 
@@ -1408,7 +1411,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
           jobForm.dataset.assessmentId = jobBtn.getAttribute("data-job-from");
           setJobFormMode(false);
           goToJobStep(1, false);
-          openJobModal(document.getElementById("jobAddBtn"), { label: "Post a prescription" });
+          openJobModal(document.getElementById("jobAddBtn"), { label: "Post a job" });
         });
       });
     }
@@ -1775,7 +1778,8 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   document.getElementById("refreshRequests").addEventListener("click", loadRequests);
   statusFilter.addEventListener("change", loadRequests);
 
-  /* ---------- jobs / prescriptions: morph modal wizard (+ / Edit) ---------- */
+  /* ---------- jobs: morph modal wizard (+ / Edit) ----------
+     Note: a job is essentially a "prescription" on the public landing page. */
   var beforeInput = document.getElementById("jobBefore");
   var afterInput = document.getElementById("jobAfter");
   var beforePreview = document.getElementById("jobBeforePreview");
@@ -1967,7 +1971,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 
     var expand = jobExpandDur();
     var fade = jobFadeDur();
-    var label = opts.label || jobFormHeading.textContent || "Prescription";
+    var label = opts.label || jobFormHeading.textContent || "Job";
 
     jobClearAnims(jobCard);
     jobClearAnims(jobBackdrop);
@@ -2091,7 +2095,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     );
 
     var br = jobRectOf(t);
-    jobMorphLabel.textContent = jobFormHeading.textContent || "Prescription";
+    jobMorphLabel.textContent = jobFormHeading.textContent || "Job";
     jobMorphLabel.style.opacity = "0";
     jobMorphLabel.style.color = skin.fg || "var(--ink)";
     jobMorph.style.opacity = "1";
@@ -2152,7 +2156,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   }
 
   function setJobFormMode(editing) {
-    jobFormHeading.textContent = editing ? "Edit prescription" : "Post a prescription";
+    jobFormHeading.textContent = editing ? "Edit job" : "Post a job";
   }
 
   function fillJobFormFromJob(job) {
@@ -2222,9 +2226,9 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
       return;
     }
     if (jobPublished.checked) {
-      jobWizardBtn.textContent = jobForm.elements.id.value ? "Save & publish" : "Publish prescription";
+      jobWizardBtn.textContent = jobForm.elements.id.value ? "Save & publish" : "Publish job";
     } else {
-      jobWizardBtn.textContent = "Save prescription";
+      jobWizardBtn.textContent = "Save job";
     }
   }
 
@@ -2418,7 +2422,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     cachedJobs = jobs || [];
     if (!cachedJobs.length) {
       jobsList.innerHTML =
-        '<div class="empty">No prescriptions yet.' +
+        '<div class="empty">No jobs yet.' +
         '<span class="empty-sub">Tap + to post one.</span></div>';
       return;
     }
@@ -2475,12 +2479,12 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
         if (!jobModal.hidden) {
           closeJobModal(function () {
             fillJobFormFromJob(job);
-            openJobModal(btn, { label: job.title || "Edit prescription" });
+            openJobModal(btn, { label: job.title || "Edit job" });
           });
           return;
         }
         fillJobFormFromJob(job);
-        openJobModal(btn, { label: job.title || "Edit prescription" });
+        openJobModal(btn, { label: job.title || "Edit job" });
       });
     });
 
@@ -2645,7 +2649,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     }
     resetJobForm();
     setJobFormMode(false);
-    openJobModal(jobAddBtn, { label: "Post a prescription" });
+    openJobModal(jobAddBtn, { label: "Post a job" });
   });
 
   function esc(s) {
