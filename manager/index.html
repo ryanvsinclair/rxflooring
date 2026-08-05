@@ -18,6 +18,7 @@
 html{
   -webkit-text-size-adjust:100%;
   height:100%;
+  height:-webkit-fill-available;
   overflow:hidden;
   overscroll-behavior:none;
 }
@@ -47,7 +48,12 @@ body{
   font-family:var(--sf); font-size:16px; line-height:1.5;
   letter-spacing:-.011em;
   -webkit-font-smoothing:antialiased;
+  /* Lock to the visual viewport so iOS home-screen PWAs don't leave a gap under fixed UI. */
+  position:fixed;
+  inset:0;
+  width:100%;
   height:100%;
+  height:-webkit-fill-available;
   overflow:hidden;
   overscroll-behavior:none;
 }
@@ -74,7 +80,8 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 
 /* ---------- gate / login ---------- */
 .gate{
-  min-height:100dvh; display:flex; align-items:center; justify-content:center;
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
   padding:max(48px, env(safe-area-inset-top, 0px)) var(--gut) max(48px, env(safe-area-inset-bottom, 0px));
   background:
     radial-gradient(90% 70% at 50% 0%, rgba(75,124,255,.16) 0%, transparent 55%),
@@ -134,12 +141,12 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 .app-bar .brand .mark{font-family:var(--rx); font-size:20px; color:#fff; line-height:1;}
 .app-bar .who{font-size:13px; color:var(--muted); max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 #appView{
-  height:100dvh;
+  position:absolute;
+  inset:0;
   display:flex;
   flex-direction:column;
   overflow:hidden;
   overscroll-behavior:none;
-  padding-bottom:calc(var(--bottom-nav-h) + env(safe-area-inset-bottom,0px));
 }
 #appView > main.wrap{
   flex:1 1 auto;
@@ -159,7 +166,10 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   overflow:hidden;
 }
 .bottom-nav{
-  position:fixed; left:0; right:0; bottom:0; z-index:30;
+  /* In-flow flex footer — more reliable than position:fixed on iOS standalone. */
+  position:relative;
+  flex:0 0 auto;
+  z-index:30;
   background:color-mix(in srgb, var(--bg) 55%, transparent);
   -webkit-backdrop-filter:saturate(180%) blur(16px);
   backdrop-filter:saturate(180%) blur(16px);
@@ -377,7 +387,8 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 }
 .req-modal-card{
   position:relative; width:min(560px,100%);
-  max-height:calc(100dvh - 48px); overflow-y:auto;
+  max-height:calc(100dvh - 48px); overflow:hidden;
+  display:flex; flex-direction:column;
   background:rgba(255,255,255,.08); color:var(--ink); border-radius:26px; opacity:0;
   border:1px solid var(--edge);
   -webkit-backdrop-filter:blur(18px) saturate(140%);
@@ -385,24 +396,37 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   box-shadow:
     0 0 0 1px rgba(29,36,43,.08),
     0 20px 60px rgba(29,36,43,.18);
-  padding:32px 28px 26px; transform-origin:center center;
+  padding:0; transform-origin:center center;
+}
+.req-modal-scroll{
+  flex:1 1 auto; min-height:0;
+  overflow-x:hidden; overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:32px 28px 26px;
 }
 @media(max-width:560px){
   .req-modal-root{padding:14px;}
-  .req-modal-card{padding:26px 18px 22px; border-radius:22px; max-height:calc(100dvh - 28px);}
+  .req-modal-card{border-radius:22px; max-height:calc(100dvh - 28px);}
+  .req-modal-scroll{padding:26px 18px 22px;}
 }
 .req-modal-x{
-  position:absolute; top:14px; right:14px; width:34px; height:34px;
+  position:absolute; top:12px; right:12px; z-index:20;
+  width:44px; height:44px;
+  display:inline-flex; align-items:center; justify-content:center;
   border:1px solid var(--edge); border-radius:50%;
-  background:rgba(255,255,255,.1); color:var(--ink);
+  background:rgba(26,31,38,.72); color:var(--ink);
   box-shadow:0 0 0 1px rgba(29,36,43,.08);
-  font-size:19px; line-height:1; cursor:pointer;
+  font-size:22px; line-height:1; cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+  pointer-events:auto;
   transition:background .18s ease, border-color .18s ease;
 }
-.req-modal-x:hover{background:rgba(255,255,255,.2); border-color:var(--edge-hover);}
+.req-modal-x:hover{background:rgba(26,31,38,.88); border-color:var(--edge-hover);}
+.req-modal-reveal{position:relative; z-index:1;}
 .req-modal-head{
   display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
-  padding-right:40px;
+  padding-right:52px;
 }
 .req-modal-card h2{
   margin:0;
@@ -525,7 +549,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 }
 .job-form h2{
   margin:0;
-  padding-right:40px;
+  padding-right:52px;
   color:var(--ink);
   font-size:24px;
   letter-spacing:-.03em;
@@ -869,7 +893,9 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   <div class="req-modal-backdrop" data-req-close></div>
   <div class="req-modal-card" id="reqModalDialog" role="dialog" aria-modal="true" aria-labelledby="reqModalTitle" tabindex="-1">
     <button class="req-modal-x" type="button" data-req-close aria-label="Close">&times;</button>
-    <div class="req-modal-reveal" id="reqModalBody"></div>
+    <div class="req-modal-scroll">
+      <div class="req-modal-reveal" id="reqModalBody"></div>
+    </div>
   </div>
 </div>
 
@@ -880,6 +906,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   <div class="req-modal-backdrop" data-job-close></div>
   <div class="req-modal-card job-modal-card" id="jobModalDialog" role="dialog" aria-modal="true" aria-labelledby="jobFormHeading" tabindex="-1">
     <button class="req-modal-x" type="button" data-job-close aria-label="Close">&times;</button>
+    <div class="req-modal-scroll">
     <form class="job-form" id="jobForm" novalidate>
       <div class="job-form-reveal">
         <h2 id="jobFormHeading">Post a prescription</h2>
@@ -964,6 +991,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
         <button class="job-form-clear" type="button" id="jobResetBtn">Clear form</button>
       </div>
     </form>
+    </div>
   </div>
 </div>
 
@@ -1397,8 +1425,10 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     var sub = snipParts.join(" · ");
     reqModalBody.innerHTML =
       '<div class="req-modal-head">' +
-        "<h2 id=\"reqModalTitle\">" + esc(row.name || "Request") + "</h2>" +
-        '<span class="badge ' + esc(row.status) + '">' + esc(row.status) + "</span>" +
+        "<div>" +
+          "<h2 id=\"reqModalTitle\">" + esc(row.name || "Request") + "</h2>" +
+          '<span class="badge ' + esc(row.status) + '" style="margin-top:10px;">' + esc(row.status) + "</span>" +
+        "</div>" +
       "</div>" +
       (sub ? '<p class="req-modal-sub">' + esc(sub) + "</p>" : "") +
       '<div class="req-fields">' +
@@ -1506,16 +1536,28 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     });
   }
   function closeRequestModal(afterClose) {
-    if (reqBusy || reqModal.hidden) {
+    if (reqModal.hidden) {
       if (afterClose) afterClose();
       return;
+    }
+    /* Allow X / backdrop to interrupt an in-progress open animation. */
+    if (reqBusy) {
+      reqClearAnims(reqCard);
+      reqClearAnims(reqBackdrop);
+      reqClearAnims(reqMorph);
+      reqClearAnims(reqMorphLabel);
+      reqResetMorph();
+      reqModal.classList.remove("measuring");
+      reqCard.style.visibility = "";
+      reqCard.style.opacity = "1";
+      reqBusy = false;
     }
     reqBusy = true;
 
     var dur = reqCloseDur();
     var t = reqLastTrigger;
     setRequestAria(t, false);
-    if (t) t.style.visibility = "";
+    /* Keep row hidden until cleanup so the close tap cannot reopen it. */
     var live = !!(t && document.contains(t));
     var skin = reqLastSkin || (live ? reqSkinOf(t) : null);
 
@@ -1593,8 +1635,27 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     reqSettle(anim, dur, cleanup);
   }
 
+  function reqBlockClickThrough() {
+    var block = function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    document.addEventListener("click", block, true);
+    setTimeout(function () {
+      document.removeEventListener("click", block, true);
+    }, 400);
+  }
+
+  function onReqClose(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    closeRequestModal();
+    reqBlockClickThrough();
+  }
   reqModal.querySelectorAll("[data-req-close]").forEach(function (el) {
-    el.addEventListener("click", function () { closeRequestModal(); });
+    el.addEventListener("click", onReqClose);
   });
   document.addEventListener("keydown", function (e) {
     if (reqModal.hidden) return;
@@ -1969,9 +2030,17 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     });
   }
   function closeJobModal(afterClose) {
-    if (jobBusy || jobModal.hidden) {
+    if (jobModal.hidden) {
       if (afterClose) afterClose();
       return;
+    }
+    if (jobBusy) {
+      jobClearAnims(jobCard);
+      jobClearAnims(jobBackdrop);
+      jobClearAnims(jobMorph);
+      jobClearAnims(jobMorphLabel);
+      jobResetMorph();
+      jobBusy = false;
     }
     jobBusy = true;
 
