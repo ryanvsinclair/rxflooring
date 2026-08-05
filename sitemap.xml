@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://rxflooring.ca/</loc>
+    <lastmod>2026-08-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://rxflooring.ca/assets/hero-poster.jpg</image:loc>
+      <image:title>RX Flooring — carpet and flooring installation in Ottawa</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://rxflooring.ca/carpet-installation-ottawa</loc>
+    <lastmod>2026-08-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://rxflooring.ca/public/services/carpet.jpg</image:loc>
+      <image:title>Carpet installation in Ottawa</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://rxflooring.ca/carpet-repair-restretching-ottawa</loc>
+    <lastmod>2026-08-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://rxflooring.ca/public/services/seaming.jpg</image:loc>
+      <image:title>Carpet repair and restretching in Ottawa</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://rxflooring.ca/stair-carpet-runners-ottawa</loc>
+    <lastmod>2026-08-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://rxflooring.ca/public/services/stairs.jpg</image:loc>
+      <image:title>Stair carpet and runner installation in Ottawa</image:title>
+    </image:image>
+  </url>
+</urlset>

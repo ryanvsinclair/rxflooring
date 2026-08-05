@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Internal tooling and parked prototypes — not for search.
+Disallow: /manager
+Disallow: /manager/
+Disallow: /freezer.html
+Disallow: /*-concepts.html
+Disallow: /jobs-focus-splits.html
+Disallow: /services-bubbles.html
+
+Sitemap: https://rxflooring.ca/sitemap.xml

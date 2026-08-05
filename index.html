@@ -16,17 +16,6 @@
 *,*::before,*::after{box-sizing:border-box;}
 html{-webkit-text-size-adjust:100%; overflow-x:hidden;}
 body{margin:0; overflow-x:hidden;}
-/* Lock document scroll while the booking modal (or other overlays) are open */
-html.is-scroll-locked,
-html.is-scroll-locked body{
-  overflow:hidden !important;
-  overscroll-behavior:none;
-}
-body.is-scroll-locked{
-  position:fixed;
-  left:0; right:0;
-  width:100%;
-}
 img{max-width:100%;display:block;}
 button,input,select,textarea{font:inherit;color:inherit;}
 
@@ -155,9 +144,9 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 }
 .hero-video{position:absolute; inset:0; width:100%; height:100%;
   object-fit:cover; object-position:center;
-  /* Opacity only - visibility:hidden stops iOS from loading/autoplaying. */
-  opacity:0;}
-.hero-video.in{opacity:1;}
+  opacity:0; visibility:hidden;
+  transition:opacity .4s ease, visibility 0s linear .4s;}
+.hero-video.in{opacity:1; visibility:visible; transition:opacity .4s ease, visibility 0s;}
 .hero .wrap{position:relative; z-index:2; width:100%;}
 
 @media(min-width:861px){
@@ -189,7 +178,7 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
   margin:0; font-size:21px; line-height:1.5; text-align:center;
   color:#fff; letter-spacing:-.018em;
   opacity:0; pointer-events:none;
-  transition:opacity .7s ease;
+  transition:opacity .48s ease;
 }
 .hero .sub.in{opacity:1; pointer-events:auto;}
 @media(max-width:700px){ .hero .sub-slot{margin-top:22px;} .hero .sub{font-size:19px;} }
@@ -210,12 +199,12 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
   -webkit-backdrop-filter:blur(14px) saturate(140%);
   backdrop-filter:blur(14px) saturate(140%);
   opacity:0; visibility:hidden;
-  transition:opacity .62s cubic-bezier(.2,.7,.3,1), visibility 0s linear .62s;
+  transition:opacity .45s cubic-bezier(.2,.7,.3,1), visibility 0s linear .45s;
 }
 .hero .links.in .pill,
 .hero .links.in .pill.ghost{
   opacity:1; visibility:visible;
-  transition:opacity .62s cubic-bezier(.2,.7,.3,1), visibility 0s;
+  transition:opacity .45s cubic-bezier(.2,.7,.3,1), visibility 0s;
 }
 .hero .links .pill:hover,
 .hero .links .pill.ghost:hover{
@@ -235,13 +224,25 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 @keyframes beatIn{ to{ opacity:1; transform:none; } }
 .hero .beat,
 .hero .kicker{
-  opacity:0; transform:translateY(13px);
-  animation:beatIn .62s cubic-bezier(.2,.7,.3,1) forwards;
+  opacity:0; transform:translateY(10px);
+  animation:beatIn .48s cubic-bezier(.2,.7,.3,1) forwards;
 }
-.hero .kicker{animation-delay:.02s;}
-.hero .beat:nth-child(1){animation-delay:.14s;}
-.hero .beat:nth-child(2){animation-delay:.26s;}
-.hero .beat:nth-child(3){animation-delay:.38s;}
+.hero .kicker{animation-delay:0s;}
+.hero .beat:nth-child(1){animation-delay:.08s;}
+.hero .beat:nth-child(2){animation-delay:.16s;}
+.hero .beat:nth-child(3){animation-delay:.24s;}
+/* Slow / failed video: poster only, hero copy + CTAs appear with no motion. */
+.hero.is-instant .hero-video{display:none !important;}
+.hero.is-instant .kicker,
+.hero.is-instant .beat{
+  opacity:1; transform:none; animation:none;
+}
+.hero.is-instant .sub,
+.hero.is-instant .links .pill,
+.hero.is-instant .links .pill.ghost{
+  opacity:1; visibility:visible; pointer-events:auto; transition:none;
+}
+.hero.is-instant .links{pointer-events:auto;}
 .chev::after{content:"›"; margin-left:.42em; }
 
 /* ---------- track record: trusted + stats ---------- */
@@ -276,9 +277,9 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 }
 .trusted-track{
   display:flex; width:max-content; align-items:center;
-  will-change:transform;
-  /* JS drives the marquee - CSS animation is unreliable on iOS Low Power Mode. */
+  animation:trustedMarquee 32s linear infinite;
 }
+.trusted-track.is-paused{ animation-play-state:paused; }
 .trusted-group{
   display:flex; align-items:center; flex-shrink:0;
   gap:72px; padding-inline:36px;
@@ -291,6 +292,10 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 .trusted-group img.caivan{height:28px; max-width:210px;}
 .trusted-group img.claridge{height:46px; max-width:210px;}
 .trusted-group img.demarco{height:36px; max-width:220px;}
+@keyframes trustedMarquee{
+  from{ transform:translateX(0); }
+  to{ transform:translateX(-50%); }
+}
 @media(max-width:700px){
   .trusted-group{gap:48px; padding-inline:24px;}
   .trusted-group img{height:32px; max-width:150px;}
@@ -298,13 +303,14 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
   .trusted-group img.caivan{height:22px; max-width:160px;}
   .trusted-group img.claridge{height:36px; max-width:160px;}
   .trusted-group img.demarco{height:28px; max-width:170px;}
+  .trusted-track{animation-duration:24s;}
   .trusted-carousel{
     -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
     mask-image:linear-gradient(90deg, transparent 0%, #000 18%, #000 82%, transparent 100%);
   }
 }
 @media (prefers-reduced-motion:reduce){
-  .trusted-track{width:100%; justify-content:center; flex-wrap:wrap; transform:none !important;}
+  .trusted-track{animation:none; width:100%; justify-content:center; flex-wrap:wrap;}
   .trusted-group{flex-wrap:wrap; justify-content:center; padding-inline:0; gap:40px 52px;}
   .trusted-group[aria-hidden="true"]{display:none;}
   .trusted-carousel{
@@ -793,8 +799,8 @@ body.is-svc-drawer-open{overflow:hidden;}
   .svc-group{ gap:16px; padding-inline:8px; }
   .svc-carousel{
     perspective:900px;
-    -webkit-mask-image:none;
-    mask-image:none;
+    -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+    mask-image:linear-gradient(90deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
   }
 }
 @media (prefers-reduced-motion:reduce){
@@ -1085,8 +1091,6 @@ body.is-svc-drawer-open{overflow:hidden;}
 
 /* Mobile: lead-with-after cards in the carousel */
 @media(max-width:700px){
-  .job-carousel-shell::before,
-  .job-carousel-shell::after{ display:none; }
   .job-carousel{
     padding:16px 0 88px;
   }
@@ -1303,33 +1307,22 @@ body.is-svc-drawer-open{overflow:hidden;}
 }
 .job-split.is-on .job-split-pane img{transform:scale(1);}
 .job-split-pane:first-child{
-  -webkit-clip-path: inset(0 100% 0 0);
   clip-path: inset(0 100% 0 0);
-  transition:clip-path .7s cubic-bezier(.22,1,.36,1),
-    -webkit-clip-path .7s cubic-bezier(.22,1,.36,1);
+  transition:clip-path .7s cubic-bezier(.22,1,.36,1);
 }
 .job-split-pane:last-child{
-  -webkit-clip-path: inset(0 0 0 100%);
   clip-path: inset(0 0 0 100%);
-  transition:clip-path .7s cubic-bezier(.22,1,.36,1),
-    -webkit-clip-path .7s cubic-bezier(.22,1,.36,1);
+  transition:clip-path .7s cubic-bezier(.22,1,.36,1);
 }
 .job-split.is-on .job-split-pane:first-child,
-.job-split.is-on .job-split-pane:last-child{
-  -webkit-clip-path: inset(0 0 0 0);
-  clip-path: inset(0 0 0 0);
-}
+.job-split.is-on .job-split-pane:last-child{clip-path: inset(0 0 0 0);}
 .job-split.is-closing .job-split-pane:first-child,
 .job-split.is-swapping .job-split-pane:first-child{
-  -webkit-clip-path: inset(0 100% 0 0);
-  clip-path: inset(0 100% 0 0);
-  transition-duration:.38s;
+  clip-path: inset(0 100% 0 0); transition-duration:.38s;
 }
 .job-split.is-closing .job-split-pane:last-child,
 .job-split.is-swapping .job-split-pane:last-child{
-  -webkit-clip-path: inset(0 0 0 100%);
-  clip-path: inset(0 0 0 100%);
-  transition-duration:.38s;
+  clip-path: inset(0 0 0 100%); transition-duration:.38s;
 }
 .job-split-label{
   position:absolute; left:14px; bottom:14px; z-index:2;
@@ -1370,29 +1363,12 @@ body.is-svc-drawer-open{overflow:hidden;}
 .job-split-dock .svc b{color:var(--ink); font-weight:600;}
 @media(max-width:700px){
   .job-split-panes{grid-template-columns:1fr; grid-template-rows:1fr 1fr;}
-  .job-split-pane:first-child{
-    -webkit-clip-path: inset(0 0 100% 0);
-    clip-path: inset(0 0 100% 0);
-  }
-  .job-split-pane:last-child{
-    -webkit-clip-path: inset(100% 0 0 0);
-    clip-path: inset(100% 0 0 0);
-  }
-  .job-split.is-on .job-split-pane:first-child,
-  .job-split.is-on .job-split-pane:last-child{
-    -webkit-clip-path: inset(0 0 0 0);
-    clip-path: inset(0 0 0 0);
-  }
+  .job-split-pane:first-child{clip-path: inset(0 0 100% 0);}
+  .job-split-pane:last-child{clip-path: inset(100% 0 0 0);}
   .job-split.is-closing .job-split-pane:first-child,
-  .job-split.is-swapping .job-split-pane:first-child{
-    -webkit-clip-path: inset(0 0 100% 0);
-    clip-path: inset(0 0 100% 0);
-  }
+  .job-split.is-swapping .job-split-pane:first-child{clip-path: inset(0 0 100% 0);}
   .job-split.is-closing .job-split-pane:last-child,
-  .job-split.is-swapping .job-split-pane:last-child{
-    -webkit-clip-path: inset(100% 0 0 0);
-    clip-path: inset(100% 0 0 0);
-  }
+  .job-split.is-swapping .job-split-pane:last-child{clip-path: inset(100% 0 0 0);}
   .job-split-dock{bottom:16px; padding:14px 16px;}
   .job-split-dock h3{font-size:18px;}
   .job-carousel .job-slip{cursor:pointer;}
@@ -1560,9 +1536,6 @@ footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; 
 .modal-root{
   position:fixed; inset:0; z-index:100;
   display:flex; align-items:center; justify-content:center; padding:24px;
-  overflow:hidden;
-  overscroll-behavior:none;
-  touch-action:none;
 }
 .modal-root[hidden]{display:none;}
 /* Only the card is hidden while measuring: backdrop can start fading on click. */
@@ -1574,109 +1547,17 @@ footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; 
 }
 .modal-card{
   position:relative; width:min(560px,100%);
-  max-width:100%;
-  max-height:calc(100dvh - 48px);
-  overflow-x:hidden;
-  overflow-y:auto;
-  overscroll-behavior:contain;
-  touch-action:pan-y;
-  /* Glass lives on ::before so nested scrollports (services step) don't
-     composite a hard seam through backdrop-filter. */
-  isolation:isolate;
-  background:transparent; color:#fff; border-radius:26px; opacity:0;
+  max-height:calc(100dvh - 48px); overflow-y:auto;
+  background:rgba(255,255,255,.08); color:#fff; border-radius:26px; opacity:0;
   border:1px solid rgba(255,255,255,.85);
-  box-shadow:0 20px 60px rgba(29,36,43,.18);
-  padding:40px 38px 34px; transform-origin:center center;
-  transition:
-    width .55s cubic-bezier(.22,1,.36,1),
-    padding .45s cubic-bezier(.22,1,.36,1);
-}
-.modal-card::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index:-1;
-  border-radius:inherit;
-  background:rgba(255,255,255,.08);
   -webkit-backdrop-filter:blur(18px) saturate(140%);
   backdrop-filter:blur(18px) saturate(140%);
-  pointer-events:none;
-}
-.modal-reveal,
-.modal-form,
-.wizard-steps,
-.wizard-step,
-.modal-form .full{
-  min-width:0;
-  max-width:100%;
-}
-@media(min-width:701px){
-  .modal-card.is-svc-wide{
-    width:min(720px, calc(100vw - 48px));
-    padding:36px 40px 32px;
-  }
-}
-/*
-  Services pick layout: the card scrolls (one scrollport = no glass seam).
-  Nav sticks to the bottom without a frosted bar - those painted the grey band.
-*/
-.modal-card.is-svc-focus{
-  display:flex;
-  flex-direction:column;
-  overflow-x:hidden;
-  overflow-y:auto;
-}
-.modal-card.is-svc-focus > .modal-x{z-index:8;}
-.modal-card.is-svc-focus .modal-reveal{
-  display:flex;
-  flex-direction:column;
-  flex:1 1 auto;
-  min-height:min-content;
-  overflow:visible;
-}
-.modal-card.is-svc-focus .modal-reveal > #bookTitle,
-.modal-card.is-svc-focus .modal-reveal > .modal-sub,
-.modal-card.is-svc-focus .modal-reveal > .modal-fine{
-  display:none;
-}
-.modal-card.is-svc-focus .modal-reveal > .mark{
-  flex:0 0 auto;
-  margin:0;
-  padding:0 40px 0 0; /* keep clear of the X */
-}
-.modal-card.is-svc-focus .modal-form{
-  display:flex;
-  flex-direction:column;
-  flex:1 1 auto;
-  min-height:min-content;
-  margin-top:14px;
-  gap:0;
-  overflow:visible;
-}
-.modal-card.is-svc-focus .wizard-status{position:absolute;}
-.modal-card.is-svc-focus .wizard-steps{
-  flex:0 0 auto;
-  overflow:visible;
-  background:transparent;
-  padding-top:6px;
-  padding-bottom:8px;
-}
-.modal-card.is-svc-focus .wizard-nav{
-  position:sticky;
-  bottom:0;
-  z-index:3;
-  flex:0 0 auto;
-  margin-top:8px;
-  padding-top:16px;
-  /* Keep glass continuous - no frosted/opaque bar under the nav. */
-  background:transparent;
+  box-shadow:0 20px 60px rgba(29,36,43,.18);
+  padding:40px 38px 34px; transform-origin:center center;
 }
 @media(max-width:560px){
   .modal-root{padding:14px;}
   .modal-card{padding:30px 22px 26px; border-radius:22px; max-height:calc(100dvh - 28px);}
-}
-@media (prefers-reduced-motion:reduce){
-  .modal-card{transition:none;}
 }
 .modal-x{
   position:absolute; top:16px; right:16px; width:34px; height:34px;
@@ -1711,59 +1592,25 @@ footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; 
   25%{transform:translateX(-6px);}
   75%{transform:translateX(6px);}
 }
-.wizard-step input.shake,.wizard-step select.shake,.wizard-step textarea.shake,
-.wizard-step .book-date-strip.shake{
+.wizard-step input.shake,.wizard-step select.shake,.wizard-step textarea.shake{
   border-color:rgba(255,163,143,.95); box-shadow:0 0 0 3px rgba(255,138,120,.18);
   animation:wizardShake .34s ease;
 }
-.book-svc-lead{
-  margin:0 0 18px;
-  text-align:center;
-  font-size:16px; line-height:1.45; font-weight:500;
-  letter-spacing:-.015em;
-  color:rgba(255,255,255,.86);
-  max-width:34em; margin-left:auto; margin-right:auto;
-}
-.book-svc-picks,
-.book-svc-chosen{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:8px;
-  justify-items:stretch;
-  width:min(100%, 340px);
-  margin:0 auto;
-  padding:0;
-  overflow:visible;
-}
-.modal-card.is-svc-focus .book-svc-picks{
-  /* Extra room so edge blur isn't clipped by the scrollport. */
-  padding:6px 4px 10px;
-}
-@media(min-width:701px){
-  .modal-card.is-svc-wide .book-svc-picks{
-    grid-template-columns:1fr 1fr;
-    width:min(100%, 560px);
-    gap:10px;
-  }
-  .book-svc-chosen{
-    width:min(100%, 360px);
-  }
+.book-svc-picks{
+  display:flex; flex-wrap:wrap; gap:8px;
+  max-height:min(42vh, 300px); overflow:auto;
+  padding:2px;
+  scrollbar-width:thin;
 }
 .book-svc-chip{
   appearance:none; margin:0; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  width:100%; box-sizing:border-box;
-  min-height:44px;
   border:1px solid rgba(255,255,255,.38);
   background:rgba(255,255,255,.1);
   color:rgba(255,255,255,.92);
-  border-radius:999px;
-  padding:10px 16px;
-  font:inherit; font-size:13.5px; font-weight:500; letter-spacing:-.01em;
-  text-align:center; line-height:1.25;
-  will-change:filter, opacity;
-  transition:background .16s ease, border-color .16s ease, color .16s ease,
-    filter .08s linear, opacity .08s linear;
+  border-radius:980px;
+  padding:9px 13px;
+  font:inherit; font-size:13px; font-weight:500; letter-spacing:-.01em;
+  transition:background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
 }
 .book-svc-chip:hover{
   background:rgba(255,255,255,.18);
@@ -1774,23 +1621,10 @@ footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; 
   border-color:rgba(255,255,255,.95);
   color:var(--ink);
 }
-.book-svc-chip.is-static{
-  cursor:default;
-  pointer-events:none;
-}
-@media (prefers-reduced-motion:reduce){
-  .book-svc-chip{
-    filter:none !important;
-    opacity:1 !important;
-    transition:background .16s ease, border-color .16s ease, color .16s ease;
-  }
-}
 .book-svc-hint{
-  margin-top:14px; font-size:13px; line-height:1.4;
-  text-align:center;
+  margin-top:10px; font-size:13px; line-height:1.4;
   color:rgba(255,255,255,.5);
 }
-.book-svc-mode[hidden]{display:none !important;}
 .wizard-nav{display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:22px; flex-wrap:wrap;}
 #wizardBtn.pill{margin-top:0;}
 .wizard-back{
@@ -1808,8 +1642,7 @@ footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; 
 }
 @media (prefers-reduced-motion:reduce){
   .wizard-step.is-active.anim{animation:none;}
-  .wizard-step input.shake,.wizard-step select.shake,.wizard-step textarea.shake,
-  .wizard-step .book-date-strip.shake{animation:none;}
+  .wizard-step input.shake,.wizard-step select.shake,.wizard-step textarea.shake{animation:none;}
 }
 /* Everything inside the card stays hidden until the glass shell opacity
    ramp finishes, then the whole stack slides in. */
@@ -1845,133 +1678,6 @@ footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; 
 }
 .modal-form input[type="date"]{min-height:48px;}
 .modal-form input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(1); opacity:.75; cursor:pointer;}
-
-/* 14-day horizontal date strip */
-.book-date{
-  position:relative;
-  width:100%;
-  min-width:0;
-  max-width:100%;
-}
-.book-date.is-custom .book-date-native{
-  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
-  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
-  opacity:0; pointer-events:none;
-}
-.book-date-rail{
-  position:relative;
-  width:calc(100% + 64px);
-  max-width:none;
-  min-width:0;
-  margin-left:-32px;
-  margin-right:-32px;
-  overflow:hidden;
-}
-@media(max-width:560px){
-  .book-date-rail{
-    width:calc(100% + 36px);
-    margin-left:-18px;
-    margin-right:-18px;
-  }
-}
-.book-date-strip{
-  display:flex; gap:8px;
-  width:100%;
-  min-width:0;
-  max-width:100%;
-  overflow-x:auto; overflow-y:hidden;
-  -webkit-overflow-scrolling:touch;
-  overscroll-behavior-x:contain;
-  overscroll-behavior-y:none;
-  touch-action:pan-x;
-  /* Proximity keeps mid-fling free; JS settles to a card after coasting. */
-  scroll-snap-type:x proximity;
-  /* Horizontal pad stays 0 so an integer number of cards can fill the width exactly */
-  padding:22px 0 14px;
-  margin:0;
-  scrollbar-width:none;
-  -ms-overflow-style:none;
-  border-radius:0;
-}
-.book-date-strip::-webkit-scrollbar{display:none; height:0;}
-.book-date-chip{
-  appearance:none; margin:0; cursor:pointer;
-  flex:0 0 auto;
-  position:relative;
-  z-index:0;
-  width:64px; /* fallback before JS measures */
-  min-height:84px;
-  box-sizing:border-box;
-  scroll-snap-align:start;
-  scroll-snap-stop:normal;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:4px;
-  padding:12px 8px;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.38);
-  background:rgba(255,255,255,.1);
-  color:rgba(255,255,255,.92);
-  font:inherit;
-  will-change:filter, opacity, transform;
-  transition:
-    background .18s ease,
-    border-color .18s ease,
-    color .18s ease,
-    transform .42s cubic-bezier(.22,1,.36,1),
-    box-shadow .42s cubic-bezier(.22,1,.36,1);
-}
-@media (prefers-reduced-motion:reduce){
-  .book-date-chip{filter:none !important; opacity:1 !important; transition:background .16s ease, border-color .16s ease, color .16s ease;}
-  .book-date-chip.is-selected{transform:none; animation:none;}
-}
-.book-date-chip:hover{
-  background:rgba(255,255,255,.18);
-  border-color:rgba(255,255,255,.6);
-}
-.book-date-chip:focus-visible{
-  outline:2px solid rgba(255,255,255,.85);
-  outline-offset:2px;
-}
-.book-date-chip .dow{
-  font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
-  color:rgba(255,255,255,.55);
-}
-.book-date-chip .dom{
-  font-size:22px; font-weight:600; letter-spacing:-.03em; line-height:1;
-}
-.book-date-chip .mon{
-  font-size:11px; font-weight:500; letter-spacing:.04em; text-transform:uppercase;
-  color:rgba(255,255,255,.55);
-}
-.book-date-chip.is-today{
-  border-color:rgba(255,255,255,.75);
-}
-@keyframes bookDateLift{
-  0%{transform:translateY(0);}
-  58%{transform:translateY(-16px);}
-  100%{transform:translateY(-12px);}
-}
-.book-date-chip.is-selected{
-  z-index:2;
-  background:rgba(255,255,255,.94);
-  border-color:rgba(255,255,255,.95);
-  color:var(--ink);
-  /* Lift only - no scale, so edge cards stay fully inside the strip */
-  transform:translateY(-12px);
-  box-shadow:
-    0 1px 2px rgba(29,36,43,.06),
-    0 14px 28px rgba(29,36,43,.22);
-}
-.book-date-chip.is-selected.is-lift{
-  animation:bookDateLift .5s cubic-bezier(.22,1,.36,1) both;
-}
-.book-date-chip.is-selected .dow,
-.book-date-chip.is-selected .mon{color:rgba(29,36,43,.55);}
-.book-date-hint{
-  margin:2px 0 0;
-  font-size:12.5px; line-height:1.4;
-  color:rgba(255,255,255,.48);
-}
 .modal-form input::placeholder,
 .modal-form textarea::placeholder{color:rgba(255,255,255,.5);}
 .modal-form input:focus,.modal-form select:focus,.modal-form textarea:focus{
@@ -1997,7 +1703,7 @@ footer{padding:64px 0 56px; border-top:1px solid var(--rule); font-size:14.5px; 
 .modal-done p{margin-top:12px; font-size:16.5px; color:rgba(255,255,255,.78);}
 
 /* ---------- reveal ---------- */
-.rise{opacity:0; transform:translateY(14px); transition:opacity .7s ease, transform .7s ease;}
+.rise{opacity:0; transform:translateY(12px); transition:opacity .5s ease, transform .5s ease;}
 .rise.in{opacity:1; transform:none;}
 @media (prefers-reduced-motion:reduce){
   .rise{opacity:1; transform:none; transition:none;}
@@ -2045,7 +1751,7 @@ html{scroll-behavior:smooth;}
       <img class="hero-poster" src="assets/hero-poster.jpg?v=4" alt=""
            width="1920" height="1080" fetchpriority="high" decoding="async" aria-hidden="true">
       <!-- src set from data-src only on good connections; otherwise poster-only. -->
-      <video class="hero-video" muted playsinline webkit-playsinline autoplay preload="metadata"
+      <video class="hero-video" muted playsinline preload="none"
              data-src="assets/hero.mp4?v=4" aria-hidden="true"></video>
     </div>
     <div class="wrap">
@@ -2174,8 +1880,8 @@ html{scroll-behavior:smooth;}
     <div class="job-carousel-shell">
     <div class="job-carousel" id="jobCarousel" aria-label="Recent job prescriptions">
       <div class="job-track">
-        <div class="job-group">
-          <article class="job-slip">
+        <div class="job-group" id="jobGroup">
+          <article class="job-slip" data-job-key="ph-carpet-room">
             <div class="job-slip-top">
               <span class="mark" aria-hidden="true">℞</span>
               <span class="job-ago">3 days ago</span>
@@ -2195,7 +1901,7 @@ html{scroll-behavior:smooth;}
             <p class="svc-line"><b>Prescribed:</b> Removal · Carpet · Subfloor</p>
           </article>
 
-          <article class="job-slip">
+          <article class="job-slip" data-job-key="ph-carpet-bed">
             <div class="job-slip-top">
               <span class="mark" aria-hidden="true">℞</span>
               <span class="job-ago">12 days ago</span>
@@ -2215,7 +1921,7 @@ html{scroll-behavior:smooth;}
             <p class="svc-line"><b>Prescribed:</b> Removal · Carpet</p>
           </article>
 
-          <article class="job-slip">
+          <article class="job-slip" data-job-key="ph-carpet-hall">
             <div class="job-slip-top">
               <span class="mark" aria-hidden="true">℞</span>
               <span class="job-ago">28 days ago</span>
@@ -2235,7 +1941,7 @@ html{scroll-behavior:smooth;}
             <p class="svc-line"><b>Prescribed:</b> Carpet · Stairs</p>
           </article>
 
-          <article class="job-slip">
+          <article class="job-slip" data-job-key="ph-carpet-office">
             <div class="job-slip-top">
               <span class="mark" aria-hidden="true">℞</span>
               <span class="job-ago">41 days ago</span>
@@ -2255,7 +1961,7 @@ html{scroll-behavior:smooth;}
             <p class="svc-line"><b>Prescribed:</b> Removal · Carpet</p>
           </article>
 
-          <article class="job-slip">
+          <article class="job-slip" data-job-key="ph-lvp">
             <div class="job-slip-top">
               <span class="mark" aria-hidden="true">℞</span>
               <span class="job-ago">48 days ago</span>
@@ -2275,7 +1981,7 @@ html{scroll-behavior:smooth;}
             <p class="svc-line"><b>Prescribed:</b> Removal · Subfloor · LVP</p>
           </article>
 
-          <article class="job-slip">
+          <article class="job-slip" data-job-key="ph-hall">
             <div class="job-slip-top">
               <span class="mark" aria-hidden="true">℞</span>
               <span class="job-ago">55 days ago</span>
@@ -2295,7 +2001,7 @@ html{scroll-behavior:smooth;}
             <p class="svc-line"><b>Prescribed:</b> Subfloor · Hardwood</p>
           </article>
 
-          <article class="job-slip">
+          <article class="job-slip" data-job-key="ph-seam">
             <div class="job-slip-top">
               <span class="mark" aria-hidden="true">℞</span>
               <span class="job-ago">67 days ago</span>
@@ -2315,7 +2021,7 @@ html{scroll-behavior:smooth;}
             <p class="svc-line"><b>Prescribed:</b> Seaming · Carpet</p>
           </article>
 
-          <article class="job-slip">
+          <article class="job-slip" data-job-key="ph-stairs">
             <div class="job-slip-top">
               <span class="mark" aria-hidden="true">℞</span>
               <span class="job-ago">82 days ago</span>
@@ -2546,7 +2252,7 @@ html{scroll-behavior:smooth;}
 
         <div class="about-body">
           <p>Ray’s been installing flooring for close to ten years, and he was hooked from day one. There’s a real craft to it. Seaming carpet so the joins disappear. Wrapping a staircase clean around every spindle. Lining up a patterned carpet so the whole room reads as one piece. Getting that right is the bar he holds every job to.</p>
-          <p>He moved to Canada almost seven years ago and kept building on that. For the past three years he’s worked as a trusted subcontractor and project manager for one of Ottawa’s flooring companies, handling measuring, scheduling, install, and warranty. In 2025 alone he ran more than 750 units across major Ottawa-area developments, including sites for Minto, Mattamy, Caivan, and Claridge Homes, coordinating more than ten crews at once and taking each home from the first measure to the final walkthrough with the homeowner.</p>
+          <p>For the past three years he’s worked as a trusted subcontractor and project manager for one of Ottawa’s flooring companies, handling measuring, scheduling, install, and warranty. In 2025 alone he ran more than 750 units across major Ottawa-area developments, including sites for Minto, Mattamy, Caivan, and Claridge Homes, coordinating more than ten crews at once and taking each home from the first measure to the final walkthrough with the homeowner.</p>
           <p>That’s how Ray runs a job today: on schedule, on budget, done right the first time. It’s also why he started this business. Same craft, same reliability, straight to homeowners, across flooring and the full range of renovation work we do.</p>
         </div>
       </div>
@@ -2644,9 +2350,7 @@ html{scroll-behavior:smooth;}
           </div>
           <div class="wizard-step" data-step="4">
             <label class="wizard-label" for="bookDate">Preferred date</label>
-            <div class="book-date" id="bookDateWrap">
-              <input id="bookDate" class="book-date-native" type="date" name="date" aria-label="Preferred date" required>
-            </div>
+            <input id="bookDate" type="date" name="date" aria-label="Preferred date" required>
           </div>
           <div class="wizard-step" data-step="5">
             <label class="wizard-label" for="bookWindow">Preferred time window</label>
@@ -2658,15 +2362,9 @@ html{scroll-behavior:smooth;}
             </select>
           </div>
           <div class="wizard-step" data-step="6">
-            <div class="book-svc-mode" id="bookSvcPickMode">
-              <p class="book-svc-lead" id="bookServicesLabel">Services are optional. Choosing what you need helps us prepare a sharper on-site assessment.</p>
-              <div class="book-svc-picks" id="bookSvcPicks" role="group" aria-labelledby="bookServicesLabel"></div>
-              <p class="book-svc-hint">Select any that apply, or continue to skip.</p>
-            </div>
-            <div class="book-svc-mode" id="bookSvcConfirmMode" hidden>
-              <p class="book-svc-lead" id="bookServicesConfirmLabel">Confirm the services for your assessment.</p>
-              <div class="book-svc-chosen" id="bookSvcChosen" role="list" aria-labelledby="bookServicesConfirmLabel"></div>
-            </div>
+            <label class="wizard-label" id="bookServicesLabel">Services <span class="wizard-optional">(optional)</span></label>
+            <div class="book-svc-picks" id="bookSvcPicks" role="group" aria-labelledby="bookServicesLabel"></div>
+            <p class="book-svc-hint">Tap to select. Prefills from the services catalog if you already added any.</p>
           </div>
           <div class="wizard-step" data-step="7">
             <label class="wizard-label" for="bookNotes">What&rsquo;s going on? <span class="wizard-optional">(optional)</span></label>
@@ -2711,27 +2409,6 @@ var bookForm = document.getElementById("bookForm");
 var dateIn   = bookForm.querySelector("[name=date]");
 var activeRoot = null, activeCard = null, activeBackdrop = null;
 var lastTrigger = null, busy = false, lastSkin = null;
-var pageScrollLockY = 0;
-var pageScrollLocks = 0;
-
-function lockPageScroll(){
-  if (pageScrollLocks === 0){
-    pageScrollLockY = window.scrollY || window.pageYOffset || 0;
-    document.documentElement.classList.add("is-scroll-locked");
-    document.body.classList.add("is-scroll-locked");
-    document.body.style.top = "-" + pageScrollLockY + "px";
-  }
-  pageScrollLocks += 1;
-}
-function unlockPageScroll(){
-  if (pageScrollLocks === 0) return;
-  pageScrollLocks -= 1;
-  if (pageScrollLocks > 0) return;
-  document.documentElement.classList.remove("is-scroll-locked");
-  document.body.classList.remove("is-scroll-locked");
-  document.body.style.top = "";
-  window.scrollTo(0, pageScrollLockY);
-}
 
 /* ---------- booking form: one-field-at-a-time wizard ---------- */
 var wizardSteps  = Array.prototype.slice.call(bookForm.querySelectorAll(".wizard-step"));
@@ -2741,16 +2418,6 @@ var wizardDots   = document.getElementById("wizardDots");
 var wizardStatus = document.getElementById("wizardStatus");
 var TOTAL_STEPS  = wizardSteps.length;
 var currentStep  = 1;
-var SVC_STEP = 6;
-var bookServicesFromLedger = false;
-var bookCard = bookModal.querySelector(".modal-card");
-var bookSvcPickMode = document.getElementById("bookSvcPickMode");
-var bookSvcConfirmMode = document.getElementById("bookSvcConfirmMode");
-var bookSvcChosen = document.getElementById("bookSvcChosen");
-var bookSvcPicks = document.getElementById("bookSvcPicks");
-var SVC_EDGE_PX = 56;
-var SVC_MAX_BLUR = 7;
-var svcEdgeRaf = 0;
 
 wizardSteps.forEach(function(){
   var dot = document.createElement("span");
@@ -2768,131 +2435,18 @@ wizardSteps.forEach(function(step){
   });
 });
 
-function isDesktopBook(){
-  return window.matchMedia("(min-width:701px)").matches;
-}
 function isStepValid(step){
-  var dateNative = step.querySelector('input[type="date"][name="date"]');
-  if (dateNative){
-    if (!dateNative.hasAttribute("required")) return true;
-    return !!dateNative.value && !!dateNative.value.trim();
-  }
   var field = stepField(step);
   if (!field || !field.hasAttribute("required")) return true;
   return !!field.value && !!field.value.trim();
 }
 function markInvalid(step){
-  var dateNative = step.querySelector("#bookDate");
-  var dateStrip = step.querySelector("#bookDateStrip");
-  var field = (dateNative && dateStrip && dateNative.closest(".book-date.is-custom"))
-    ? dateStrip
-    : stepField(step);
+  var field = stepField(step);
   if (!field) return;
   field.classList.remove("shake");
   void field.offsetWidth;
   field.classList.add("shake");
-  if (field === dateStrip){
-    var focusChip = dateStrip.querySelector(".book-date-chip.is-selected") ||
-      dateStrip.querySelector(".book-date-chip");
-    if (focusChip) focusChip.focus({ preventScroll: true });
-  } else {
-    field.focus({ preventScroll: true });
-  }
-}
-function clearSvcEdgeBlur(){
-  if (!bookSvcPicks) return;
-  bookSvcPicks.querySelectorAll(".book-svc-chip").forEach(function(chip){
-    chip.style.filter = "";
-    chip.style.opacity = "";
-  });
-}
-function updateSvcEdgeBlur(){
-  svcEdgeRaf = 0;
-  if (reduced()) return;
-  if (!bookCard || !bookCard.classList.contains("is-svc-focus") || !bookSvcPicks){
-    clearSvcEdgeBlur();
-    return;
-  }
-  var cardRect = bookCard.getBoundingClientRect();
-  var markEl = bookCard.querySelector(".modal-reveal > .mark");
-  var navEl = bookCard.querySelector(".wizard-nav");
-  var topEdge = markEl ? markEl.getBoundingClientRect().bottom : cardRect.top;
-  var bottomEdge = navEl ? navEl.getBoundingClientRect().top : cardRect.bottom;
-  var chips = bookSvcPicks.querySelectorAll(".book-svc-chip");
-  for (var i = 0; i < chips.length; i++){
-    var chip = chips[i];
-    /* Selected pills stay crisp - same as the date picker. */
-    if (chip.classList.contains("is-on")){
-      chip.style.filter = "";
-      chip.style.opacity = "";
-      continue;
-    }
-    var r = chip.getBoundingClientRect();
-    var mid = r.top + r.height * 0.5;
-    var distTop = mid - topEdge;
-    var distBottom = bottomEdge - mid;
-    var dist = Math.min(distTop, distBottom);
-    var t = 0;
-    if (dist < SVC_EDGE_PX){
-      t = 1 - Math.max(0, dist) / SVC_EDGE_PX;
-      t = t * t;
-    }
-    if (t <= 0.01){
-      chip.style.filter = "";
-      chip.style.opacity = "";
-    } else {
-      chip.style.filter = "blur(" + (t * SVC_MAX_BLUR).toFixed(2) + "px)";
-      chip.style.opacity = String(Math.max(0.28, 1 - t * 0.55).toFixed(3));
-    }
-  }
-}
-function scheduleSvcEdgeBlur(){
-  if (reduced()) return;
-  if (!svcEdgeRaf) svcEdgeRaf = requestAnimationFrame(updateSvcEdgeBlur);
-}
-function clearSvcShell(){
-  if (!bookCard) return;
-  bookCard.classList.remove("is-svc-wide", "is-svc-focus");
-  clearSvcEdgeBlur();
-}
-function renderChosenServices(){
-  if (!bookSvcChosen) return;
-  var titles = getBookServices();
-  bookSvcChosen.innerHTML = titles.map(function(t){
-    return '<span class="book-svc-chip is-on is-static" role="listitem">' +
-      String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") +
-    "</span>";
-  }).join("");
-}
-function syncSvcStepLayout(){
-  var onSvc = currentStep === SVC_STEP;
-  var fromLedger = bookServicesFromLedger && getBookServices().length > 0;
-
-  if (!onSvc){
-    if (bookSvcPickMode) bookSvcPickMode.hidden = false;
-    if (bookSvcConfirmMode) bookSvcConfirmMode.hidden = true;
-    clearSvcShell();
-    return;
-  }
-
-  if (fromLedger){
-    if (bookSvcPickMode) bookSvcPickMode.hidden = true;
-    if (bookSvcConfirmMode) bookSvcConfirmMode.hidden = false;
-    renderChosenServices();
-    clearSvcShell();
-    wizardBtn.textContent = "Confirm";
-    return;
-  }
-
-  if (bookSvcPickMode) bookSvcPickMode.hidden = false;
-  if (bookSvcConfirmMode) bookSvcConfirmMode.hidden = true;
-  if (!bookCard) return;
-  /* Expand on desktop; hide title/sub + lock chrome on all viewports. */
-  bookCard.classList.remove("is-svc-wide", "is-svc-focus");
-  void bookCard.offsetWidth;
-  if (isDesktopBook()) bookCard.classList.add("is-svc-wide");
-  bookCard.classList.add("is-svc-focus");
-  scheduleSvcEdgeBlur();
+  field.focus();
 }
 function renderStep(animate){
   var step = wizardSteps[currentStep - 1];
@@ -2906,50 +2460,20 @@ function renderStep(animate){
   wizardBtn.textContent = currentStep === TOTAL_STEPS ? "Request assessment" : "Continue";
   wizardDotEls.forEach(function(d, i){ d.classList.toggle("is-active", i === currentStep - 1); });
   wizardStatus.textContent = "Step " + currentStep + " of " + TOTAL_STEPS;
-  syncSvcStepLayout();
-  if (bookCard) bookCard.scrollLeft = 0;
-  var dateStrip = step.querySelector("#bookDateStrip");
   var field = stepField(step);
-  if (dateStrip && step.querySelector(".book-date.is-custom")){
-    var chip = dateStrip.querySelector(".book-date-chip.is-selected") ||
-      dateStrip.querySelector(".book-date-chip");
-    if (chip) chip.focus({ preventScroll:true });
-    if (typeof window.rxUpdateBookDateBlur === "function"){
-      requestAnimationFrame(window.rxUpdateBookDateBlur);
-    }
-  } else if (field){
-    field.focus({ preventScroll:true });
-  } else if (currentStep === SVC_STEP){
-    wizardBtn.focus({ preventScroll:true });
-    scheduleSvcEdgeBlur();
-  }
-}
-if (bookCard){
-  bookCard.addEventListener("scroll", function(){
-    if (bookCard.classList.contains("is-svc-focus")) scheduleSvcEdgeBlur();
-  }, { passive: true });
-}
-window.addEventListener("resize", function(){
-  if (bookCard && bookCard.classList.contains("is-svc-focus")) scheduleSvcEdgeBlur();
-});
-if (bookSvcPicks){
-  bookSvcPicks.addEventListener("click", function(){
-    scheduleSvcEdgeBlur();
-  });
+  if (field) field.focus({ preventScroll:true });
 }
 function goToStep(n, animate){
   currentStep = n;
   renderStep(animate);
 }
 function resetBookServices(){
-  bookServicesFromLedger = false;
   var host = document.getElementById("bookSvcPicks");
   if (!host) return;
   host.querySelectorAll(".book-svc-chip.is-on").forEach(function(chip){
     chip.classList.remove("is-on");
     chip.setAttribute("aria-pressed", "false");
   });
-  if (bookSvcChosen) bookSvcChosen.innerHTML = "";
 }
 function getBookServices(){
   var host = document.getElementById("bookSvcPicks");
@@ -2962,12 +2486,8 @@ function getBookServices(){
 function applyBookServices(slugs){
   var host = document.getElementById("bookSvcPicks");
   if (!host) return;
-  host.querySelectorAll(".book-svc-chip.is-on").forEach(function(chip){
-    chip.classList.remove("is-on");
-    chip.setAttribute("aria-pressed", "false");
-  });
-  bookServicesFromLedger = !!(slugs && slugs.length);
-  if (!bookServicesFromLedger) return;
+  resetBookServices();
+  if (!slugs || !slugs.length) return;
   var want = {};
   for (var i = 0; i < slugs.length; i++) want[slugs[i]] = true;
   host.querySelectorAll(".book-svc-chip").forEach(function(chip){
@@ -2982,7 +2502,6 @@ window.rxApplyBookServices = applyBookServices;
 function resetWizard(){
   currentStep = 1;
   resetBookServices();
-  clearSvcShell();
   renderStep(false);
 }
 wizardBack.addEventListener("click", function(){
@@ -2998,332 +2517,8 @@ function setDateMin(){
   var mm = String(d.getMonth() + 1).padStart(2, "0");
   var dd = String(d.getDate()).padStart(2, "0");
   dateIn.min = yyyy + "-" + mm + "-" + dd;
-  if (typeof window.rxRefreshBookDatePicker === "function"){
-    window.rxRefreshBookDatePicker();
-  }
 }
 setDateMin();
-
-/* Next-14-days horizontal date strip (all platforms, including iOS). */
-(function initBookDatePicker(){
-  var wrap = document.getElementById("bookDateWrap");
-  var input = document.getElementById("bookDate");
-  if (!wrap || !input) return;
-
-  wrap.classList.add("is-custom");
-  input.setAttribute("tabindex", "-1");
-  input.setAttribute("aria-hidden", "true");
-
-  var rail = document.createElement("div");
-  rail.className = "book-date-rail";
-
-  var strip = document.createElement("div");
-  strip.className = "book-date-strip";
-  strip.id = "bookDateStrip";
-  strip.setAttribute("role", "listbox");
-  strip.setAttribute("aria-label", "Preferred date - next 14 days");
-
-  var hint = document.createElement("p");
-  hint.className = "book-date-hint";
-  hint.textContent = "Scroll and pick any day in the next two weeks.";
-
-  rail.appendChild(strip);
-  wrap.appendChild(rail);
-  wrap.appendChild(hint);
-
-  var DAYS = 14;
-  var DOW = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-  var MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  var GAP = 8;
-  var MIN_CARD = 52;
-  var MAX_CARD = 68;
-  var MIN_VISIBLE = 4;
-  var MAX_VISIBLE = 7;
-  var EDGE_PX = 56;
-  var MAX_BLUR = 7;
-  var edgeRaf = 0;
-  var snapTimer = 0;
-  var scrollingProgrammatic = false;
-  var visibleCount = 5;
-  var cardWidth = 64;
-  var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  function pad(n){ return String(n).padStart(2, "0"); }
-  function toKey(d){
-    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
-  }
-  function parseKey(s){
-    if (!s) return null;
-    var p = s.split("-");
-    if (p.length !== 3) return null;
-    var d = new Date(+p[0], +p[1] - 1, +p[2]);
-    d.setHours(0, 0, 0, 0);
-    return isNaN(d.getTime()) ? null : d;
-  }
-  function startDate(){
-    var d = parseKey(input.min);
-    if (!d){
-      d = new Date();
-      d.setHours(0, 0, 0, 0);
-    }
-    return d;
-  }
-  function formatLabel(d){
-    try {
-      return d.toLocaleDateString(undefined, {
-        weekday: "long", month: "long", day: "numeric", year: "numeric"
-      });
-    } catch (err){
-      return toKey(d);
-    }
-  }
-  function updateEdgeBlur(){
-    edgeRaf = 0;
-    if (reducedMotion) return;
-    var stripRect = strip.getBoundingClientRect();
-    var leftEdge = stripRect.left;
-    var rightEdge = stripRect.right;
-    var chips = strip.querySelectorAll(".book-date-chip");
-    for (var i = 0; i < chips.length; i++){
-      var chip = chips[i];
-      /* Selected card stays crisp - lifted out of the edge blur. */
-      if (chip.classList.contains("is-selected")){
-        chip.style.filter = "";
-        chip.style.opacity = "";
-        continue;
-      }
-      var r = chip.getBoundingClientRect();
-      var mid = r.left + r.width * 0.5;
-      var distLeft = mid - leftEdge;
-      var distRight = rightEdge - mid;
-      var dist = Math.min(distLeft, distRight);
-      var t = 0;
-      if (dist < EDGE_PX){
-        t = 1 - Math.max(0, dist) / EDGE_PX;
-        /* Ease in so blur ramps harder near the border */
-        t = t * t;
-      }
-      if (t <= 0.01){
-        chip.style.filter = "";
-        chip.style.opacity = "";
-      } else {
-        chip.style.filter = "blur(" + (t * MAX_BLUR).toFixed(2) + "px)";
-        chip.style.opacity = String(Math.max(0.28, 1 - t * 0.55).toFixed(3));
-      }
-    }
-  }
-  function scheduleEdgeBlur(){
-    if (reducedMotion) return;
-    if (!edgeRaf) edgeRaf = requestAnimationFrame(updateEdgeBlur);
-  }
-  function syncSelection(opts){
-    opts = opts || {};
-    var key = input.value || "";
-    var chips = strip.querySelectorAll(".book-date-chip");
-    var picked = null;
-    for (var i = 0; i < chips.length; i++){
-      var on = chips[i].getAttribute("data-date") === key;
-      chips[i].classList.toggle("is-selected", on);
-      chips[i].setAttribute("aria-selected", on ? "true" : "false");
-      chips[i].classList.remove("is-lift");
-      if (on) picked = chips[i];
-    }
-    strip.classList.remove("shake");
-    if (opts.animate && picked && !reducedMotion){
-      void picked.offsetWidth;
-      picked.classList.add("is-lift");
-    }
-    scheduleEdgeBlur();
-  }
-  function stepSize(){
-    var chip = strip.querySelector(".book-date-chip");
-    var w = chip ? chip.offsetWidth : cardWidth;
-    return w + GAP;
-  }
-  function padLeft(){
-    return parseFloat(getComputedStyle(strip).paddingLeft) || 0;
-  }
-  function clampScroll(left){
-    var max = Math.max(0, strip.scrollWidth - strip.clientWidth);
-    if (left < 0) return 0;
-    if (left > max) return max;
-    return left;
-  }
-  function maxStartIndex(){
-    return Math.max(0, DAYS - visibleCount);
-  }
-  function layoutChips(){
-    strip.style.paddingLeft = "0px";
-    strip.style.paddingRight = "0px";
-    var w = strip.clientWidth;
-    if (w < 80) return;
-    var n = Math.floor((w + GAP) / (MIN_CARD + GAP));
-    n = Math.min(MAX_VISIBLE, Math.max(MIN_VISIBLE, n));
-    var width = Math.floor((w - GAP * (n - 1)) / n);
-    while (width > MAX_CARD && n < MAX_VISIBLE){
-      n += 1;
-      width = Math.floor((w - GAP * (n - 1)) / n);
-    }
-    while (width < MIN_CARD && n > MIN_VISIBLE){
-      n -= 1;
-      width = Math.floor((w - GAP * (n - 1)) / n);
-    }
-    var used = width * n + GAP * (n - 1);
-    var leftover = Math.max(0, w - used);
-    var padL = Math.floor(leftover / 2);
-    var padR = leftover - padL;
-    strip.style.paddingLeft = padL + "px";
-    strip.style.paddingRight = padR + "px";
-    visibleCount = n;
-    cardWidth = width;
-    var chips = strip.querySelectorAll(".book-date-chip");
-    for (var i = 0; i < chips.length; i++){
-      chips[i].style.flex = "0 0 " + width + "px";
-      chips[i].style.width = width + "px";
-      chips[i].style.maxWidth = width + "px";
-    }
-    strip.style.setProperty("--book-date-card", width + "px");
-    scheduleEdgeBlur();
-  }
-  function scrollToStartIndex(index, behavior){
-    var chips = strip.querySelectorAll(".book-date-chip");
-    index = Math.max(0, Math.min(maxStartIndex(), index));
-    var chip = chips[index];
-    if (!chip) return;
-    var target = clampScroll(Math.round(chip.offsetLeft - padLeft()));
-    if (Math.abs(target - strip.scrollLeft) < 0.5){
-      strip.scrollLeft = target;
-      scheduleEdgeBlur();
-      return;
-    }
-    scrollingProgrammatic = true;
-    window.clearTimeout(snapTimer);
-    if (typeof strip.scrollTo === "function"){
-      strip.scrollTo({ left: target, behavior: behavior || "smooth" });
-    } else {
-      strip.scrollLeft = target;
-    }
-    window.setTimeout(function(){
-      /* Lock exact pixel so pick/lift never leaves edge cards half-clipped */
-      strip.scrollLeft = target;
-      scrollingProgrammatic = false;
-      scheduleEdgeBlur();
-    }, behavior === "auto" || reducedMotion ? 40 : 440);
-    scheduleEdgeBlur();
-  }
-  function scrollChipToCenter(chip, behavior){
-    if (!chip) return;
-    layoutChips();
-    var chips = strip.querySelectorAll(".book-date-chip");
-    var idx = Array.prototype.indexOf.call(chips, chip);
-    if (idx < 0) return;
-    var mid = Math.floor((visibleCount - 1) / 2);
-    scrollToStartIndex(idx - mid, behavior);
-  }
-  function snapToNearestChip(){
-    if (scrollingProgrammatic) return;
-    var step = stepSize();
-    if (step <= 0) return;
-    var index = Math.round((strip.scrollLeft) / step);
-    scrollToStartIndex(index, reducedMotion ? "auto" : "smooth");
-  }
-  function scheduleSnap(){
-    if (scrollingProgrammatic) return;
-    window.clearTimeout(snapTimer);
-    /* Wait a beat after the last scroll tick so flings can coast before snap. */
-    snapTimer = window.setTimeout(snapToNearestChip, 260);
-  }
-  function scrollSelectedIntoView(){
-    scrollChipToCenter(
-      strip.querySelector(".book-date-chip.is-selected"),
-      reducedMotion ? "auto" : "smooth"
-    );
-  }
-  function render(){
-    var start = startDate();
-    var end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + (DAYS - 1));
-    input.max = toKey(end);
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-    var todayKey = toKey(today);
-    var selectedKey = input.value || "";
-    var html = "";
-    for (var i = 0; i < DAYS; i++){
-      var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
-      d.setHours(0, 0, 0, 0);
-      var key = toKey(d);
-      var cls = "book-date-chip";
-      if (key === todayKey) cls += " is-today";
-      if (key === selectedKey) cls += " is-selected";
-      html +=
-        '<button type="button" class="' + cls + '" role="option" data-date="' + key + '"' +
-          ' aria-label="' + formatLabel(d) + '"' +
-          ' aria-selected="' + (key === selectedKey ? "true" : "false") + '">' +
-          '<span class="dow">' + DOW[d.getDay()] + "</span>" +
-          '<span class="dom">' + d.getDate() + "</span>" +
-          '<span class="mon">' + MON[d.getMonth()] + "</span>" +
-        "</button>";
-    }
-    strip.innerHTML = html;
-    layoutChips();
-
-    /* If a previously chosen date fell outside the window, clear it. */
-    if (selectedKey){
-      var still = strip.querySelector('.book-date-chip[data-date="' + selectedKey + '"]');
-      if (!still){
-        input.value = "";
-        input.dispatchEvent(new Event("input", { bubbles: true }));
-        input.dispatchEvent(new Event("change", { bubbles: true }));
-        syncSelection();
-      }
-    }
-    scheduleEdgeBlur();
-  }
-
-  strip.addEventListener("click", function(e){
-    var chip = e.target.closest(".book-date-chip[data-date]");
-    if (!chip || !strip.contains(chip)) return;
-    input.value = chip.getAttribute("data-date");
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-    input.dispatchEvent(new Event("change", { bubbles: true }));
-    syncSelection({ animate: true });
-    scrollChipToCenter(chip, reducedMotion ? "auto" : "smooth");
-    chip.focus({ preventScroll: true });
-  });
-  strip.addEventListener("scroll", function(){
-    scheduleEdgeBlur();
-    scheduleSnap();
-  }, { passive: true });
-  strip.addEventListener("scrollend", function(){
-    window.clearTimeout(snapTimer);
-    snapToNearestChip();
-  });
-  window.addEventListener("resize", function(){
-    layoutChips();
-    snapToNearestChip();
-    scheduleEdgeBlur();
-  });
-  if (typeof ResizeObserver === "function"){
-    var ro = new ResizeObserver(function(){
-      layoutChips();
-      scheduleSnap();
-    });
-    ro.observe(strip);
-  }
-
-  input.addEventListener("change", function(){ syncSelection(); });
-  render();
-
-  window.rxRefreshBookDatePicker = function(){
-    render();
-    syncSelection();
-    scrollSelectedIntoView();
-  };
-  window.rxUpdateBookDateBlur = function(){
-    layoutChips();
-    scheduleEdgeBlur();
-  };
-})();
 
 function reduced(){ return window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
 
@@ -3458,7 +2653,7 @@ function hardHide(root){
   var b = root.querySelector(".modal-backdrop");
   clearAnims(c);
   clearAnims(b);
-  c.classList.remove("fields-in", "is-svc-wide", "is-svc-focus");
+  c.classList.remove("fields-in");
   c.style.opacity = "";
   c.style.visibility = "";
   b.style.opacity = "";
@@ -3483,7 +2678,7 @@ function openModal(trigger, root){
   modal.hidden = false;
   modal.classList.add("measuring");
   card.classList.remove("fields-in");
-  lockPageScroll();
+  document.body.style.overflow = "hidden";
   card.style.opacity = "0";
   backdrop.style.opacity = "0";
 
@@ -3554,7 +2749,7 @@ function closeModal(){
   function cleanup(){
     resetMorph();
     hardHide(modal);
-    unlockPageScroll();
+    document.body.style.overflow = "";
     busy = false;
     if (t) t.style.visibility = "";
     if (modal === bookModal && !doneEl.hidden){
@@ -3618,6 +2813,23 @@ document.querySelectorAll("[data-book]").forEach(function(btn){
   });
 });
 
+/* Service pages deep-link with /?book=1 or /#book — open wizard, then clean URL. */
+(function openBookFromDeepLink(){
+  try{
+    var params = new URLSearchParams(window.location.search);
+    var want = params.get("book") === "1" || window.location.hash === "#book";
+    if (!want || !bookModal) return;
+    setDateMin();
+    openModal(null, bookModal);
+    params.delete("book");
+    var qs = params.toString();
+    var next = window.location.pathname + (qs ? "?" + qs : "");
+    if (window.history && window.history.replaceState){
+      window.history.replaceState(null, "", next);
+    }
+  }catch(err){}
+})();
+
 bookModal.querySelectorAll("[data-close]").forEach(function(el){
   el.addEventListener("click", closeModal);
 });
@@ -3675,20 +2887,41 @@ bookForm.addEventListener("submit", async function(e){
 
 /* ---------- Hero: poster-first; video only on good connections ----------
    Skip hero.mp4 when reduced-motion, Save-Data, or slow effectiveType.
-   After the clip (or immediately if skipped): ".sub" then CTAs. */
+   If playback has not started within 2s: keep poster, snap hero copy/CTAs
+   with no fade. Otherwise wait for ended, then animate sub → CTAs. */
 (function(){
+  var hero = document.querySelector(".hero");
   var hv = document.querySelector(".hero-video");
   var sub = document.querySelector(".hero .sub");
   var links = document.querySelector(".hero .links");
-  var finished = false;
-  var showLinks = function(){ if (links) links.classList.add("in"); };
-  var showSub = function(){ if (sub) sub.classList.add("in"); };
-  var afterVideo = function(){
-    if (finished) return;
-    finished = true;
+  var settled = false;
+  var failTimer = null;
+
+  function showLinks(){ if (links) links.classList.add("in"); }
+  function showSub(){ if (sub) sub.classList.add("in"); }
+
+  function finishAnimated(){
+    if (settled) return;
+    settled = true;
+    if (failTimer) clearTimeout(failTimer);
     showSub();
-    setTimeout(showLinks, 1000);
-  };
+    setTimeout(showLinks, 700);
+  }
+
+  function finishInstant(){
+    if (settled) return;
+    settled = true;
+    if (failTimer) clearTimeout(failTimer);
+    if (hv){
+      try { hv.pause(); } catch (e) {}
+      hv.removeAttribute("src");
+      try { hv.load(); } catch (e2) {}
+      hv.classList.remove("in");
+    }
+    if (hero) hero.classList.add("is-instant");
+    showSub();
+    showLinks();
+  }
 
   function allowHeroVideo(){
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
@@ -3696,60 +2929,35 @@ bookForm.addEventListener("submit", async function(e){
     if (c){
       if (c.saveData) return false;
       var t = c.effectiveType;
-      /* Only skip truly slow links - mobile often reports "3g" on Wi‑Fi. */
       if (t === "slow-2g" || t === "2g") return false;
     }
     return true;
   }
 
   if (!hv || !allowHeroVideo()){
-    afterVideo();
+    finishInstant();
     return;
   }
 
-  hv.muted = true;
-  hv.defaultMuted = true;
-  hv.setAttribute("muted", "");
-  hv.setAttribute("playsinline", "");
-  hv.setAttribute("webkit-playsinline", "");
-  hv.playsInline = true;
+  failTimer = setTimeout(finishInstant, 2000);
+
   hv.preload = "auto";
   hv.src = hv.dataset.src;
   hv.load();
-
-  var reveal = function(){ hv.classList.add("in"); };
-  var tryPlay = function(){
+  var reveal = function(){ if (!settled) hv.classList.add("in"); };
+  var start = function(){
+    if (settled) return;
     var p = hv.play();
-    if (p && p.catch){
-      p.catch(function(err){
-        /* AbortError is usually a race before the media is ready. */
-        if (err && err.name === "AbortError") return;
-      });
-    }
+    if (p && p.catch) p.catch(function(){ finishInstant(); });
   };
-
-  hv.addEventListener("loadeddata", tryPlay);
-  hv.addEventListener("canplay", tryPlay);
-  hv.addEventListener("playing", reveal);
-  hv.addEventListener("ended", afterVideo, { once:true });
-  tryPlay();
-
-  /* iOS Low Power Mode often needs a gesture before muted autoplay sticks. */
-  var kick = function(){
-    if (finished || !hv.paused) return;
-    tryPlay();
-  };
-  document.addEventListener("touchstart", kick, { passive: true, once: true });
-  document.addEventListener("click", kick, { once: true });
-
-  /* If iOS never delivers media events, don't leave the CTAs hidden. */
-  setTimeout(function(){
-    if (hv.classList.contains("in") && !hv.paused) return;
-    tryPlay();
-    setTimeout(function(){
-      if (!hv.classList.contains("in") || hv.paused) afterVideo();
-    }, 900);
-  }, 3000);
+  hv.addEventListener("loadeddata", start, { once:true });
+  hv.addEventListener("playing", function(){
+    if (settled) return;
+    if (failTimer) clearTimeout(failTimer);
+    reveal();
+  }, { once:true });
+  hv.addEventListener("ended", finishAnimated, { once:true });
+  hv.addEventListener("error", finishInstant, { once:true });
 })();
 
 /* ---------- 750 units counter ---------- */
@@ -3806,7 +3014,7 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches && "Intersect
     });
   }, { rootMargin: "0px 0px -8% 0px" });
   document.querySelectorAll(".rise").forEach(function(el, i){
-    el.style.transitionDelay = (i % 4) * 70 + "ms";
+    el.style.transitionDelay = (i % 4) * 45 + "ms";
     io.observe(el);
   });
 } else {
@@ -4003,8 +3211,44 @@ function initCoverflowCarousel(root, opts){
 
   root.addEventListener("touchstart", function(){ pauseAuto(); }, { passive: true });
 
-  /* Touch/pen: native overflow scroll only. JS drag + pointer capture was
-     eating taps (jobs focus / services) after a few pixels of finger jitter. */
+  /* Touch keeps native overflow scroll. Desktop: no click-drag scroll -
+     wheel + autoplay move the track; card clicks stay clean. */
+  var DRAG_THRESHOLD = 8;
+  var drag = null;
+  root.addEventListener("pointerdown", function(e){
+    if (desktopOnly && !window.matchMedia("(min-width:701px)").matches) return;
+    if (isDesktopPointer()) return;
+    if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
+    pauseAuto();
+    drag = {
+      id: e.pointerId,
+      x: e.clientX,
+      y: e.clientY,
+      left: root.scrollLeft,
+      active: false
+    };
+  });
+  root.addEventListener("pointermove", function(e){
+    if (!drag || e.pointerId !== drag.id) return;
+    var dx = e.clientX - drag.x;
+    var dy = e.clientY - drag.y;
+    if (!drag.active){
+      if (Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD) return;
+      drag.active = true;
+      try { root.setPointerCapture(e.pointerId); } catch (err){}
+    }
+    pauseAuto();
+    root.scrollLeft = drag.left - dx;
+  });
+  function endDrag(e){
+    if (!drag || e.pointerId !== drag.id) return;
+    if (drag.active){
+      try { root.releasePointerCapture(e.pointerId); } catch (err){}
+    }
+    drag = null;
+  }
+  root.addEventListener("pointerup", endDrag);
+  root.addEventListener("pointercancel", endDrag);
 
   function tick(now){
     rafId = 0;
@@ -4067,80 +3311,21 @@ function initCoverflowCarousel(root, opts){
   };
 }
 
-/* Trusted-by logo marquee (rAF - CSS animation stalls on iOS Low Power Mode) */
+/* Pause trusted-by CSS marquee while off-screen */
 (function(){
   var shell = document.querySelector(".trusted-carousel");
   var track = shell && shell.querySelector(".trusted-track");
-  if (!shell || !track) return;
+  if (!track) return;
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-  var group = track.querySelector(".trusted-group");
-  if (!group) return;
-
-  var x = 0;
-  var half = 0;
-  var inView = true;
-  var rafId = 0;
-  var last = performance.now();
-  /* ~full loop in 32s on desktop, a bit quicker on narrow screens */
-  var loopSeconds = window.matchMedia("(max-width:700px)").matches ? 24 : 32;
-
-  function measure(){
-    half = group.offsetWidth || 0;
-  }
-  function pxPerSec(){
-    return half > 0 ? half / loopSeconds : 40;
-  }
-  function frame(now){
-    rafId = 0;
-    var dt = Math.min(64, now - last);
-    last = now;
-    if (inView && half > 0){
-      x -= pxPerSec() * (dt / 1000);
-      if (x <= -half) x += half;
-      if (x > 0) x -= half;
-      track.style.transform = "translate3d(" + x.toFixed(2) + "px,0,0)";
+  if (!("IntersectionObserver" in window)) return;
+  track.classList.add("is-paused");
+  var tio = new IntersectionObserver(function(entries){
+    for (var i = 0; i < entries.length; i++){
+      if (entries[i].target !== shell) continue;
+      track.classList.toggle("is-paused", !entries[i].isIntersecting);
     }
-    rafId = requestAnimationFrame(frame);
-  }
-  function start(){
-    if (rafId) return;
-    last = performance.now();
-    rafId = requestAnimationFrame(frame);
-  }
-  function stop(){
-    if (!rafId) return;
-    cancelAnimationFrame(rafId);
-    rafId = 0;
-  }
-
-  measure();
-  start();
-
-  window.addEventListener("resize", function(){
-    loopSeconds = window.matchMedia("(max-width:700px)").matches ? 24 : 32;
-    measure();
-    if (half > 0 && x <= -half) x = x % half;
-  });
-
-  if ("IntersectionObserver" in window){
-    var tio = new IntersectionObserver(function(entries){
-      for (var i = 0; i < entries.length; i++){
-        if (entries[i].target !== shell) continue;
-        inView = entries[i].isIntersecting;
-        if (inView){
-          measure();
-          start();
-        }
-      }
-    }, { root: null, rootMargin: "20% 0px", threshold: 0 });
-    tio.observe(shell);
-  }
-
-  if ("ResizeObserver" in window){
-    var ro = new ResizeObserver(function(){ measure(); });
-    ro.observe(group);
-  }
+  }, { root: null, rootMargin: "12% 0px", threshold: 0 });
+  tio.observe(shell);
 })();
 
 /* ---------- Services: glass card carousel ---------- */
@@ -4150,90 +3335,136 @@ function initCoverflowCarousel(root, opts){
 
   var SERVICES = [
     {
+      category: "flooring",
       cat: "Flooring",
       slug: "carpet",
       title: "Carpet Installation",
       detail: "Wall-to-wall stretch-in and glue-down."
     },
     {
+      category: "flooring",
       cat: "Flooring",
       slug: "stairs",
       title: "Stair Wrapping & Runners",
       detail: "Carpet stair wrapping and stair runners, clean around every spindle."
     },
     {
+      category: "flooring",
       cat: "Flooring",
       slug: "seaming",
       title: "Seaming, Repair & Restretching",
       detail: "Carpet seaming, repair, and power-stretch restretching."
     },
     {
+      category: "flooring",
       cat: "Flooring",
       slug: "lvp",
       title: "LVP / LVT Installation",
       detail: "Luxury vinyl plank and luxury vinyl tile."
     },
     {
+      category: "flooring",
       cat: "Flooring",
       slug: "laminate",
       title: "Laminate Installation",
       detail: "Laminate flooring, measured and laid right."
     },
     {
+      category: "flooring",
       cat: "Flooring",
       slug: "hardwood",
       title: "Hardwood Installation",
       detail: "Nail-down, glue-down, and floating hardwood."
     },
     {
+      category: "flooring",
       cat: "Flooring",
       slug: "refinish",
       title: "Sanding & Refinishing",
       detail: "Hardwood sanding and refinishing that restores the grain."
     },
     {
+      category: "flooring",
       cat: "Flooring",
       slug: "tile",
       title: "Ceramic & Porcelain Tile",
       detail: "Tile installation with clean lines and correct prep."
     },
     {
+      category: "flooring",
       cat: "Flooring",
       slug: "subfloor",
       title: "Subfloor Prep & Repair",
       detail: "Leveling, repair, and prep before the finish floor goes down."
     },
     {
+      category: "flooring",
       cat: "Flooring",
       slug: "removal",
       title: "Flooring Removal & Disposal",
       detail: "Old flooring torn out and hauled away."
     },
     {
+      category: "renovation",
       cat: "Renovation",
       slug: "painting",
       title: "Interior Painting",
       detail: "Clean interior paint work that finishes the room."
     },
     {
+      category: "renovation",
       cat: "Renovation",
       slug: "demo",
       title: "Interior Demolition",
       detail: "Strip-outs and interior demolition, contained and scheduled."
     },
     {
+      category: "renovation",
       cat: "Renovation",
       slug: "junk",
       title: "Junk Removal",
       detail: "Debris haul-away so the site is clear when we leave."
     },
     {
+      category: "renovation",
       cat: "Renovation",
       slug: "pm",
       title: "Project Management",
       detail: "Measuring, scheduling, multi-trade coordination, and warranty."
+    },
+    {
+      category: "landscaping",
+      cat: "Landscaping",
+      slug: "lawn",
+      title: "Lawn Care",
+      detail: "Mowing, edging, and seasonal lawn maintenance."
+    },
+    {
+      category: "landscaping",
+      cat: "Landscaping",
+      slug: "garden",
+      title: "Garden & Beds",
+      detail: "Planting, mulching, and bed refresh."
+    },
+    {
+      category: "landscaping",
+      cat: "Landscaping",
+      slug: "yard",
+      title: "Yard Cleanup",
+      detail: "Brush clearing, leaf cleanup, and seasonal yard work."
+    },
+    {
+      category: "snow",
+      cat: "Snow",
+      slug: "snow",
+      title: "Snow Clearing",
+      detail: "Driveways, walkways, and entrances cleared after every storm."
     }
   ];
+
+  var CAROUSEL_SERVICES = SERVICES.filter(function(s){
+    return s.category === "flooring";
+  });
 
   function esc(s){
     return String(s)
@@ -4247,7 +3478,8 @@ function initCoverflowCarousel(root, opts){
     carpet: true, stairs: true, seaming: true, lvp: true,
     laminate: true, hardwood: true, refinish: true, tile: true,
     subfloor: true, removal: true, painting: true, demo: true,
-    junk: true, pm: true
+    junk: true, pm: true,
+    lawn: true, garden: true, yard: true, snow: true
   };
 
   function cardHTML(s, forClone){
@@ -4267,7 +3499,7 @@ function initCoverflowCarousel(root, opts){
           '<div class="site-card-photo svc-media" role="img" aria-label="' + label + '"></div>'
         );
     return (
-      '<article class="site-card svc-card">' +
+      '<article class="site-card svc-card" data-category="' + esc(s.category) + '">' +
         '<div class="site-card-inner">' +
           media +
           '<div class="site-card-rim" aria-hidden="true"></div>' +
@@ -4283,7 +3515,7 @@ function initCoverflowCarousel(root, opts){
 
   function groupHTML(hidden){
     var html = '<div class="svc-group"' + (hidden ? ' aria-hidden="true"' : "") + ">";
-    for (var i = 0; i < SERVICES.length; i++) html += cardHTML(SERVICES[i], hidden);
+    for (var i = 0; i < CAROUSEL_SERVICES.length; i++) html += cardHTML(CAROUSEL_SERVICES[i], hidden);
     html += "</div>";
     return html;
   }
@@ -4367,7 +3599,7 @@ function initCoverflowCarousel(root, opts){
           )
         : "";
       return (
-        '<article class="svc-drawer-row' + (added ? " is-added" : "") + '" data-slug="' + esc(s.slug) + '">' +
+        '<article class="svc-drawer-row' + (added ? " is-added" : "") + '" data-slug="' + esc(s.slug) + '" data-category="' + esc(s.category) + '">' +
           '<div class="svc-drawer-thumb">' + media + "</div>" +
           "<div>" +
             "<h4>" + esc(s.title) + "</h4>" +
@@ -4497,11 +3729,106 @@ function initCoverflowCarousel(root, opts){
 })();
 
 /* ---------- Jobs: prescription slip carousel + full-bleed split focus ---------- */
+/* Order: live manager jobs (completed_at desc) first, then hardcoded placeholders. */
 (function(){
   var root = document.getElementById("jobCarousel");
   var split = document.getElementById("jobSplit");
   if (!root || !split) return;
 
+  function escHtml(s){
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function daysAgoLabel(iso){
+    if (!iso) return "";
+    var t = new Date(iso).getTime();
+    if (isNaN(t)) return "";
+    var days = Math.max(0, Math.round((Date.now() - t) / 86400000));
+    if (days === 0) return "Today";
+    if (days === 1) return "1 day ago";
+    return days + " days ago";
+  }
+
+  function photoUrl(path){
+    if (!path || !window.rxSupabase) return "";
+    var { data } = window.rxSupabase.storage.from("job-photos").getPublicUrl(path);
+    return (data && data.publicUrl) || "";
+  }
+
+  function pickPhoto(photos, kind){
+    photos = photos || [];
+    for (var i = 0; i < photos.length; i++){
+      if (photos[i].kind === kind) return photos[i];
+    }
+    return null;
+  }
+
+  function buildLiveSlip(job){
+    var photos = job.job_photos || [];
+    var before = pickPhoto(photos, "before");
+    var after = pickPhoto(photos, "after");
+    if (!before || !after) return null;
+    var beforeSrc = photoUrl(before.storage_path);
+    var afterSrc = photoUrl(after.storage_path);
+    if (!beforeSrc || !afterSrc) return null;
+    var ago = daysAgoLabel(job.completed_at || job.created_at) || "Recently";
+    var title = job.title || "Prescription";
+    var desc = job.description || "";
+    var rx = job.prescribed || "";
+    var el = document.createElement("article");
+    el.className = "job-slip";
+    el.setAttribute("data-job-key", "live-" + job.id);
+    el.innerHTML =
+      '<div class="job-slip-top">' +
+        '<span class="mark" aria-hidden="true">℞</span>' +
+        '<span class="job-ago">' + escHtml(ago) + "</span>" +
+      "</div>" +
+      '<div class="job-pair">' +
+        '<div class="job-shot job-before">' +
+          '<img src="' + escHtml(beforeSrc) + '" alt="" loading="lazy" decoding="async">' +
+          "<i>Before</i>" +
+        "</div>" +
+        '<div class="job-shot job-after">' +
+          '<img src="' + escHtml(afterSrc) + '" alt="" loading="lazy" decoding="async">' +
+          "<i>After</i>" +
+        "</div>" +
+      "</div>" +
+      "<h3>" + escHtml(title) + "</h3>" +
+      "<p>" + escHtml(desc) + "</p>" +
+      '<p class="svc-line"><b>Prescribed:</b> ' + escHtml(rx) + "</p>";
+    return el;
+  }
+
+  async function prependLiveJobs(){
+    var group = document.getElementById("jobGroup") || root.querySelector(".job-group");
+    if (!group || !window.rxSupabase) return;
+    try {
+      var { data, error } = await window.rxSupabase
+        .from("jobs")
+        .select("id, title, description, prescribed, completed_at, created_at, job_photos(storage_path, kind, sort_order)")
+        .eq("published", true)
+        .order("completed_at", { ascending: false, nullsFirst: false })
+        .order("created_at", { ascending: false });
+      if (error) {
+        console.warn("Live prescriptions unavailable", error.message);
+        return;
+      }
+      if (!data || !data.length) return;
+      var frag = document.createDocumentFragment();
+      for (var i = 0; i < data.length; i++){
+        var slip = buildLiveSlip(data[i]);
+        if (slip) frag.appendChild(slip);
+      }
+      if (frag.childNodes.length) group.insertBefore(frag, group.firstChild);
+    } catch (err) {
+      /* Placeholders stay; live jobs are optional. */
+      console.warn("Live prescriptions unavailable", err);
+    }
+  }
+
+  function bootJobsCarousel(){
   /* Wrap slip contents in a face so coverflow rotateY doesn't warp the hit box. */
   (function wrapJobFaces(){
     var slips = root.querySelectorAll(".job-slip");
@@ -4571,8 +3898,7 @@ function initCoverflowCarousel(root, opts){
   var settleTimer = null;
   var navTimer = null;
   var scrollRaf = 0;
-  var coarsePointer = window.matchMedia("(pointer: coarse)").matches;
-  var CLICK_SLOP = coarsePointer ? 28 : 10;
+  var CLICK_SLOP = 8;
   var CLOSE_MS = reducedMq.matches ? 40 : 380;
   var SWAP_EXIT_MS = reducedMq.matches ? 0 : 320;
   var NAV_BEAT_MS = reducedMq.matches ? 0 : 180;
@@ -4582,6 +3908,8 @@ function initCoverflowCarousel(root, opts){
 
   function jobKeyForSlip(slip){
     if (!slip) return "";
+    var key = slip.getAttribute("data-job-key");
+    if (key) return key;
     var title = slip.querySelector("h3");
     return title ? title.textContent.trim() : "";
   }
@@ -4733,15 +4061,9 @@ function initCoverflowCarousel(root, opts){
     document.body.style.overflow = "hidden";
     if (carousel && carousel.holdPause) carousel.holdPause();
 
-    /* Double rAF so iOS paints the closed clip-path before opening. */
     void split.offsetWidth;
-    requestAnimationFrame(function(){
-      requestAnimationFrame(function(){
-        if (!open) return;
-        split.classList.add("is-on", "is-blurred");
-        markSettled();
-      });
-    });
+    split.classList.add("is-on", "is-blurred");
+    markSettled();
   }
 
   function closeSplit(immediate){
@@ -4800,14 +4122,9 @@ function initCoverflowCarousel(root, opts){
           fillSplit(job);
           split.classList.remove("is-closing", "is-swapping");
           void split.offsetWidth;
-          requestAnimationFrame(function(){
-            requestAnimationFrame(function(){
-              if (!open){ navBusy = false; return; }
-              split.classList.add("is-on", "is-blurred");
-              navBusy = false;
-              markSettled();
-            });
-          });
+          split.classList.add("is-on", "is-blurred");
+          navBusy = false;
+          markSettled();
         }, NAV_BEAT_MS);
       });
     }, SWAP_EXIT_MS);
@@ -4822,10 +4139,7 @@ function initCoverflowCarousel(root, opts){
   }, true);
   root.addEventListener("pointermove", function(e){
     if (!pendingSlip) return;
-    var dx = Math.abs(e.clientX - downX);
-    var dy = Math.abs(e.clientY - downY);
-    /* Only treat intentional horizontal skims as cancels - not tap jitter. */
-    if (dx > CLICK_SLOP && dx > dy){
+    if (Math.abs(e.clientX - downX) > CLICK_SLOP || Math.abs(e.clientY - downY) > CLICK_SLOP){
       suppressOpen = true;
       pendingSlip = null;
     }
@@ -4886,6 +4200,11 @@ function initCoverflowCarousel(root, opts){
       e.preventDefault();
       navigateSplit(1);
     }
+  });
+  } /* end bootJobsCarousel */
+
+  prependLiveJobs().then(bootJobsCarousel).catch(function(){
+    bootJobsCarousel();
   });
 })();
 </script>

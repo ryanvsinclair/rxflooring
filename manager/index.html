@@ -2,8 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#1A1F26">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rx Manager">
+<link rel="manifest" href="/manager/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/manager/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/manager/icons/icon-192.png">
 <title>RX Flooring · Manager</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;}
@@ -67,7 +75,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 /* ---------- gate / login ---------- */
 .gate{
   min-height:100dvh; display:flex; align-items:center; justify-content:center;
-  padding:48px var(--gut);
+  padding:max(48px, env(safe-area-inset-top, 0px)) var(--gut) max(48px, env(safe-area-inset-bottom, 0px));
   background:
     radial-gradient(90% 70% at 50% 0%, rgba(75,124,255,.16) 0%, transparent 55%),
     radial-gradient(60% 45% at 10% 80%, rgba(43,182,115,.07) 0%, transparent 50%),
@@ -112,6 +120,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   -webkit-backdrop-filter:saturate(180%) blur(16px);
   backdrop-filter:saturate(180%) blur(16px);
   border-bottom:1px solid rgba(255,255,255,.06);
+  padding-top:env(safe-area-inset-top, 0px);
 }
 .app-bar-in{
   max-width:var(--wide); margin:0 auto; padding:0 var(--gut);
