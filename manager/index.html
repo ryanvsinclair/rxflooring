@@ -18,7 +18,7 @@
 html{
   -webkit-text-size-adjust:100%;
   height:100%;
-  height:-webkit-fill-available;
+  background:var(--bg, #0B1220);
   overflow:hidden;
   overscroll-behavior:none;
 }
@@ -38,6 +38,8 @@ button,input,select,textarea{font:inherit;color:inherit;}
   --rx:"Iowan Old Style","Hoefler Text",Palatino,"Times New Roman",serif;
   --gut:24px; --wide:1080px;
   --bottom-nav-h:56px;
+  /* Set by JS from window.innerHeight — avoids iOS PWA gap left by -webkit-fill-available / Safari chrome. */
+  --app-height:100dvh;
 }
 body{
   background:
@@ -48,12 +50,10 @@ body{
   font-family:var(--sf); font-size:16px; line-height:1.5;
   letter-spacing:-.011em;
   -webkit-font-smoothing:antialiased;
-  /* Lock to the visual viewport so iOS home-screen PWAs don't leave a gap under fixed UI. */
   position:fixed;
-  inset:0;
+  top:0; left:0; right:0;
   width:100%;
-  height:100%;
-  height:-webkit-fill-available;
+  height:var(--app-height);
   overflow:hidden;
   overscroll-behavior:none;
 }
@@ -162,13 +162,14 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   overflow:hidden;
 }
 .bottom-nav{
-  /* In-flow flex footer — more reliable than position:fixed on iOS standalone. */
+  /* In-flow flex footer — shell height is --app-height so this sits on the real bottom. */
   position:relative;
   flex:0 0 auto;
   z-index:30;
   background:transparent;
   border:0;
-  padding:0 var(--gut) max(10px, env(safe-area-inset-bottom, 0px));
+  /* Home-indicator only; do not reserve Safari toolbar space. */
+  padding:0 var(--gut) max(8px, env(safe-area-inset-bottom, 0px));
 }
 .bottom-nav-in{
   /* Same glass as Refresh / + toolbar pills */
@@ -1005,6 +1006,26 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 <script src="/js/supabase-client.js"></script>
 <script>
 (function () {
+  /* iOS home-screen / Safari: lock shell to the live viewport height so the
+     bottom nav is not left floating above phantom browser-chrome space. */
+  function syncAppHeight() {
+    var h = window.innerHeight;
+    if (window.visualViewport && window.visualViewport.height) {
+      /* Prefer the larger of the two so standalone doesn't shrink to a stale svh. */
+      h = Math.max(h, Math.round(window.visualViewport.height + (window.visualViewport.offsetTop || 0)));
+    }
+    document.documentElement.style.setProperty("--app-height", h + "px");
+  }
+  syncAppHeight();
+  window.addEventListener("resize", syncAppHeight);
+  window.addEventListener("orientationchange", function () {
+    setTimeout(syncAppHeight, 50);
+    setTimeout(syncAppHeight, 300);
+  });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", syncAppHeight);
+  }
+
   var sb = window.rxSupabase;
   if (!sb) {
     document.getElementById("gateError").hidden = false;
