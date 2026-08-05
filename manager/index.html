@@ -20,7 +20,8 @@ button,input,select,textarea{font:inherit;color:inherit;}
   color-scheme:dark;
   --bg:#1A1F26; --bg-alt:#222932; --panel:#242B34; --panel-alt:#2C343E;
   --ink:#F2F4F6; --body:#C2C8CF; --muted:#8B949E;
-  --rule:rgba(255,255,255,.14); --rule-soft:rgba(255,255,255,.08);
+  --rule:rgba(255,255,255,.10); --rule-soft:rgba(255,255,255,.06);
+  --edge:rgba(255,255,255,.28); --edge-hover:rgba(255,255,255,.42);
   --accent:#4B7CFF; --accent-hover:#6B94FF; --on-accent:#FFFFFF; --signal:#2BB673;
   --danger:#E57368;
   --sf:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",system-ui,sans-serif;
@@ -58,7 +59,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 }
 .pill:hover{background:var(--accent-hover);}
 .pill:disabled{opacity:.55; cursor:not-allowed;}
-.pill.ghost{background:transparent; color:var(--ink); border:1px solid rgba(255,255,255,.35);}
+.pill.ghost{background:transparent; color:var(--ink); border:1px solid var(--edge);}
 .pill.ghost:hover{background:rgba(255,255,255,.08); color:var(--ink);}
 .pill.danger{background:transparent; color:var(--danger); border:1px solid rgba(229,115,104,.4);}
 .pill.danger:hover{background:rgba(229,115,104,.1);}
@@ -92,7 +93,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 }
 .field textarea{min-height:96px; resize:vertical;}
 .field input:focus,.field select:focus,.field textarea:focus{
-  outline:none; border-color:rgba(255,255,255,.55);
+  outline:none; border-color:var(--edge-hover);
   box-shadow:0 0 0 3px rgba(75,124,255,.22);
 }
 .field input::placeholder,.field textarea::placeholder{color:var(--muted);}
@@ -191,7 +192,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 }
 .list > .empty{width:100%; box-sizing:border-box;}
 .card{
-  border:1px solid rgba(255,255,255,.14); border-radius:16px; padding:18px 18px 16px;
+  border:1px solid var(--rule); border-radius:16px; padding:18px 18px 16px;
   background:rgba(255,255,255,.06);
   -webkit-backdrop-filter:blur(14px) saturate(140%);
   backdrop-filter:blur(14px) saturate(140%);
@@ -240,7 +241,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 .req-list > .empty{width:100%; box-sizing:border-box;}
 .req-row{
   border-radius:22px;
-  border:1px solid rgba(255,255,255,.85);
+  border:1px solid var(--edge);
   background:rgba(255,255,255,.08);
   -webkit-backdrop-filter:blur(18px) saturate(140%);
   backdrop-filter:blur(18px) saturate(140%);
@@ -304,7 +305,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   padding:0;
   border-radius:50%;
   background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.85);
+  border:1px solid var(--edge);
   box-shadow:0 0 0 1px rgba(29,36,43,.08);
   -webkit-backdrop-filter:blur(14px) saturate(140%);
   backdrop-filter:blur(14px) saturate(140%);
@@ -315,7 +316,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   cursor:pointer;
   transition:background .16s ease, border-color .16s ease;
 }
-.req-call:hover{background:rgba(255,255,255,.14); color:var(--ink); border-color:#fff;}
+.req-call:hover{background:rgba(255,255,255,.14); color:var(--ink); border-color:var(--edge-hover);}
 .req-call:focus,.req-call:focus-visible{outline:none;}
 .req-call svg{flex-shrink:0; display:block;}
 .req-chev-btn{
@@ -369,7 +370,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   position:relative; width:min(560px,100%);
   max-height:calc(100dvh - 48px); overflow-y:auto;
   background:rgba(255,255,255,.08); color:var(--ink); border-radius:26px; opacity:0;
-  border:1px solid rgba(255,255,255,.85);
+  border:1px solid var(--edge);
   -webkit-backdrop-filter:blur(18px) saturate(140%);
   backdrop-filter:blur(18px) saturate(140%);
   box-shadow:
@@ -383,13 +384,13 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 }
 .req-modal-x{
   position:absolute; top:14px; right:14px; width:34px; height:34px;
-  border:1px solid rgba(255,255,255,.85); border-radius:50%;
+  border:1px solid var(--edge); border-radius:50%;
   background:rgba(255,255,255,.1); color:var(--ink);
   box-shadow:0 0 0 1px rgba(29,36,43,.08);
   font-size:19px; line-height:1; cursor:pointer;
   transition:background .18s ease, border-color .18s ease;
 }
-.req-modal-x:hover{background:rgba(255,255,255,.2); border-color:#fff;}
+.req-modal-x:hover{background:rgba(255,255,255,.2); border-color:var(--edge-hover);}
 .req-modal-head{
   display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
   padding-right:40px;
@@ -434,7 +435,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   display:flex; gap:8px; flex-wrap:wrap; align-items:center;
 }
 .req-actions select{
-  border:1px solid rgba(255,255,255,.85);
+  border:1px solid var(--edge);
   border-radius:12px;
   padding:10px 12px;
   background:rgba(255,255,255,.1);
@@ -448,7 +449,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   min-height:44px;
   background:rgba(255,255,255,.06);
   color:var(--ink);
-  border:1px solid rgba(255,255,255,.85);
+  border:1px solid var(--edge);
   box-shadow:0 0 0 1px rgba(29,36,43,.08);
   -webkit-backdrop-filter:blur(14px) saturate(140%);
   backdrop-filter:blur(14px) saturate(140%);
@@ -476,7 +477,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   padding:8px 14px;
   font-size:13px;
   color:var(--ink);
-  border:1px solid rgba(255,255,255,.85);
+  border:1px solid var(--edge);
   border-radius:980px;
   box-shadow:0 0 0 1px rgba(29,36,43,.08);
   background:rgba(255,255,255,.08);
@@ -559,7 +560,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 .job-form textarea{
   width:100%;
   background:rgba(255,255,255,.1);
-  border:1px solid rgba(255,255,255,.85);
+  border:1px solid var(--edge);
   border-radius:12px;
   padding:13px 14px;
   font-size:16px;
@@ -575,7 +576,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 .job-form select:focus,
 .job-form textarea:focus{
   outline:none;
-  border-color:#fff;
+  border-color:var(--edge-hover);
   background:rgba(255,255,255,.18);
   box-shadow:0 0 0 1px rgba(29,36,43,.08), 0 0 0 3px rgba(27,77,255,.12);
 }
@@ -611,7 +612,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 }
 .job-check input{width:18px; height:18px; margin-top:2px; accent-color:var(--accent); flex-shrink:0;}
 .shot-slot{
-  border:1px dashed rgba(255,255,255,.85);
+  border:1px dashed var(--edge);
   border-radius:16px;
   background:rgba(255,255,255,.06);
   box-shadow:0 0 0 1px rgba(29,36,43,.06);
@@ -633,7 +634,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   border-radius:12px;
   object-fit:cover;
   background:rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.55);
+  border:1px solid var(--edge);
 }
 .shot-preview[hidden]{display:none !important;}
 .shot-current{font-size:12.5px; color:var(--muted); line-height:1.4; margin:0;}
@@ -642,7 +643,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   padding:14px 14px 12px;
   border-radius:14px;
   background:rgba(255,255,255,.1);
-  border:1px solid rgba(255,255,255,.65);
+  border:1px solid var(--edge);
   box-shadow:0 0 0 1px rgba(29,36,43,.06);
   font-size:14px;
   color:var(--body);
@@ -669,7 +670,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   font-weight:600;
   background:rgba(255,255,255,.06);
   color:var(--ink);
-  border:1px solid rgba(255,255,255,.85);
+  border:1px solid var(--edge);
   box-shadow:0 0 0 1px rgba(29,36,43,.08);
   -webkit-backdrop-filter:blur(14px) saturate(140%);
   backdrop-filter:blur(14px) saturate(140%);
@@ -1169,7 +1170,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   var REQ_SHADOW_ON = "0 0 0 1px rgba(29,36,43,.08), 0 20px 60px rgba(29,36,43,.18)";
   var REQ_SHADOW_OFF = "0 0 0 1px rgba(29,36,43,.08), 0 12px 36px rgba(29,36,43,.1)";
   var REQ_GLASS_BG = "rgba(255, 255, 255, 0.08)";
-  var REQ_GLASS_BORDER = "rgba(255, 255, 255, 0.85)";
+  var REQ_GLASS_BORDER = "rgba(255, 255, 255, 0.28)";
   var REQ_GLASS_BORDER_W = "1px";
   var reqBusy = false;
   var reqLastTrigger = null;
@@ -1743,7 +1744,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   var JOB_SHADOW_ON = "0 0 0 1px rgba(29,36,43,.08), 0 20px 60px rgba(29,36,43,.18)";
   var JOB_SHADOW_OFF = "0 0 0 1px rgba(29,36,43,.08), 0 12px 36px rgba(29,36,43,.1)";
   var JOB_GLASS_BG = "rgba(255, 255, 255, 0.08)";
-  var JOB_GLASS_BORDER = "rgba(255, 255, 255, 0.85)";
+  var JOB_GLASS_BORDER = "rgba(255, 255, 255, 0.28)";
   var JOB_GLASS_BORDER_W = "1px";
 
   jobWizardSteps.forEach(function () {
