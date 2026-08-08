@@ -136,17 +136,17 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 }
 @media(max-width:700px){ .hero{padding:88px 0 72px; min-height:72vh;} }
 
-/* Poster is the LCP layer; video fades over it only on good connections. */
-.hero-media{position:absolute; inset:0; z-index:0; background:#fff;}
+/* Video-first: dark hold while it loads. Poster only if playback can't run. */
+.hero-media{position:absolute; inset:0; z-index:0; background:#111;}
 .hero-poster{
   position:absolute; inset:0; width:100%; height:100%;
   object-fit:cover; object-position:center; display:block;
+  opacity:0; visibility:hidden; pointer-events:none;
 }
 .hero-video{position:absolute; inset:0; width:100%; height:100%;
   object-fit:cover; object-position:center;
-  opacity:0; visibility:hidden;
-  transition:opacity .4s ease, visibility 0s linear .4s;}
-.hero-video.in{opacity:1; visibility:visible; transition:opacity .4s ease, visibility 0s;}
+  opacity:0; visibility:hidden;}
+.hero-video.in{opacity:1; visibility:visible;}
 .hero .wrap{position:relative; z-index:2; width:100%;}
 
 @media(min-width:861px){
@@ -231,8 +231,9 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 .hero .beat:nth-child(1){animation-delay:.08s;}
 .hero .beat:nth-child(2){animation-delay:.16s;}
 .hero .beat:nth-child(3){animation-delay:.24s;}
-/* Failed / blocked video: poster only, hero copy + CTAs appear with no motion. */
+/* Failed / blocked video: reveal poster fallback; copy + CTAs with no motion. */
 .hero.is-instant .hero-video{display:none !important;}
+.hero.is-instant .hero-poster{opacity:1; visibility:visible;}
 .hero.is-instant .kicker,
 .hero.is-instant .beat{
   opacity:1; transform:none; animation:none;
@@ -1748,9 +1749,9 @@ html{scroll-behavior:smooth;}
   <!-- ================= HERO ================= -->
   <header class="hero">
     <div class="hero-media">
+      <!-- Poster is fallback only (shown when .hero.is-instant). -->
       <img class="hero-poster" src="assets/hero-poster.jpg?v=6" alt=""
-           width="1920" height="1080" fetchpriority="high" decoding="async" aria-hidden="true">
-      <!-- src set from data-src only on good connections; otherwise poster-only. -->
+           width="1920" height="1080" decoding="async" aria-hidden="true">
       <video class="hero-video" muted playsinline webkit-playsinline preload="none"
              data-src="assets/hero.mp4?v=6" aria-hidden="true"></video>
     </div>
@@ -2885,11 +2886,10 @@ bookForm.addEventListener("submit", async function(e){
   bookModal.querySelector(".modal-x").focus();
 });
 
-/* ---------- Hero: poster-first; video only on good connections ----------
-   Skip hero.mp4 when reduced-motion, Save-Data, or slow effectiveType.
-   If the file errors or play() is blocked: keep poster, snap hero copy/CTAs.
-   Slow networks get a long grace period — do not abort just because first
-   paint took >2s (1.8MB mp4 often needs longer on mobile / 3g). */
+/* ---------- Hero: video-first; poster only as fallback ----------
+   Skip hero.mp4 when reduced-motion, Save-Data, or slow effectiveType → poster.
+   Otherwise load/play video over a dark hold (no poster flash). Poster shows
+   only if the file errors or play() is blocked. */
 (function(){
   var hero = document.querySelector(".hero");
   var hv = document.querySelector(".hero-video");
