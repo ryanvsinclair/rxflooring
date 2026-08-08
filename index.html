@@ -241,19 +241,9 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 .hero.is-waiting .beat{
   opacity:0; transform:translateY(10px); animation:none;
 }
-/* Fail: end-frame poster, then snap copy + CTAs (no motion). */
+/* Fail: end-frame poster visible; copy stays held by is-waiting until image is ready. */
 .hero.is-instant .hero-video{display:none !important;}
 .hero.is-instant .hero-poster{opacity:1; visibility:visible;}
-.hero.is-instant .kicker,
-.hero.is-instant .beat{
-  opacity:1; transform:none; animation:none;
-}
-.hero.is-instant .sub,
-.hero.is-instant .links .pill,
-.hero.is-instant .links .pill.ghost{
-  opacity:1; visibility:visible; pointer-events:auto; transition:none;
-}
-.hero.is-instant .links{pointer-events:auto;}
 .chev::after{content:"›"; margin-left:.42em; }
 
 /* ---------- track record: trusted + stats ---------- */
@@ -2897,12 +2887,14 @@ bookForm.addEventListener("submit", async function(e){
 });
 
 /* ---------- Hero: white wait → video success, or end-frame fallback ----------
-   Up to 2s: white background only (no poster, no copy).
+   Up to 3s: white background only (no poster, no copy).
    Success: fade video in, run beat/kicker, on ended → sub → CTAs.
-   Fail / blocked: show end-frame carpet poster, then snap headers + CTAs. */
+   Fail / blocked: show end-frame poster, wait until it has rendered, then
+   animate headers and CTAs. */
 (function(){
   var hero = document.querySelector(".hero");
   var hv = document.querySelector(".hero-video");
+  var poster = document.querySelector(".hero-poster");
   var sub = document.querySelector(".hero .sub");
   var links = document.querySelector(".hero .links");
   var settled = false;
@@ -2923,6 +2915,43 @@ bookForm.addEventListener("submit", async function(e){
     setTimeout(showLinks, 700);
   }
 
+  function whenPosterReady(done){
+    if (!poster){ done(); return; }
+    function afterPaint(){
+      /* Two rAFs: wait until the browser has painted the decoded image. */
+      requestAnimationFrame(function(){
+        requestAnimationFrame(done);
+      });
+    }
+    function decoded(){
+      if (poster.decode){
+        poster.decode().then(afterPaint).catch(afterPaint);
+      } else {
+        afterPaint();
+      }
+    }
+    if (poster.complete && poster.naturalWidth > 0){
+      decoded();
+      return;
+    }
+    poster.addEventListener("load", decoded, { once:true });
+    poster.addEventListener("error", done, { once:true });
+  }
+
+  function revealFallbackCopy(){
+    if (!hero){
+      showSub();
+      showLinks();
+      return;
+    }
+    hero.classList.remove("is-waiting");
+    hero.classList.add("is-playing");
+    setTimeout(function(){
+      showSub();
+      setTimeout(showLinks, 700);
+    }, 320);
+  }
+
   function finishInstant(){
     if (settled) return;
     settled = true;
@@ -2934,11 +2963,10 @@ bookForm.addEventListener("submit", async function(e){
       hv.classList.remove("in");
     }
     if (hero){
-      hero.classList.remove("is-waiting", "is-playing");
-      hero.classList.add("is-instant");
+      hero.classList.remove("is-playing");
+      hero.classList.add("is-waiting", "is-instant");
     }
-    showSub();
-    showLinks();
+    whenPosterReady(revealFallbackCopy);
   }
 
   function allowHeroVideo(){
@@ -2959,7 +2987,7 @@ bookForm.addEventListener("submit", async function(e){
     return;
   }
 
-  failTimer = setTimeout(finishInstant, 2000);
+  failTimer = setTimeout(finishInstant, 3000);
 
   hv.muted = true;
   hv.playsInline = true;
