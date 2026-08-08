@@ -136,11 +136,12 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 }
 @media(max-width:700px){ .hero{padding:88px 0 72px; min-height:72vh;} }
 
-/* Poster is the LCP layer; video fades over it only on good connections. */
+/* White hold while deciding if video will play; end-frame poster only on fail. */
 .hero-media{position:absolute; inset:0; z-index:0; background:#fff;}
 .hero-poster{
   position:absolute; inset:0; width:100%; height:100%;
   object-fit:cover; object-position:center; display:block;
+  opacity:0; visibility:hidden; pointer-events:none;
 }
 .hero-video{position:absolute; inset:0; width:100%; height:100%;
   object-fit:cover; object-position:center;
@@ -225,14 +226,24 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 .hero .beat,
 .hero .kicker{
   opacity:0; transform:translateY(10px);
+}
+/* Success: start beats when wait ends (video revealed). */
+.hero.is-playing .kicker,
+.hero.is-playing .beat{
   animation:beatIn .48s cubic-bezier(.2,.7,.3,1) forwards;
 }
-.hero .kicker{animation-delay:0s;}
-.hero .beat:nth-child(1){animation-delay:.08s;}
-.hero .beat:nth-child(2){animation-delay:.16s;}
-.hero .beat:nth-child(3){animation-delay:.24s;}
-/* Slow / failed video: poster only, hero copy + CTAs appear with no motion. */
+.hero.is-playing .kicker{animation-delay:0s;}
+.hero.is-playing .beat:nth-child(1){animation-delay:.08s;}
+.hero.is-playing .beat:nth-child(2){animation-delay:.16s;}
+.hero.is-playing .beat:nth-child(3){animation-delay:.24s;}
+/* Decision window: white hold, no copy yet. */
+.hero.is-waiting .kicker,
+.hero.is-waiting .beat{
+  opacity:0; transform:translateY(10px); animation:none;
+}
+/* Fail: end-frame poster, then snap copy + CTAs (no motion). */
 .hero.is-instant .hero-video{display:none !important;}
+.hero.is-instant .hero-poster{opacity:1; visibility:visible;}
 .hero.is-instant .kicker,
 .hero.is-instant .beat{
   opacity:1; transform:none; animation:none;
@@ -1746,13 +1757,13 @@ html{scroll-behavior:smooth;}
 <main id="top">
 
   <!-- ================= HERO ================= -->
-  <header class="hero">
+  <header class="hero is-waiting">
     <div class="hero-media">
-      <img class="hero-poster" src="assets/hero-poster.jpg?v=4" alt=""
-           width="1920" height="1080" fetchpriority="high" decoding="async" aria-hidden="true">
-      <!-- src set from data-src only on good connections; otherwise poster-only. -->
-      <video class="hero-video" muted playsinline preload="none"
-             data-src="assets/hero.mp4?v=4" aria-hidden="true"></video>
+      <!-- End-frame carpet: shown only if video fails (readable under white type). -->
+      <img class="hero-poster" src="assets/hero-poster-end.jpg?v=1" alt=""
+           width="1920" height="1080" decoding="async" aria-hidden="true">
+      <video class="hero-video" muted playsinline webkit-playsinline preload="none"
+             data-src="assets/hero.mp4?v=8" aria-hidden="true"></video>
     </div>
     <div class="wrap">
       <div class="hero-copy">
@@ -2885,10 +2896,10 @@ bookForm.addEventListener("submit", async function(e){
   bookModal.querySelector(".modal-x").focus();
 });
 
-/* ---------- Hero: poster-first; video only on good connections ----------
-   Skip hero.mp4 when reduced-motion, Save-Data, or slow effectiveType.
-   If playback has not started within 2s: keep poster, snap hero copy/CTAs
-   with no fade. Otherwise wait for ended, then animate sub → CTAs. */
+/* ---------- Hero: white wait → video success, or end-frame fallback ----------
+   Up to 2s: white background only (no poster, no copy).
+   Success: fade video in, run beat/kicker, on ended → sub → CTAs.
+   Fail / blocked: show end-frame carpet poster, then snap headers + CTAs. */
 (function(){
   var hero = document.querySelector(".hero");
   var hv = document.querySelector(".hero-video");
@@ -2900,10 +2911,14 @@ bookForm.addEventListener("submit", async function(e){
   function showLinks(){ if (links) links.classList.add("in"); }
   function showSub(){ if (sub) sub.classList.add("in"); }
 
+  function clearFail(){
+    if (failTimer){ clearTimeout(failTimer); failTimer = null; }
+  }
+
   function finishAnimated(){
     if (settled) return;
     settled = true;
-    if (failTimer) clearTimeout(failTimer);
+    clearFail();
     showSub();
     setTimeout(showLinks, 700);
   }
@@ -2911,14 +2926,17 @@ bookForm.addEventListener("submit", async function(e){
   function finishInstant(){
     if (settled) return;
     settled = true;
-    if (failTimer) clearTimeout(failTimer);
+    clearFail();
     if (hv){
       try { hv.pause(); } catch (e) {}
       hv.removeAttribute("src");
       try { hv.load(); } catch (e2) {}
       hv.classList.remove("in");
     }
-    if (hero) hero.classList.add("is-instant");
+    if (hero){
+      hero.classList.remove("is-waiting", "is-playing");
+      hero.classList.add("is-instant");
+    }
     showSub();
     showLinks();
   }
@@ -2934,6 +2952,8 @@ bookForm.addEventListener("submit", async function(e){
     return true;
   }
 
+  if (hero) hero.classList.add("is-waiting");
+
   if (!hv || !allowHeroVideo()){
     finishInstant();
     return;
@@ -2941,9 +2961,14 @@ bookForm.addEventListener("submit", async function(e){
 
   failTimer = setTimeout(finishInstant, 2000);
 
+  hv.muted = true;
+  hv.playsInline = true;
+  hv.setAttribute("playsinline", "");
+  hv.setAttribute("webkit-playsinline", "");
   hv.preload = "auto";
   hv.src = hv.dataset.src;
   hv.load();
+
   var reveal = function(){ if (!settled) hv.classList.add("in"); };
   var start = function(){
     if (settled) return;
@@ -2953,7 +2978,11 @@ bookForm.addEventListener("submit", async function(e){
   hv.addEventListener("loadeddata", start, { once:true });
   hv.addEventListener("playing", function(){
     if (settled) return;
-    if (failTimer) clearTimeout(failTimer);
+    clearFail();
+    if (hero){
+      hero.classList.remove("is-waiting");
+      hero.classList.add("is-playing");
+    }
     reveal();
   }, { once:true });
   hv.addEventListener("ended", finishAnimated, { once:true });
