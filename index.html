@@ -231,7 +231,7 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 .hero .beat:nth-child(1){animation-delay:.08s;}
 .hero .beat:nth-child(2){animation-delay:.16s;}
 .hero .beat:nth-child(3){animation-delay:.24s;}
-/* Slow / failed video: poster only, hero copy + CTAs appear with no motion. */
+/* Failed / blocked video: poster only, hero copy + CTAs appear with no motion. */
 .hero.is-instant .hero-video{display:none !important;}
 .hero.is-instant .kicker,
 .hero.is-instant .beat{
@@ -1748,11 +1748,11 @@ html{scroll-behavior:smooth;}
   <!-- ================= HERO ================= -->
   <header class="hero">
     <div class="hero-media">
-      <img class="hero-poster" src="assets/hero-poster.jpg?v=4" alt=""
+      <img class="hero-poster" src="assets/hero-poster.jpg?v=6" alt=""
            width="1920" height="1080" fetchpriority="high" decoding="async" aria-hidden="true">
       <!-- src set from data-src only on good connections; otherwise poster-only. -->
-      <video class="hero-video" muted playsinline preload="none"
-             data-src="assets/hero.mp4?v=4" aria-hidden="true"></video>
+      <video class="hero-video" muted playsinline webkit-playsinline preload="none"
+             data-src="assets/hero.mp4?v=6" aria-hidden="true"></video>
     </div>
     <div class="wrap">
       <div class="hero-copy">
@@ -2887,8 +2887,9 @@ bookForm.addEventListener("submit", async function(e){
 
 /* ---------- Hero: poster-first; video only on good connections ----------
    Skip hero.mp4 when reduced-motion, Save-Data, or slow effectiveType.
-   If playback has not started within 2s: keep poster, snap hero copy/CTAs
-   with no fade. Otherwise wait for ended, then animate sub → CTAs. */
+   If the file errors or play() is blocked: keep poster, snap hero copy/CTAs.
+   Slow networks get a long grace period — do not abort just because first
+   paint took >2s (1.8MB mp4 often needs longer on mobile / 3g). */
 (function(){
   var hero = document.querySelector(".hero");
   var hv = document.querySelector(".hero-video");
@@ -2900,10 +2901,14 @@ bookForm.addEventListener("submit", async function(e){
   function showLinks(){ if (links) links.classList.add("in"); }
   function showSub(){ if (sub) sub.classList.add("in"); }
 
+  function clearFail(){
+    if (failTimer){ clearTimeout(failTimer); failTimer = null; }
+  }
+
   function finishAnimated(){
     if (settled) return;
     settled = true;
-    if (failTimer) clearTimeout(failTimer);
+    clearFail();
     showSub();
     setTimeout(showLinks, 700);
   }
@@ -2911,7 +2916,7 @@ bookForm.addEventListener("submit", async function(e){
   function finishInstant(){
     if (settled) return;
     settled = true;
-    if (failTimer) clearTimeout(failTimer);
+    clearFail();
     if (hv){
       try { hv.pause(); } catch (e) {}
       hv.removeAttribute("src");
@@ -2939,21 +2944,42 @@ bookForm.addEventListener("submit", async function(e){
     return;
   }
 
-  failTimer = setTimeout(finishInstant, 2000);
+  /* Absolute last resort if nothing ever loads — not a “slow first byte” cut. */
+  failTimer = setTimeout(function(){
+    if (!settled && hv.readyState < 2) finishInstant();
+  }, 12000);
 
+  hv.muted = true;
+  hv.defaultMuted = true;
+  hv.playsInline = true;
+  hv.setAttribute("playsinline", "");
+  hv.setAttribute("webkit-playsinline", "");
   hv.preload = "auto";
   hv.src = hv.dataset.src;
   hv.load();
+
   var reveal = function(){ if (!settled) hv.classList.add("in"); };
   var start = function(){
     if (settled) return;
+    clearFail();
+    /* Once bytes are here, give play() a short window; don't poster-bail mid-buffer. */
+    failTimer = setTimeout(function(){
+      if (!settled && hv.paused) finishInstant();
+    }, 4000);
     var p = hv.play();
-    if (p && p.catch) p.catch(function(){ finishInstant(); });
+    if (p && p.then){
+      p.then(function(){
+        clearFail();
+        reveal();
+      }).catch(function(){ finishInstant(); });
+    } else if (p && p.catch){
+      p.catch(function(){ finishInstant(); });
+    }
   };
   hv.addEventListener("loadeddata", start, { once:true });
   hv.addEventListener("playing", function(){
     if (settled) return;
-    if (failTimer) clearTimeout(failTimer);
+    clearFail();
     reveal();
   }, { once:true });
   hv.addEventListener("ended", finishAnimated, { once:true });
