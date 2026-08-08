@@ -136,17 +136,17 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 }
 @media(max-width:700px){ .hero{padding:88px 0 72px; min-height:72vh;} }
 
-/* Video-first: white hold matches the clip’s open. Poster only if playback can't run. */
+/* Poster is the LCP layer; video fades over it only on good connections. */
 .hero-media{position:absolute; inset:0; z-index:0; background:#fff;}
 .hero-poster{
   position:absolute; inset:0; width:100%; height:100%;
   object-fit:cover; object-position:center; display:block;
-  opacity:0; visibility:hidden; pointer-events:none;
 }
 .hero-video{position:absolute; inset:0; width:100%; height:100%;
   object-fit:cover; object-position:center;
-  opacity:0; visibility:hidden;}
-.hero-video.in{opacity:1; visibility:visible;}
+  opacity:0; visibility:hidden;
+  transition:opacity .4s ease, visibility 0s linear .4s;}
+.hero-video.in{opacity:1; visibility:visible; transition:opacity .4s ease, visibility 0s;}
 .hero .wrap{position:relative; z-index:2; width:100%;}
 
 @media(min-width:861px){
@@ -231,9 +231,8 @@ h2.big{font-size:clamp(30px,4.6vw,50px); line-height:1.08; font-weight:600;}
 .hero .beat:nth-child(1){animation-delay:.08s;}
 .hero .beat:nth-child(2){animation-delay:.16s;}
 .hero .beat:nth-child(3){animation-delay:.24s;}
-/* Failed / blocked video: reveal poster fallback; copy + CTAs with no motion. */
+/* Slow / failed video: poster only, hero copy + CTAs appear with no motion. */
 .hero.is-instant .hero-video{display:none !important;}
-.hero.is-instant .hero-poster{opacity:1; visibility:visible;}
 .hero.is-instant .kicker,
 .hero.is-instant .beat{
   opacity:1; transform:none; animation:none;
@@ -1749,11 +1748,11 @@ html{scroll-behavior:smooth;}
   <!-- ================= HERO ================= -->
   <header class="hero">
     <div class="hero-media">
-      <!-- Poster is fallback only (shown when .hero.is-instant). -->
-      <img class="hero-poster" src="assets/hero-poster.jpg?v=6" alt=""
-           width="1920" height="1080" decoding="async" aria-hidden="true">
-      <video class="hero-video" muted playsinline webkit-playsinline preload="none"
-             data-src="assets/hero.mp4?v=6" aria-hidden="true"></video>
+      <img class="hero-poster" src="assets/hero-poster.jpg?v=4" alt=""
+           width="1920" height="1080" fetchpriority="high" decoding="async" aria-hidden="true">
+      <!-- src set from data-src only on good connections; otherwise poster-only. -->
+      <video class="hero-video" muted playsinline preload="none"
+             data-src="assets/hero.mp4?v=4" aria-hidden="true"></video>
     </div>
     <div class="wrap">
       <div class="hero-copy">
@@ -2886,10 +2885,10 @@ bookForm.addEventListener("submit", async function(e){
   bookModal.querySelector(".modal-x").focus();
 });
 
-/* ---------- Hero: video-first; poster only as fallback ----------
-   Skip hero.mp4 when reduced-motion, Save-Data, or slow effectiveType → poster.
-   Otherwise load/play video over a white hold (matches clip open; no poster flash).
-   Poster shows only if the file errors or play() is blocked. */
+/* ---------- Hero: poster-first; video only on good connections ----------
+   Skip hero.mp4 when reduced-motion, Save-Data, or slow effectiveType.
+   If playback has not started within 2s: keep poster, snap hero copy/CTAs
+   with no fade. Otherwise wait for ended, then animate sub → CTAs. */
 (function(){
   var hero = document.querySelector(".hero");
   var hv = document.querySelector(".hero-video");
@@ -2901,14 +2900,10 @@ bookForm.addEventListener("submit", async function(e){
   function showLinks(){ if (links) links.classList.add("in"); }
   function showSub(){ if (sub) sub.classList.add("in"); }
 
-  function clearFail(){
-    if (failTimer){ clearTimeout(failTimer); failTimer = null; }
-  }
-
   function finishAnimated(){
     if (settled) return;
     settled = true;
-    clearFail();
+    if (failTimer) clearTimeout(failTimer);
     showSub();
     setTimeout(showLinks, 700);
   }
@@ -2916,7 +2911,7 @@ bookForm.addEventListener("submit", async function(e){
   function finishInstant(){
     if (settled) return;
     settled = true;
-    clearFail();
+    if (failTimer) clearTimeout(failTimer);
     if (hv){
       try { hv.pause(); } catch (e) {}
       hv.removeAttribute("src");
@@ -2944,42 +2939,21 @@ bookForm.addEventListener("submit", async function(e){
     return;
   }
 
-  /* Absolute last resort if nothing ever loads — not a “slow first byte” cut. */
-  failTimer = setTimeout(function(){
-    if (!settled && hv.readyState < 2) finishInstant();
-  }, 12000);
+  failTimer = setTimeout(finishInstant, 2000);
 
-  hv.muted = true;
-  hv.defaultMuted = true;
-  hv.playsInline = true;
-  hv.setAttribute("playsinline", "");
-  hv.setAttribute("webkit-playsinline", "");
   hv.preload = "auto";
   hv.src = hv.dataset.src;
   hv.load();
-
   var reveal = function(){ if (!settled) hv.classList.add("in"); };
   var start = function(){
     if (settled) return;
-    clearFail();
-    /* Once bytes are here, give play() a short window; don't poster-bail mid-buffer. */
-    failTimer = setTimeout(function(){
-      if (!settled && hv.paused) finishInstant();
-    }, 4000);
     var p = hv.play();
-    if (p && p.then){
-      p.then(function(){
-        clearFail();
-        reveal();
-      }).catch(function(){ finishInstant(); });
-    } else if (p && p.catch){
-      p.catch(function(){ finishInstant(); });
-    }
+    if (p && p.catch) p.catch(function(){ finishInstant(); });
   };
   hv.addEventListener("loadeddata", start, { once:true });
   hv.addEventListener("playing", function(){
     if (settled) return;
-    clearFail();
+    if (failTimer) clearTimeout(failTimer);
     reveal();
   }, { once:true });
   hv.addEventListener("ended", finishAnimated, { once:true });
