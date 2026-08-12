@@ -235,6 +235,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 .tab.is-active{color:var(--accent);}
 .tab:hover{color:var(--ink);}
 .tab.is-active:hover{color:var(--accent);}
+.tab.is-add svg{stroke-width:2;}
 
 .list{
   display:flex; flex-direction:column; gap:12px; padding-bottom:16px;
@@ -264,6 +265,8 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 .badge.contacted,.badge.scheduled{background:rgba(43,182,115,.16); color:var(--signal);}
 .badge.done,.badge.closed,.badge.complete,.badge.archived{background:var(--panel-alt); color:var(--muted);}
 .badge.in_progress{background:rgba(75,124,255,.18); color:var(--accent);}
+.badge.live{background:rgba(43,182,115,.16); color:#5CDEA4;}
+.badge.draft{background:rgba(75,124,255,.16); color:#9BB6FF;}
 .card-body{margin-top:12px; display:grid; gap:6px; font-size:14.5px; color:var(--body);}
 .card-actions{margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
 .card-actions select{
@@ -273,6 +276,45 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   border:1px dashed var(--rule); border-radius:16px; padding:36px 20px;
   text-align:center; color:var(--muted);
 }
+.empty .empty-cta{
+  font:inherit; font-size:16px; font-weight:600; color:var(--accent);
+  background:none; border:0; padding:0; cursor:pointer;
+  text-decoration:underline; text-underline-offset:3px;
+}
+.empty .empty-cta:hover{color:var(--accent-hover);}
+.empty .empty-sub{display:block; margin-top:10px; font-size:13.5px;}
+
+/* Concept 2: Home mode switch + job buckets */
+.home-mode{
+  display:flex; gap:3px; padding:3px; margin-bottom:14px;
+  border:1px solid var(--rule); border-radius:12px;
+  background:rgba(255,255,255,.04);
+}
+.home-mode button{
+  flex:1; font:inherit; font-size:13.5px; font-weight:600;
+  color:var(--muted); background:transparent; border:0;
+  border-radius:9px; padding:9px 8px; cursor:pointer;
+}
+.home-mode button.is-active{
+  color:var(--ink); background:rgba(255,255,255,.1);
+}
+.job-buckets{
+  display:flex; gap:6px; margin-bottom:12px;
+}
+.job-buckets button{
+  flex:1; font:inherit; font-size:12.5px; font-weight:600;
+  color:var(--muted); background:rgba(255,255,255,.04);
+  border:1px solid var(--rule); border-radius:999px;
+  padding:8px 6px; cursor:pointer;
+}
+.job-buckets button.is-active{
+  color:#fff; background:var(--accent); border-color:var(--accent);
+}
+.tab.is-add.is-active{
+  color:#fff;
+  background:rgba(75,124,255,.22);
+}
+.tab.is-add.is-active:hover{color:#fff;}
 .err-banner{
   margin:0 0 16px; padding:12px 14px; border-radius:12px;
   background:rgba(229,115,104,.12); color:var(--danger); font-size:14px;
@@ -706,23 +748,70 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 }
 .shot-preview[hidden]{display:none !important;}
 .shot-current{font-size:12.5px; color:var(--muted); line-height:1.4; margin:0;}
+.shot-pair{display:grid; gap:12px;}
+@media(min-width:420px){
+  .shot-pair{grid-template-columns:1fr 1fr;}
+}
+.shot-pair .shot-slot{min-height:140px;}
 .job-review{
-  display:grid; gap:10px;
-  padding:14px 14px 12px;
-  border-radius:14px;
-  background:rgba(255,255,255,.1);
-  border:1px solid var(--edge);
-  box-shadow:0 0 0 1px rgba(29,36,43,.06);
-  font-size:14px;
-  color:var(--body);
+  padding:0; border:0; background:transparent; box-shadow:none;
 }
-.job-review-row{display:grid; gap:2px;}
-.job-review-row .lbl{
-  font-size:11px; font-weight:600; letter-spacing:.06em;
-  text-transform:uppercase; color:var(--muted);
+/* Landing-page prescription slip (light) inside dark manager modal */
+.job-slip-preview{
+  --slip-ink:#1D242B;
+  --slip-body:#4A535C;
+  --slip-muted:#79828B;
+  --slip-rule:#E3E6EA;
+  --slip-accent:#1B4DFF;
+  --slip-bg:#FFFFFF;
+  --slip-rx:"Iowan Old Style","Hoefler Text",Palatino,"Times New Roman",serif;
+  background:var(--slip-bg);
+  color:var(--slip-body);
+  border-radius:18px;
+  padding:16px 16px 14px;
+  border:1px solid var(--slip-rule);
+  box-shadow:0 12px 28px rgba(0,0,0,.18);
 }
-.job-review-row .val{color:var(--ink); word-break:break-word;}
-.job-review-row .val.is-empty{color:var(--muted);}
+.job-slip-preview .job-slip-top{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin-bottom:10px;
+}
+.job-slip-preview .mark{
+  font-family:var(--slip-rx); font-size:22px; color:var(--slip-accent); line-height:1;
+}
+.job-slip-preview .job-ago{
+  font-size:9px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--slip-muted);
+}
+.job-slip-preview .job-pair{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px;
+}
+.job-slip-preview .job-shot{
+  position:relative; overflow:hidden; border-radius:12px;
+  background:#EDF0F2; aspect-ratio:4/3;
+}
+.job-slip-preview .job-shot img{
+  width:100%; height:100%; object-fit:cover; display:block;
+}
+.job-slip-preview .job-shot.is-empty{
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--slip-muted);
+}
+.job-slip-preview .job-shot i{
+  position:absolute; left:8px; bottom:8px;
+  font-style:normal; font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+  color:#fff; background:rgba(29,36,43,.42); padding:4px 7px; border-radius:980px;
+}
+.job-slip-preview h3{
+  margin:12px 0 0; color:var(--slip-ink); font-size:17px;
+  letter-spacing:-.02em; font-weight:600;
+}
+.job-slip-preview > p{
+  margin:7px 0 0; font-size:14px; color:var(--slip-body); line-height:1.45;
+}
+.job-slip-preview .svc-line{margin-top:10px; font-size:12.5px; color:var(--slip-muted);}
+.job-slip-preview .svc-line b{color:var(--slip-ink); font-weight:600;}
+.job-slip-preview .slip-missing{opacity:.55; font-style:italic;}
 .job-wizard-nav{
   display:flex;
   align-items:center;
@@ -870,35 +959,41 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   <main class="wrap">
     <p class="err-banner" id="appError" hidden></p>
 
-    <!-- Requests: list only; detail opens via morph modal -->
-    <section id="tab-requests">
-      <div class="panel-toolbar is-split">
-        <select id="statusFilter" aria-label="Filter by status">
-          <option value="active" selected>Active</option>
-          <option value="all">All statuses</option>
-          <option value="new">New</option>
-          <option value="contacted">Contacted</option>
-          <option value="scheduled">Scheduled</option>
-          <option value="done">Done</option>
-          <option value="closed">Closed</option>
-          <option value="archived">Archived</option>
-        </select>
-        <button type="button" class="pill ghost" id="refreshRequests">Refresh</button>
+    <!-- Concept 2: single Home with Bookings | Jobs modes -->
+    <section id="tab-home">
+      <div class="home-mode" role="tablist" aria-label="Home mode">
+        <button type="button" class="is-active" data-home-mode="bookings" role="tab" aria-selected="true">Bookings</button>
+        <button type="button" data-home-mode="jobs" role="tab" aria-selected="false">Jobs</button>
       </div>
-      <div class="req-list" id="requestsList"><p class="loading">Loading…</p></div>
-    </section>
 
-    <!--
-      Jobs tab: manager-facing name for completed / showcase work.
-      A "job" here is essentially a public "prescription" on the landing page —
-      same record; landing copy stays prescription-branded.
-    -->
-    <section id="tab-jobs" hidden>
-      <div class="panel-toolbar">
-        <button type="button" class="pill ghost" id="refreshJobs">Refresh</button>
-        <button type="button" class="pill jobs-add" id="jobAddBtn" aria-label="Post a job" title="Post a job">+</button>
+      <div id="mode-bookings">
+        <div class="panel-toolbar is-split">
+          <select id="statusFilter" aria-label="Filter by status">
+            <option value="active" selected>Active</option>
+            <option value="all">All statuses</option>
+            <option value="new">New</option>
+            <option value="contacted">Contacted</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="done">Done</option>
+            <option value="closed">Closed</option>
+            <option value="archived">Archived</option>
+          </select>
+          <button type="button" class="pill ghost" id="refreshRequests">Refresh</button>
+        </div>
+        <div class="req-list" id="requestsList"><p class="loading">Loading…</p></div>
       </div>
-      <div class="list" id="jobsList"><p class="loading">Loading…</p></div>
+
+      <div id="mode-jobs" hidden>
+        <div class="job-buckets" role="tablist" aria-label="Job status">
+          <button type="button" class="is-active" data-job-bucket="live" role="tab" aria-selected="true">Live</button>
+          <button type="button" data-job-bucket="draft" role="tab" aria-selected="false">Draft</button>
+          <button type="button" data-job-bucket="archived" role="tab" aria-selected="false">Archive</button>
+        </div>
+        <div class="panel-toolbar">
+          <button type="button" class="pill ghost" id="refreshJobs">Refresh</button>
+        </div>
+        <div class="list" id="jobsList"><p class="loading">Loading…</p></div>
+      </div>
     </section>
   </main>
 </div>
@@ -906,20 +1001,18 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 <!-- Outside #appView so position:fixed is viewport-rooted on iOS PWA. -->
 <nav class="bottom-nav" id="bottomNav" hidden aria-label="Manager sections">
   <div class="bottom-nav-in" role="tablist">
-    <button type="button" class="tab is-active" data-tab="requests" role="tab" aria-selected="true">
+    <button type="button" class="tab is-active" data-nav="home" role="tab" aria-selected="true">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M4 6h16M4 12h16M4 18h10"/>
         <circle cx="19" cy="18" r="1.25" fill="currentColor" stroke="none"/>
       </svg>
-      <span>Requests</span>
+      <span>Home</span>
     </button>
-    <button type="button" class="tab" data-tab="jobs" role="tab" aria-selected="false">
+    <button type="button" class="tab is-add" id="jobAddBtn" data-nav="add" role="tab" aria-selected="false" aria-label="Add a job" title="Add a job">
       <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M8 4h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
-        <path d="M9 4V3.5A1.5 1.5 0 0 1 10.5 2h3A1.5 1.5 0 0 1 15 3.5V4"/>
-        <path d="M9 11h6M9 15h4"/>
+        <path d="M12 5v14M5 12h14"/>
       </svg>
-      <span>Jobs</span>
+      <span>Add job</span>
     </button>
   </div>
 </nav>
@@ -953,71 +1046,55 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 
         <p class="job-wizard-status" id="jobWizardStatus" aria-live="polite"></p>
         <div class="job-wizard-steps" id="jobWizardSteps">
-          <div class="job-wizard-step is-active" data-step="1" data-key="title">
+          <div class="job-wizard-step is-active" data-step="1" data-key="photos">
+            <label class="job-wizard-label">Photos</label>
+            <div class="shot-pair">
+              <div class="shot-slot" id="jobBeforeSlot">
+                <span class="job-wizard-label" style="margin:0;">Before</span>
+                <img class="shot-preview" id="jobBeforePreview" alt="" hidden>
+                <p class="shot-current" id="jobBeforeCurrent" hidden>Current photo on file — pick a new one to replace.</p>
+                <input id="jobBefore" name="before" type="file" accept="image/*" capture="environment">
+              </div>
+              <div class="shot-slot" id="jobAfterSlot">
+                <span class="job-wizard-label" style="margin:0;">After <span class="wizard-optional">(optional)</span></span>
+                <img class="shot-preview" id="jobAfterPreview" alt="" hidden>
+                <p class="shot-current" id="jobAfterCurrent" hidden>Current photo on file — pick a new one to replace.</p>
+                <input id="jobAfter" name="after" type="file" accept="image/*" capture="environment">
+              </div>
+            </div>
+          </div>
+          <div class="job-wizard-step" data-step="2" data-key="title">
             <label class="job-wizard-label" for="jobTitle">Title</label>
             <input id="jobTitle" name="title" required placeholder="e.g. Peaking LVP" autocomplete="off">
           </div>
-          <div class="job-wizard-step" data-step="2" data-key="description">
-            <label class="job-wizard-label" for="jobDescription">Description</label>
+          <div class="job-wizard-step" data-step="3" data-key="description">
+            <label class="job-wizard-label" for="jobDescription">Description <span class="wizard-optional">(optional)</span></label>
             <textarea id="jobDescription" name="description" rows="4" placeholder="e.g. Moisture under the old floor. Pulled, dried, levelled, re-laid."></textarea>
           </div>
-          <div class="job-wizard-step" data-step="3" data-key="prescribed">
-            <label class="job-wizard-label" for="jobPrescribed">Prescribed</label>
+          <div class="job-wizard-step" data-step="4" data-key="prescribed">
+            <label class="job-wizard-label" for="jobPrescribed">Prescribed services</label>
             <input id="jobPrescribed" name="prescribed" placeholder="e.g. Removal · Subfloor · LVP" autocomplete="off">
           </div>
-          <div class="job-wizard-step" data-step="4" data-key="completed">
-            <div class="job-step-stack">
-              <div>
-                <label class="job-wizard-label" for="jobCompletedAt">Completed</label>
-                <input id="jobCompletedAt" name="completed_at" type="date">
-              </div>
-              <div>
-                <label class="job-wizard-label" for="jobStatus">Status</label>
-                <select id="jobStatus" name="status">
-                  <option value="complete" selected>Complete</option>
-                  <option value="planned">Planned</option>
-                  <option value="in_progress">In progress</option>
-                  <option value="archived">Archived</option>
-                </select>
-              </div>
+          <div class="job-wizard-step" data-step="5" data-key="after">
+            <label class="job-wizard-label" for="jobAfterLater">After photo <span class="wizard-optional">(optional)</span></label>
+            <div class="shot-slot" id="jobAfterLaterSlot">
+              <img class="shot-preview" id="jobAfterLaterPreview" alt="" hidden>
+              <p class="shot-current" id="jobAfterLaterCurrent" hidden>Current photo on file — pick a new one to replace.</p>
+              <input id="jobAfterLater" name="after_later" type="file" accept="image/*" capture="environment">
             </div>
           </div>
-          <div class="job-wizard-step" data-step="5" data-key="before">
-            <label class="job-wizard-label" for="jobBefore">Before photo</label>
-            <div class="shot-slot" id="jobBeforeSlot">
-              <img class="shot-preview" id="jobBeforePreview" alt="" hidden>
-              <p class="shot-current" id="jobBeforeCurrent" hidden>Current photo on file — pick a new one to replace.</p>
-              <input id="jobBefore" name="before" type="file" accept="image/*" capture="environment">
-            </div>
+          <div class="job-wizard-step" data-step="6" data-key="address">
+            <label class="job-wizard-label" for="jobAddress">Address <span class="wizard-optional">(private, optional)</span></label>
+            <input id="jobAddress" name="address" placeholder="Job site address" autocomplete="street-address">
           </div>
-          <div class="job-wizard-step" data-step="6" data-key="after">
-            <label class="job-wizard-label" for="jobAfter">After photo</label>
-            <div class="shot-slot" id="jobAfterSlot">
-              <img class="shot-preview" id="jobAfterPreview" alt="" hidden>
-              <p class="shot-current" id="jobAfterCurrent" hidden>Current photo on file — pick a new one to replace.</p>
-              <input id="jobAfter" name="after" type="file" accept="image/*" capture="environment">
-            </div>
-          </div>
-          <div class="job-wizard-step" data-step="7" data-key="private">
-            <div class="job-step-stack">
-              <div>
-                <label class="job-wizard-label" for="jobAddress">Address <span class="wizard-optional">(private)</span></label>
-                <input id="jobAddress" name="address" placeholder="Job site address" autocomplete="street-address">
-              </div>
-              <div>
-                <label class="job-wizard-label" for="jobNotes">Internal notes <span class="wizard-optional">(optional)</span></label>
-                <input id="jobNotes" name="notes" placeholder="Managers only — not on the site">
-              </div>
-            </div>
+          <div class="job-wizard-step" data-step="7" data-key="notes">
+            <label class="job-wizard-label" for="jobNotes">Internal notes <span class="wizard-optional">(optional)</span></label>
+            <input id="jobNotes" name="notes" placeholder="Managers only — not on the site">
           </div>
           <div class="job-wizard-step" data-step="8" data-key="review">
-            <label class="job-wizard-label">Review &amp; publish</label>
+            <label class="job-wizard-label">How it looks on the site</label>
             <div class="job-review" id="jobReviewSummary" aria-live="polite"></div>
-            <label class="job-check" style="margin-top:16px;">
-              <input type="checkbox" id="jobPublished" name="published" checked>
-              <span>Show on the public site</span>
-            </label>
-            <p class="job-form-fine">Publish needs title, description, prescribed line, and before &amp; after photos.</p>
+            <p class="job-form-fine">Saved as a draft. Publish from Jobs → Draft when you are ready.</p>
           </div>
         </div>
 
@@ -1259,21 +1336,64 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     await sendUnlockEmail(email);
   });
 
-  /* bottom nav tabs */
+  /* Concept 2: Home (Bookings|Jobs) + Add job */
+  var modeBookings = document.getElementById("mode-bookings");
+  var modeJobs = document.getElementById("mode-jobs");
+  var homeMode = "bookings";
+  var jobBucket = "live";
+
+  function setHomeMode(mode) {
+    homeMode = mode === "jobs" ? "jobs" : "bookings";
+    document.querySelectorAll("[data-home-mode]").forEach(function (btn) {
+      var on = btn.getAttribute("data-home-mode") === homeMode;
+      btn.classList.toggle("is-active", on);
+      btn.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    modeBookings.hidden = homeMode !== "bookings";
+    modeJobs.hidden = homeMode !== "jobs";
+    if (homeMode === "jobs") loadJobs();
+  }
+
+  document.querySelectorAll("[data-home-mode]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      setHomeMode(btn.getAttribute("data-home-mode"));
+    });
+  });
+
+  document.querySelectorAll("[data-job-bucket]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      jobBucket = btn.getAttribute("data-job-bucket") || "live";
+      document.querySelectorAll("[data-job-bucket]").forEach(function (b) {
+        var on = b === btn;
+        b.classList.toggle("is-active", on);
+        b.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      renderJobsList();
+    });
+  });
+
   document.querySelectorAll(".bottom-nav .tab").forEach(function (tab) {
     tab.addEventListener("click", function () {
-      document.querySelectorAll(".bottom-nav .tab").forEach(function (t) {
-        t.classList.toggle("is-active", t === tab);
-        t.setAttribute("aria-selected", t === tab ? "true" : "false");
-      });
-      var name = tab.getAttribute("data-tab");
-      document.getElementById("tab-requests").hidden = name !== "requests";
-      document.getElementById("tab-jobs").hidden = name !== "jobs";
-      if (name !== "jobs") {
-        var jm = document.getElementById("jobModal");
-        if (jm && !jm.hidden && typeof closeJobModal === "function") closeJobModal();
+      var name = tab.getAttribute("data-nav");
+      if (name === "add") {
+        if (typeof jobBusy !== "undefined" && jobBusy) return;
+        if (jobModal && !jobModal.hidden) {
+          closeJobModal();
+          return;
+        }
+        if (typeof resetJobForm === "function") {
+          resetJobForm();
+          setJobFormMode(false);
+          openJobModal(tab, { label: "Post a job" });
+        }
+        return;
       }
-      if (name === "jobs") loadJobs();
+      document.querySelectorAll(".bottom-nav .tab").forEach(function (t) {
+        var on = t.getAttribute("data-nav") === "home";
+        t.classList.toggle("is-active", on);
+        t.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      if (jobModal && !jobModal.hidden && typeof closeJobModal === "function") closeJobModal();
     });
   });
 
@@ -1487,12 +1607,16 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     if (jobBtn) {
       jobBtn.addEventListener("click", function () {
         closeRequestModal(function () {
-          document.querySelector('.bottom-nav .tab[data-tab="jobs"]').click();
+          setHomeMode("jobs");
+          jobBucket = "draft";
+          document.querySelectorAll("[data-job-bucket]").forEach(function (b) {
+            var on = b.getAttribute("data-job-bucket") === "draft";
+            b.classList.toggle("is-active", on);
+            b.setAttribute("aria-selected", on ? "true" : "false");
+          });
           resetJobForm();
           jobForm.elements.title.value = "Assessment · " + (jobBtn.getAttribute("data-title") || "");
           jobForm.elements.address.value = jobBtn.getAttribute("data-address") || "";
-          jobForm.elements.status.value = "planned";
-          jobPublished.checked = false;
           jobForm.dataset.assessmentId = jobBtn.getAttribute("data-job-from");
           setJobFormMode(false);
           goToJobStep(1, false);
@@ -1809,7 +1933,17 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
       return;
     }
     if (!data || !data.length) {
-      requestsList.innerHTML = '<div class="empty">No booking requests yet.</div>';
+      requestsList.innerHTML =
+        '<div class="empty">' +
+          '<button type="button" class="empty-cta" id="emptyAddJob">Click here to add a new job</button>' +
+          '<span class="empty-sub">No booking requests yet.</span>' +
+        "</div>";
+      var emptyBtn = document.getElementById("emptyAddJob");
+      if (emptyBtn) {
+        emptyBtn.addEventListener("click", function () {
+          document.getElementById("jobAddBtn").click();
+        });
+      }
       return;
     }
     data = sortRequestsForFocus(data, focusYmd);
@@ -1867,13 +2001,16 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
      Note: a job is essentially a "prescription" on the public landing page. */
   var beforeInput = document.getElementById("jobBefore");
   var afterInput = document.getElementById("jobAfter");
+  var afterLaterInput = document.getElementById("jobAfterLater");
   var beforePreview = document.getElementById("jobBeforePreview");
   var afterPreview = document.getElementById("jobAfterPreview");
+  var afterLaterPreview = document.getElementById("jobAfterLaterPreview");
   var beforeCurrent = document.getElementById("jobBeforeCurrent");
   var afterCurrent = document.getElementById("jobAfterCurrent");
+  var afterLaterCurrent = document.getElementById("jobAfterLaterCurrent");
   var beforeSlot = document.getElementById("jobBeforeSlot");
   var afterSlot = document.getElementById("jobAfterSlot");
-  var jobPublished = document.getElementById("jobPublished");
+  var afterLaterSlot = document.getElementById("jobAfterLaterSlot");
   var jobFormHeading = document.getElementById("jobFormHeading");
   var jobFormError = document.getElementById("jobFormError");
   var jobReviewSummary = document.getElementById("jobReviewSummary");
@@ -1898,6 +2035,9 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   var cachedJobs = [];
   var jobBusy = false;
   var jobLastTrigger = null;
+  var jobDraftSaving = false;
+  var pendingBeforeFile = null;
+  var pendingAfterFile = null;
   var jobLastSkin = null;
   var JOB_CARD_RADIUS = 26;
   var JOB_SHADOW_ON = "0 0 0 1px rgba(29,36,43,.08), 0 20px 60px rgba(29,36,43,.18)";
@@ -2244,28 +2384,53 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     jobFormHeading.textContent = editing ? "Edit job" : "Post a job";
   }
 
+  function currentJobRecord() {
+    var id = jobForm.elements.id.value;
+    if (!id) return null;
+    return cachedJobs.find(function (j) { return j.id === id; }) || null;
+  }
+
+  function hasAfterPhoto() {
+    if (pendingAfterFile) return true;
+    if (afterInput.files && afterInput.files[0]) return true;
+    if (afterLaterInput.files && afterLaterInput.files[0]) return true;
+    var existing = currentJobRecord();
+    return !!(existing && photoByKind(existing.job_photos, "after"));
+  }
+
+  function hasBeforePhoto() {
+    if (pendingBeforeFile) return true;
+    if (beforeInput.files && beforeInput.files[0]) return true;
+    var existing = currentJobRecord();
+    return !!(existing && photoByKind(existing.job_photos, "before"));
+  }
+
   function fillJobFormFromJob(job) {
     clearShotUi();
+    pendingBeforeFile = null;
+    pendingAfterFile = null;
     jobForm.elements.id.value = job.id;
-    jobForm.elements.title.value = job.title || "";
+    jobForm.elements.title.value = job.title && job.title !== "Untitled draft" ? job.title : (job.title || "");
+    if (job.title === "Untitled draft") jobForm.elements.title.value = "";
     jobForm.elements.description.value = job.description || "";
     jobForm.elements.prescribed.value = job.prescribed || "";
     jobForm.elements.address.value = job.address || "";
-    jobForm.elements.status.value = job.status || "complete";
     jobForm.elements.notes.value = job.notes || "";
-    jobForm.elements.completed_at.value = toDateInput(job.completed_at || job.created_at);
-    jobPublished.checked = !!job.published;
     var hasBefore = !!photoByKind(job.job_photos, "before");
     var hasAfter = !!photoByKind(job.job_photos, "after");
     beforeCurrent.hidden = !hasBefore;
     afterCurrent.hidden = !hasAfter;
+    afterLaterCurrent.hidden = !hasAfter;
     if (hasBefore) {
       beforePreview.src = publicPhotoUrl(photoByKind(job.job_photos, "before").storage_path);
       beforePreview.hidden = !beforePreview.src;
     }
     if (hasAfter) {
-      afterPreview.src = publicPhotoUrl(photoByKind(job.job_photos, "after").storage_path);
-      afterPreview.hidden = !afterPreview.src;
+      var url = publicPhotoUrl(photoByKind(job.job_photos, "after").storage_path);
+      afterPreview.src = url;
+      afterPreview.hidden = !url;
+      afterLaterPreview.src = url;
+      afterLaterPreview.hidden = !url;
     }
     delete jobForm.dataset.assessmentId;
     setJobFormMode(true);
@@ -2273,36 +2438,49 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   }
 
   function updateJobReviewSummary() {
-    function row(label, value) {
-      var empty = !value;
-      return (
-        '<div class="job-review-row">' +
-          '<span class="lbl">' + esc(label) + "</span>" +
-          '<span class="val' + (empty ? " is-empty" : "") + '">' +
-            esc(empty ? "—" : value) +
-          "</span>" +
-        "</div>"
-      );
+    var title = jobForm.elements.title.value.trim() || "Untitled draft";
+    var description = jobForm.elements.description.value.trim();
+    var prescribed = jobForm.elements.prescribed.value.trim();
+    var beforeUrl = "";
+    var afterUrl = "";
+    if (beforePreview && !beforePreview.hidden && beforePreview.src) beforeUrl = beforePreview.src;
+    if (afterPreview && !afterPreview.hidden && afterPreview.src) afterUrl = afterPreview.src;
+    if (!afterUrl && afterLaterPreview && !afterLaterPreview.hidden && afterLaterPreview.src) {
+      afterUrl = afterLaterPreview.src;
     }
-    var id = jobForm.elements.id.value;
-    var existing = id
-      ? cachedJobs.find(function (j) { return j.id === id; })
-      : null;
-    var beforeFile = beforeInput.files && beforeInput.files[0];
-    var afterFile = afterInput.files && afterInput.files[0];
-    var beforeOk = !!(beforeFile || (existing && photoByKind(existing.job_photos, "before")));
-    var afterOk = !!(afterFile || (existing && photoByKind(existing.job_photos, "after")));
-    var statusLabel = (jobForm.elements.status.options[jobForm.elements.status.selectedIndex] || {}).text || "";
+    var existing = currentJobRecord();
+    if (!beforeUrl && existing && photoByKind(existing.job_photos, "before")) {
+      beforeUrl = publicPhotoUrl(photoByKind(existing.job_photos, "before").storage_path);
+    }
+    if (!afterUrl && existing && photoByKind(existing.job_photos, "after")) {
+      afterUrl = publicPhotoUrl(photoByKind(existing.job_photos, "after").storage_path);
+    }
+    var agoSrc = existing && (existing.completed_at || existing.created_at);
+    var ago = agoSrc ? fmtRel(agoSrc) : "just now";
+    if (!ago || ago === "just now") ago = "just now";
+    else if (!/ago$/i.test(ago)) ago = ago + " ago";
     jobReviewSummary.innerHTML =
-      row("Title", jobForm.elements.title.value.trim()) +
-      row("Description", jobForm.elements.description.value.trim()) +
-      row("Prescribed", jobForm.elements.prescribed.value.trim()) +
-      row("Completed", jobForm.elements.completed_at.value || "") +
-      row("Status", statusLabel) +
-      row("Before", beforeOk ? "Ready" : "Missing") +
-      row("After", afterOk ? "Ready" : "Missing") +
-      row("Address", jobForm.elements.address.value.trim()) +
-      row("Notes", jobForm.elements.notes.value.trim());
+      '<article class="job-slip-preview">' +
+        '<div class="job-slip-top">' +
+          '<span class="mark" aria-hidden="true">℞</span>' +
+          '<span class="job-ago">' + esc(ago) + "</span>" +
+        "</div>" +
+        '<div class="job-pair">' +
+          (beforeUrl
+            ? '<div class="job-shot job-before"><img src="' + escAttr(beforeUrl) + '" alt=""><i>Before</i></div>'
+            : '<div class="job-shot is-empty">Before</div>') +
+          (afterUrl
+            ? '<div class="job-shot job-after"><img src="' + escAttr(afterUrl) + '" alt=""><i>After</i></div>'
+            : '<div class="job-shot is-empty">After</div>') +
+        "</div>" +
+        "<h3>" + esc(title) + "</h3>" +
+        "<p" + (description ? "" : ' class="slip-missing"') + ">" +
+          esc(description || "Description will show here") +
+        "</p>" +
+        '<p class="svc-line"><b>Prescribed:</b> ' +
+          (prescribed ? esc(prescribed) : '<span class="slip-missing">Services</span>') +
+        "</p>" +
+      "</article>";
   }
 
   function updateJobWizardBtn() {
@@ -2310,11 +2488,37 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
       jobWizardBtn.textContent = "Continue";
       return;
     }
-    if (jobPublished.checked) {
-      jobWizardBtn.textContent = jobForm.elements.id.value ? "Save & publish" : "Publish job";
-    } else {
-      jobWizardBtn.textContent = "Save job";
+    jobWizardBtn.textContent = "Done";
+  }
+
+  function shouldSkipAfterStep() {
+    return hasAfterPhoto();
+  }
+
+  function nextJobStepIndex(from) {
+    var n = from + 1;
+    while (n <= TOTAL_JOB_STEPS) {
+      var key = jobStepKey(jobWizardSteps[n - 1]);
+      if (key === "after" && shouldSkipAfterStep()) {
+        n += 1;
+        continue;
+      }
+      return n;
     }
+    return TOTAL_JOB_STEPS;
+  }
+
+  function prevJobStepIndex(from) {
+    var n = from - 1;
+    while (n >= 1) {
+      var key = jobStepKey(jobWizardSteps[n - 1]);
+      if (key === "after" && shouldSkipAfterStep()) {
+        n -= 1;
+        continue;
+      }
+      return n;
+    }
+    return 1;
   }
 
   function renderJobStep(animate) {
@@ -2327,6 +2531,9 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     }
     jobWizardBack.hidden = currentJobStep === 1;
     jobWizardDotEls.forEach(function (d, i) {
+      var key = jobStepKey(jobWizardSteps[i]);
+      var skip = key === "after" && shouldSkipAfterStep();
+      d.style.display = skip ? "none" : "";
       d.classList.toggle("is-active", i === currentJobStep - 1);
     });
     jobWizardStatus.textContent = "Step " + currentJobStep + " of " + TOTAL_JOB_STEPS;
@@ -2338,11 +2545,15 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 
   function goToJobStep(n, animate) {
     currentJobStep = Math.max(1, Math.min(TOTAL_JOB_STEPS, n));
+    if (jobStepKey(jobWizardSteps[currentJobStep - 1]) === "after" && shouldSkipAfterStep()) {
+      currentJobStep = nextJobStepIndex(currentJobStep);
+    }
     renderJobStep(animate);
   }
 
   function isJobStepValid(step) {
     var key = jobStepKey(step);
+    if (key === "photos") return hasBeforePhoto();
     if (key === "title") {
       return !!(jobForm.elements.title.value && jobForm.elements.title.value.trim());
     }
@@ -2352,14 +2563,16 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   function markJobInvalid(step) {
     var key = jobStepKey(step);
     var target = null;
-    if (key === "before") target = beforeSlot;
-    else if (key === "after") target = afterSlot;
+    if (key === "photos") target = beforeSlot;
+    else if (key === "after") target = afterLaterSlot || afterSlot;
     else target = jobStepField(step);
     if (!target) return;
     target.classList.remove("shake");
     void target.offsetWidth;
     target.classList.add("shake");
-    var field = jobStepField(step) || (key === "before" ? beforeInput : key === "after" ? afterInput : null);
+    var field = jobStepField(step);
+    if (key === "photos") field = beforeInput;
+    if (key === "after") field = afterLaterInput;
     if (field) field.focus({ preventScroll: true });
   }
 
@@ -2370,13 +2583,32 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
       field.addEventListener(evt, function () { field.classList.remove("shake"); });
     });
   });
-  beforeInput.addEventListener("change", function () { beforeSlot.classList.remove("shake"); });
-  afterInput.addEventListener("change", function () { afterSlot.classList.remove("shake"); });
-  jobPublished.addEventListener("change", updateJobWizardBtn);
+  beforeInput.addEventListener("change", function () {
+    beforeSlot.classList.remove("shake");
+    pendingBeforeFile = beforeInput.files && beforeInput.files[0] || null;
+  });
+  afterInput.addEventListener("change", function () {
+    afterSlot.classList.remove("shake");
+    pendingAfterFile = afterInput.files && afterInput.files[0] || null;
+    if (pendingAfterFile && afterLaterPreview) {
+      var url = URL.createObjectURL(pendingAfterFile);
+      afterLaterPreview.src = url;
+      afterLaterPreview.hidden = false;
+    }
+  });
+  afterLaterInput.addEventListener("change", function () {
+    afterLaterSlot.classList.remove("shake");
+    pendingAfterFile = afterLaterInput.files && afterLaterInput.files[0] || null;
+    if (pendingAfterFile && afterPreview) {
+      var url = URL.createObjectURL(pendingAfterFile);
+      afterPreview.src = url;
+      afterPreview.hidden = false;
+    }
+  });
 
   jobWizardBack.addEventListener("click", function () {
     if (currentJobStep === 1) return;
-    goToJobStep(currentJobStep - 1, true);
+    goToJobStep(prevJobStepIndex(currentJobStep), true);
   });
 
   function todayInputValue() {
@@ -2395,11 +2627,6 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     return d.getFullYear() + "-" + m + "-" + day;
   }
 
-  function completedAtIso(dateStr) {
-    if (!dateStr) return new Date().toISOString();
-    return new Date(dateStr + "T12:00:00").toISOString();
-  }
-
   function publicPhotoUrl(path) {
     if (!path) return "";
     var { data } = sb.storage.from("job-photos").getPublicUrl(path);
@@ -2415,6 +2642,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   }
 
   function bindShotPreview(input, img) {
+    if (!input || !img) return;
     input.addEventListener("change", function () {
       var file = input.files && input.files[0];
       if (!file) {
@@ -2429,26 +2657,30 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   }
   bindShotPreview(beforeInput, beforePreview);
   bindShotPreview(afterInput, afterPreview);
+  bindShotPreview(afterLaterInput, afterLaterPreview);
 
   function clearShotUi() {
     beforeInput.value = "";
     afterInput.value = "";
-    beforePreview.hidden = true;
-    afterPreview.hidden = true;
-    beforePreview.removeAttribute("src");
-    afterPreview.removeAttribute("src");
+    afterLaterInput.value = "";
+    pendingBeforeFile = null;
+    pendingAfterFile = null;
+    [beforePreview, afterPreview, afterLaterPreview].forEach(function (img) {
+      if (!img) return;
+      img.hidden = true;
+      img.removeAttribute("src");
+    });
     beforeCurrent.hidden = true;
     afterCurrent.hidden = true;
+    afterLaterCurrent.hidden = true;
     beforeSlot.classList.remove("shake");
     afterSlot.classList.remove("shake");
+    if (afterLaterSlot) afterLaterSlot.classList.remove("shake");
   }
 
   function resetJobForm() {
     jobForm.reset();
     jobForm.elements.id.value = "";
-    jobForm.elements.status.value = "complete";
-    jobForm.elements.completed_at.value = todayInputValue();
-    jobPublished.checked = true;
     delete jobForm.dataset.assessmentId;
     clearShotUi();
     showJobError("");
@@ -2491,30 +2723,106 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     return { path: path };
   }
 
-  async function loadJobs() {
-    showError(appError, "");
-    jobsList.innerHTML = '<p class="loading">Loading…</p>';
-    var { data: jobs, error } = await sb.from("jobs")
-      .select("*, job_photos(*)")
-      .order("created_at", { ascending: false });
-    if (error) {
-      jobsList.innerHTML = "";
-      showError(appError, error.message + (error.message.indexOf("description") >= 0 || error.message.indexOf("published") >= 0
-        ? " — run supabase/prescription_jobs.sql in the SQL Editor."
-        : ""));
-      return;
+  function draftPayloadFromForm() {
+    var title = jobForm.elements.title.value.trim() || "Untitled draft";
+    var payload = {
+      title: title,
+      description: jobForm.elements.description.value.trim() || null,
+      prescribed: jobForm.elements.prescribed.value.trim() || null,
+      address: jobForm.elements.address.value.trim() || null,
+      notes: jobForm.elements.notes.value.trim() || null,
+      status: "planned",
+      published: false
+    };
+    if (jobForm.dataset.assessmentId) {
+      payload.assessment_request_id = jobForm.dataset.assessmentId;
     }
-    cachedJobs = jobs || [];
+    return payload;
+  }
+
+  async function saveDraftStep() {
+    if (jobDraftSaving) return { ok: true };
+    jobDraftSaving = true;
+    try {
+      var id = jobForm.elements.id.value;
+      var payload = draftPayloadFromForm();
+      var res = id
+        ? await sb.from("jobs").update(payload).eq("id", id).select("*, job_photos(*)").single()
+        : await sb.from("jobs").insert(payload).select("*, job_photos(*)").single();
+      if (res.error) return { error: res.error };
+
+      jobForm.elements.id.value = res.data.id;
+      var idx = cachedJobs.findIndex(function (j) { return j.id === res.data.id; });
+      if (idx >= 0) cachedJobs[idx] = res.data;
+      else cachedJobs.unshift(res.data);
+
+      var beforeFile = pendingBeforeFile || (beforeInput.files && beforeInput.files[0]);
+      var afterFile = pendingAfterFile
+        || (afterInput.files && afterInput.files[0])
+        || (afterLaterInput.files && afterLaterInput.files[0]);
+
+      if (beforeFile) {
+        var upB = await uploadKindPhoto(res.data.id, beforeFile, "before");
+        if (upB.error) return { error: upB.error };
+        pendingBeforeFile = null;
+        beforeInput.value = "";
+      }
+      if (afterFile) {
+        var upA = await uploadKindPhoto(res.data.id, afterFile, "after");
+        if (upA.error) return { error: upA.error };
+        pendingAfterFile = null;
+        afterInput.value = "";
+        afterLaterInput.value = "";
+      }
+
+      // refresh photos on cached row
+      var refreshed = await sb.from("jobs").select("*, job_photos(*)").eq("id", res.data.id).single();
+      if (!refreshed.error && refreshed.data) {
+        var i2 = cachedJobs.findIndex(function (j) { return j.id === refreshed.data.id; });
+        if (i2 >= 0) cachedJobs[i2] = refreshed.data;
+        beforeCurrent.hidden = !photoByKind(refreshed.data.job_photos, "before");
+        afterCurrent.hidden = !photoByKind(refreshed.data.job_photos, "after");
+        afterLaterCurrent.hidden = afterCurrent.hidden;
+      }
+      return { ok: true, job: refreshed.data || res.data };
+    } finally {
+      jobDraftSaving = false;
+    }
+  }
+
+  function jobBucketOf(job) {
+    if (job.status === "archived") return "archived";
+    if (job.published) return "live";
+    return "draft";
+  }
+
+  function jobsForBucket(bucket) {
+    return cachedJobs.filter(function (j) { return jobBucketOf(j) === bucket; });
+  }
+
+  function renderJobsList() {
+    var rows = jobsForBucket(jobBucket);
     if (!cachedJobs.length) {
       jobsList.innerHTML =
-        '<div class="empty">No jobs yet.' +
-        '<span class="empty-sub">Tap + to post one.</span></div>';
+        '<div class="empty">' +
+          '<button type="button" class="empty-cta" id="emptyJobsAdd">Click here to add a new job</button>' +
+          '<span class="empty-sub">No jobs yet.</span>' +
+        "</div>";
+      var emptyBtn = document.getElementById("emptyJobsAdd");
+      if (emptyBtn) emptyBtn.addEventListener("click", function () { jobAddBtn.click(); });
+      return;
+    }
+    if (!rows.length) {
+      jobsList.innerHTML =
+        '<div class="empty">' +
+          '<span class="empty-sub">No ' + esc(jobBucket) + " jobs.</span>" +
+        "</div>";
       return;
     }
 
     var html = "";
-    for (var i = 0; i < cachedJobs.length; i++) {
-      var job = cachedJobs[i];
+    for (var i = 0; i < rows.length; i++) {
+      var job = rows[i];
       var photos = job.job_photos || [];
       photos.sort(function (a, b) { return (a.sort_order || 0) - (b.sort_order || 0); });
       var photoHtml = "";
@@ -2528,11 +2836,29 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
             (label ? "<figcaption>" + esc(label) + "</figcaption>" : "") +
           "</figure>";
       }
+      var bucket = jobBucketOf(job);
       var metaBits = [];
-      if (job.published) metaBits.push("On site");
+      if (bucket === "live") metaBits.push("On site");
+      if (bucket === "draft") metaBits.push("Draft");
       if (job.completed_at) metaBits.push(fmtDate(job.completed_at));
       else metaBits.push(fmtDate(job.created_at));
       if (job.address) metaBits.push(job.address);
+      var actions = "";
+      if (bucket === "draft") {
+        actions =
+          '<button type="button" class="pill ghost" data-edit-job="' + job.id + '">Continue</button>' +
+          '<button type="button" class="pill" data-publish-job="' + job.id + '">Publish</button>' +
+          '<button type="button" class="pill ghost" data-archive-job="' + job.id + '">Archive</button>';
+      } else if (bucket === "live") {
+        actions =
+          '<button type="button" class="pill ghost" data-edit-job="' + job.id + '">Edit</button>' +
+          '<button type="button" class="pill ghost" data-unpublish-job="' + job.id + '">Unpublish</button>' +
+          '<button type="button" class="pill ghost" data-archive-job="' + job.id + '">Archive</button>';
+      } else {
+        actions =
+          '<button type="button" class="pill ghost" data-edit-job="' + job.id + '">Edit</button>' +
+          '<button type="button" class="pill ghost" data-restore-job="' + job.id + '">Restore</button>';
+      }
       html +=
         '<article class="card" data-job="' + job.id + '">' +
           '<div class="card-top">' +
@@ -2540,23 +2866,19 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
               "<h3>" + esc(job.title) + "</h3>" +
               '<p class="meta">' + esc(metaBits.join(" · ")) + "</p>" +
             "</div>" +
-            (job.published
-              ? '<span class="badge live">Live</span>'
-              : '<span class="badge ' + esc(job.status) + '">' + esc(job.status.replace("_", " ")) + "</span>") +
+            '<span class="badge ' + esc(bucket) + '">' + esc(bucket) + "</span>" +
           "</div>" +
           (job.description ? '<div class="card-body"><div>' + esc(job.description) + "</div></div>" : "") +
           (job.prescribed ? '<div class="card-body"><div><b>Prescribed:</b> ' + esc(job.prescribed) + "</div></div>" : "") +
           (photoHtml ? '<div class="photos">' + photoHtml + "</div>" : "") +
-          '<div class="card-actions">' +
-            '<button type="button" class="pill ghost" data-edit-job="' + job.id + '">Edit</button>' +
-            '<button type="button" class="pill ghost" data-toggle-pub="' + job.id + '">' +
-              (job.published ? "Unpublish" : "Publish") +
-            "</button>" +
-          "</div>" +
+          '<div class="card-actions">' + actions + "</div>" +
         "</article>";
     }
     jobsList.innerHTML = html;
+    bindJobListActions();
+  }
 
+  function bindJobListActions() {
     jobsList.querySelectorAll("[data-edit-job]").forEach(function (btn) {
       btn.addEventListener("click", function () {
         var job = cachedJobs.find(function (j) { return j.id === btn.getAttribute("data-edit-job"); });
@@ -2573,28 +2895,113 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
       });
     });
 
-    jobsList.querySelectorAll("[data-toggle-pub]").forEach(function (btn) {
+    jobsList.querySelectorAll("[data-publish-job]").forEach(function (btn) {
       btn.addEventListener("click", async function () {
-        var job = cachedJobs.find(function (j) { return j.id === btn.getAttribute("data-toggle-pub"); });
+        var job = cachedJobs.find(function (j) { return j.id === btn.getAttribute("data-publish-job"); });
         if (!job) return;
-        var next = !job.published;
-        if (next) {
-          var b = photoByKind(job.job_photos, "before");
-          var a = photoByKind(job.job_photos, "after");
-          if (!b || !a) {
-            showError(appError, "Add before and after photos before publishing.");
-            return;
-          }
+        var b = photoByKind(job.job_photos, "before");
+        var a = photoByKind(job.job_photos, "after");
+        if (!b || !a) {
+          showError(appError, "Add before and after photos before publishing.");
+          return;
+        }
+        if (!job.title || job.title === "Untitled draft") {
+          showError(appError, "Add a title before publishing.");
+          return;
+        }
+        if (!job.prescribed) {
+          showError(appError, "Add prescribed services before publishing.");
+          return;
         }
         var res = await sb.from("jobs").update({
-          published: next,
-          status: next ? "complete" : job.status,
+          published: true,
+          status: "complete",
           completed_at: job.completed_at || new Date().toISOString()
         }).eq("id", job.id);
         if (res.error) { showError(appError, res.error.message); return; }
+        jobBucket = "live";
+        document.querySelectorAll("[data-job-bucket]").forEach(function (b) {
+          var on = b.getAttribute("data-job-bucket") === "live";
+          b.classList.toggle("is-active", on);
+          b.setAttribute("aria-selected", on ? "true" : "false");
+        });
         loadJobs();
       });
     });
+
+    jobsList.querySelectorAll("[data-unpublish-job]").forEach(function (btn) {
+      btn.addEventListener("click", async function () {
+        var job = cachedJobs.find(function (j) { return j.id === btn.getAttribute("data-unpublish-job"); });
+        if (!job) return;
+        var res = await sb.from("jobs").update({
+          published: false,
+          status: "planned"
+        }).eq("id", job.id);
+        if (res.error) { showError(appError, res.error.message); return; }
+        jobBucket = "draft";
+        document.querySelectorAll("[data-job-bucket]").forEach(function (b) {
+          var on = b.getAttribute("data-job-bucket") === "draft";
+          b.classList.toggle("is-active", on);
+          b.setAttribute("aria-selected", on ? "true" : "false");
+        });
+        loadJobs();
+      });
+    });
+
+    jobsList.querySelectorAll("[data-archive-job]").forEach(function (btn) {
+      btn.addEventListener("click", async function () {
+        var job = cachedJobs.find(function (j) { return j.id === btn.getAttribute("data-archive-job"); });
+        if (!job) return;
+        var res = await sb.from("jobs").update({
+          status: "archived",
+          published: false
+        }).eq("id", job.id);
+        if (res.error) { showError(appError, res.error.message); return; }
+        jobBucket = "archived";
+        document.querySelectorAll("[data-job-bucket]").forEach(function (b) {
+          var on = b.getAttribute("data-job-bucket") === "archived";
+          b.classList.toggle("is-active", on);
+          b.setAttribute("aria-selected", on ? "true" : "false");
+        });
+        loadJobs();
+      });
+    });
+
+    jobsList.querySelectorAll("[data-restore-job]").forEach(function (btn) {
+      btn.addEventListener("click", async function () {
+        var job = cachedJobs.find(function (j) { return j.id === btn.getAttribute("data-restore-job"); });
+        if (!job) return;
+        var res = await sb.from("jobs").update({
+          status: "planned",
+          published: false
+        }).eq("id", job.id);
+        if (res.error) { showError(appError, res.error.message); return; }
+        jobBucket = "draft";
+        document.querySelectorAll("[data-job-bucket]").forEach(function (b) {
+          var on = b.getAttribute("data-job-bucket") === "draft";
+          b.classList.toggle("is-active", on);
+          b.setAttribute("aria-selected", on ? "true" : "false");
+        });
+        loadJobs();
+      });
+    });
+  }
+
+  async function loadJobs() {
+    showError(appError, "");
+    jobsList.innerHTML = '<p class="loading">Loading…</p>';
+    var { data: jobs, error } = await sb.from("jobs")
+      .select("*, job_photos(*)")
+      .order("created_at", { ascending: false });
+    if (error) {
+      jobsList.innerHTML = "";
+      showError(appError, error.message + (error.message.indexOf("description") >= 0 || error.message.indexOf("published") >= 0
+        ? " — run supabase/prescription_jobs.sql in the SQL Editor."
+        : ""));
+      return;
+    }
+    cachedJobs = jobs || [];
+    renderJobsList();
   }
 
   function sanitizeFile(name) {
@@ -2609,113 +3016,38 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
       markJobInvalid(step);
       return;
     }
-    if (currentJobStep < TOTAL_JOB_STEPS) {
-      goToJobStep(currentJobStep + 1, true);
-      return;
-    }
 
     var btn = jobWizardBtn;
-    var id = jobForm.elements.id.value;
-    var beforeFile = beforeInput.files && beforeInput.files[0];
-    var afterFile = afterInput.files && afterInput.files[0];
-    var editing = !!id;
-    var existing = editing
-      ? cachedJobs.find(function (j) { return j.id === id; })
-      : null;
-    var hasBefore = !!(beforeFile || (existing && photoByKind(existing.job_photos, "before")));
-    var hasAfter = !!(afterFile || (existing && photoByKind(existing.job_photos, "after")));
-    var publish = !!jobPublished.checked;
-    var title = jobForm.elements.title.value.trim();
-    var description = jobForm.elements.description.value.trim();
-    var prescribed = jobForm.elements.prescribed.value.trim();
-
-    if (!title) {
-      showJobError("Title is required.");
-      goToJobStep(stepIndexByKey("title"), true);
-      markJobInvalid(jobWizardSteps[stepIndexByKey("title") - 1]);
-      return;
-    }
-    if (publish) {
-      if (!description) {
-        showJobError("Description is required to show on the site.");
-        goToJobStep(stepIndexByKey("description"), true);
-        markJobInvalid(jobWizardSteps[stepIndexByKey("description") - 1]);
-        return;
-      }
-      if (!prescribed) {
-        showJobError("Prescribed line is required to show on the site.");
-        goToJobStep(stepIndexByKey("prescribed"), true);
-        markJobInvalid(jobWizardSteps[stepIndexByKey("prescribed") - 1]);
-        return;
-      }
-      if (!hasBefore) {
-        showJobError("Before photo is required to show on the site.");
-        goToJobStep(stepIndexByKey("before"), true);
-        markJobInvalid(jobWizardSteps[stepIndexByKey("before") - 1]);
-        return;
-      }
-      if (!hasAfter) {
-        showJobError("After photo is required to show on the site.");
-        goToJobStep(stepIndexByKey("after"), true);
-        markJobInvalid(jobWizardSteps[stepIndexByKey("after") - 1]);
-        return;
-      }
-    }
-
     btn.disabled = true;
     var prevLabel = btn.textContent;
-    btn.textContent = publish ? "Publishing…" : "Saving…";
-    var payload = {
-      title: title,
-      description: description || null,
-      prescribed: prescribed || null,
-      address: jobForm.elements.address.value.trim() || null,
-      status: jobForm.elements.status.value,
-      notes: jobForm.elements.notes.value.trim() || null,
-      completed_at: jobForm.elements.completed_at.value
-        ? completedAtIso(jobForm.elements.completed_at.value)
-        : (publish ? new Date().toISOString() : null),
-      published: publish
-    };
-    if (publish) payload.status = "complete";
-    if (jobForm.dataset.assessmentId) {
-      payload.assessment_request_id = jobForm.dataset.assessmentId;
-    }
+    btn.textContent = "Saving…";
 
-    var res = editing
-      ? await sb.from("jobs").update(payload).eq("id", id).select().single()
-      : await sb.from("jobs").insert(payload).select().single();
-    if (res.error) {
+    var saved = await saveDraftStep();
+    if (saved.error) {
       btn.disabled = false;
       btn.textContent = prevLabel;
-      showJobError(res.error.message + (String(res.error.message).indexOf("column") >= 0
-        ? " — run supabase/prescription_jobs.sql in the SQL Editor."
+      showJobError(saved.error.message + (String(saved.error.message).indexOf("column") >= 0
+        ? " — run supabase/setup.sql in the SQL Editor."
         : ""));
       return;
     }
 
-    var jobId = res.data.id;
-    if (beforeFile) {
-      var upB = await uploadKindPhoto(jobId, beforeFile, "before");
-      if (upB.error) {
-        btn.disabled = false;
-        btn.textContent = prevLabel;
-        showJobError(upB.error.message);
-        return;
-      }
-    }
-    if (afterFile) {
-      var upA = await uploadKindPhoto(jobId, afterFile, "after");
-      if (upA.error) {
-        btn.disabled = false;
-        btn.textContent = prevLabel;
-        showJobError(upA.error.message);
-        return;
-      }
+    btn.disabled = false;
+    btn.textContent = prevLabel;
+
+    if (currentJobStep < TOTAL_JOB_STEPS) {
+      goToJobStep(nextJobStepIndex(currentJobStep), true);
+      return;
     }
 
-    btn.disabled = false;
     resetJobForm();
+    setHomeMode("jobs");
+    jobBucket = "draft";
+    document.querySelectorAll("[data-job-bucket]").forEach(function (b) {
+      var on = b.getAttribute("data-job-bucket") === "draft";
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
     closeJobModal(function () { loadJobs(); });
   });
 
@@ -2726,16 +3058,6 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
     goToJobStep(1, false);
   });
   document.getElementById("refreshJobs").addEventListener("click", loadJobs);
-  jobAddBtn.addEventListener("click", function () {
-    if (jobBusy) return;
-    if (!jobModal.hidden) {
-      closeJobModal();
-      return;
-    }
-    resetJobForm();
-    setJobFormMode(false);
-    openJobModal(jobAddBtn, { label: "Post a job" });
-  });
 
   function esc(s) {
     return String(s == null ? "" : s)

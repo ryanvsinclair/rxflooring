@@ -311,14 +311,14 @@ a:hover{color:var(--accent-hover);}
   </div>
 
   <div class="picker" role="tablist" aria-label="Concept">
-    <button type="button" class="is-active" data-concept="1">1 · Lists in drawer</button>
-    <button type="button" data-concept="2">2 · Bookings / Jobs modes</button>
+    <button type="button" data-concept="1">1 · Lists in drawer</button>
+    <button type="button" class="is-active" data-concept="2">2 · Bookings / Jobs modes</button>
     <button type="button" data-concept="3">3 · Drawer filters main</button>
   </div>
 
   <p class="blurb" id="blurb">
-    <span class="tag">Concept 1</span>
-    <strong>Jobs tab = add only.</strong> Swipe/tap the bottom bar grab to open a sheet with Live · Draft · Archive and the job cards. Publish / Archive from the sheet. Requests stay booking-only.
+    <span class="tag">Chosen</span>
+    <strong>Concept 2 is selected for implementation.</strong> Home screen toggles Bookings | Jobs. Live / Draft / Archive live in Jobs mode. Bottom “Add job” opens the wizard. Publish from the Draft list.
   </p>
 
   <div class="stage">
@@ -326,11 +326,11 @@ a:hover{color:var(--accent-hover);}
       <div class="phone-notch"><span></span></div>
       <header class="app-bar">
         <div class="brand"><span class="m">℞</span> Manager</div>
-        <div class="hint" id="phoneHint">Concept 1</div>
+        <div class="hint" id="phoneHint">Concept 2</div>
       </header>
 
       <!-- ========== CONCEPT 1 ========== -->
-      <div class="screen concept" data-concept-panel="1">
+      <div class="screen concept" data-concept-panel="1" hidden>
         <div class="screen-body" id="c1Body">
           <div class="toolbar">
             <select aria-label="Request filter" style="flex:1">
@@ -379,7 +379,7 @@ a:hover{color:var(--accent-hover);}
       </div>
 
       <!-- ========== CONCEPT 2 ========== -->
-      <div class="screen concept" data-concept-panel="2" hidden>
+      <div class="screen concept" data-concept-panel="2">
         <div class="screen-body">
           <div class="toolbar">
             <div class="seg" role="tablist" aria-label="Screen mode">
@@ -498,7 +498,7 @@ a:hover{color:var(--accent-hover);}
 
   var blurbs = {
     "1": '<span class="tag">Concept 1</span><strong>Jobs tab = add only.</strong> Swipe/tap the bottom bar grab to open a sheet with Live · Draft · Archive and the job cards. Publish &amp; archive from the sheet. Requests stay booking-only.',
-    "2": '<span class="tag">Concept 2</span><strong>One Home screen with Bookings | Jobs modes.</strong> Job list (and Live/Draft/Archive) lives up top. Bottom “Add job” only starts the wizard. Drawer not required.',
+    "2": '<span class="tag">Chosen</span><strong>Concept 2 is selected for implementation.</strong> Home screen toggles Bookings | Jobs. Live / Draft / Archive live in Jobs mode. Bottom “Add job” opens the wizard. Publish from the Draft list.',
     "3": '<span class="tag">Concept 3</span><strong>Drawer is just a filter picker.</strong> Jobs tab shows an add-only screen. Pick Live/Draft/Archive in the sheet → drawer closes → that list becomes the main page.'
   };
 
