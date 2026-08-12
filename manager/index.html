@@ -86,7 +86,15 @@ body{
 a{color:var(--accent); text-decoration:none;}
 a:hover{color:var(--accent-hover);}
 :focus,:focus-visible{outline:none;}
-button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparent;}
+*,*::before,*::after{-webkit-tap-highlight-color:transparent;}
+button,a,select,input,textarea,[tabindex]{
+  -webkit-tap-highlight-color:transparent;
+  tap-highlight-color:transparent;
+}
+button{
+  -webkit-appearance:none;
+  appearance:none;
+}
 .wrap{max-width:var(--wide); margin:0 auto; padding:0 var(--gut); width:100%; box-sizing:border-box;}
 [hidden]{display:none !important;}
 
@@ -267,6 +275,36 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 .badge.draft{background:rgba(75,124,255,.16); color:#9BB6FF;}
 .card-body{margin-top:12px; display:grid; gap:6px; font-size:14.5px; color:var(--body);}
 .card-actions{margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+.card-actions .pill:hover,
+.card-actions .pill:active,
+.card-actions .pill:focus,
+.card-actions .pill:focus-visible{
+  outline:none;
+  box-shadow:none;
+}
+.card-actions .pill.ghost:hover,
+.card-actions .pill.ghost:active,
+.card-actions .pill.ghost:focus,
+.card-actions .pill.ghost:focus-visible{
+  background:transparent;
+  color:var(--ink);
+  border-color:var(--edge);
+}
+.card-actions .pill:not(.ghost):not(.danger):hover,
+.card-actions .pill:not(.ghost):not(.danger):active,
+.card-actions .pill:not(.ghost):not(.danger):focus,
+.card-actions .pill:not(.ghost):not(.danger):focus-visible{
+  background:var(--accent);
+  color:var(--on-accent);
+}
+.card-actions .pill.danger:hover,
+.card-actions .pill.danger:active,
+.card-actions .pill.danger:focus,
+.card-actions .pill.danger:focus-visible{
+  background:transparent;
+  color:var(--danger);
+  border-color:rgba(229,115,104,.4);
+}
 .card-actions select{
   border:1px solid var(--rule); border-radius:10px; padding:8px 10px; background:rgba(255,255,255,.06); color:var(--ink);
 }
@@ -327,6 +365,11 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   -webkit-overflow-scrolling:touch;
 }
 .req-list > .empty{width:100%; box-sizing:border-box;}
+.req-list,.list,.req-row,.req-line,.card{
+  -webkit-touch-callout:none;
+  user-select:none;
+  -webkit-user-select:none;
+}
 .req-row{
   border-radius:22px;
   border:1px solid var(--edge);
@@ -365,8 +408,14 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
 }
-.req-line:hover .req-summary{background:rgba(255,255,255,.12);}
-.req-summary:focus,.req-summary:focus-visible{outline:none;}
+.req-summary:hover,
+.req-summary:focus,
+.req-summary:focus-visible,
+.req-summary:active{
+  background:transparent;
+  outline:none;
+  box-shadow:none;
+}
 .req-main{
   min-width:0;
   display:flex; flex-direction:column; gap:1px;
@@ -404,8 +453,16 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   cursor:pointer;
   transition:background .16s ease, border-color .16s ease;
 }
-.req-call:hover{background:rgba(255,255,255,.14); color:var(--ink); border-color:var(--edge-hover);}
-.req-call:focus,.req-call:focus-visible{outline:none;}
+.req-call:hover,
+.req-call:focus,
+.req-call:focus-visible,
+.req-call:active{
+  background:rgba(255,255,255,.06);
+  color:var(--ink);
+  border-color:var(--edge);
+  outline:none;
+  box-shadow:0 0 0 1px rgba(29,36,43,.08);
+}
 .req-call svg{flex-shrink:0; display:block;}
 .req-chev-btn{
   flex:0 0 auto;
@@ -425,8 +482,14 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
 }
-.req-chev-btn:hover{background:rgba(255,255,255,.12); color:var(--ink);}
-.req-chev-btn:focus,.req-chev-btn:focus-visible{outline:none;}
+.req-chev-btn:hover,
+.req-chev-btn:focus,
+.req-chev-btn:focus-visible,
+.req-chev-btn:active{
+  background:transparent;
+  color:var(--muted);
+  outline:none;
+}
 .req-chev{width:18px; height:18px; flex-shrink:0; color:inherit;}
 
 /* Morph shell — copy of Book .morph (index.html) */
