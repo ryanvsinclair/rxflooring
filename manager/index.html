@@ -2113,7 +2113,7 @@ select{
         btn.setAttribute("aria-expanded", open ? "true" : "false");
       }
       function applyStatus(value) {
-        if (label) label.textContent = value;
+        if (label) label.textContent = statusDisplay(value);
         menu.querySelectorAll("[data-value]").forEach(function (opt) {
           var on = opt.getAttribute("data-value") === value;
           opt.classList.toggle("is-selected", on);
@@ -2141,12 +2141,12 @@ select{
           var srcBadge = reqLastRow && reqLastRow.querySelector(".badge");
           if (srcBadge) {
             srcBadge.className = "badge " + value;
-            srcBadge.textContent = value;
+            srcBadge.textContent = statusDisplay(value);
           }
           var modalBadge = reqModalBody.querySelector(".badge");
           if (modalBadge) {
             modalBadge.className = "badge " + value;
-            modalBadge.textContent = value;
+            modalBadge.textContent = statusDisplay(value);
           }
         });
       });
@@ -2191,28 +2191,29 @@ select{
   }
   function reqStatusOption(value, current) {
     var on = value === current;
+    var label = String(value || "").replace(/_/g, " ");
+    label = label.charAt(0).toUpperCase() + label.slice(1);
     return '<li role="presentation"><button type="button" role="option" data-value="' + value +
       '" aria-selected="' + (on ? "true" : "false") + '"' +
-      (on ? ' class="is-selected"' : "") + ">" + value.replace("_", " ") + "</button></li>";
+      (on ? ' class="is-selected"' : "") + ">" + label + "</button></li>";
+  }
+  function statusDisplay(value) {
+    var s = String(value || "").replace(/_/g, " ");
+    return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
   }
   function fillRequestModal(row) {
     var tel = telHref(row.phone);
     var phoneVal = tel
       ? '<a href="tel:' + escAttr(tel) + '">' + esc(row.phone) + "</a>"
       : "—";
-    var snipParts = [];
-    if (row.preferred_date) snipParts.push(fmtDay(row.preferred_date).replace(/,.*/, ""));
-    else if (row.address) snipParts.push(String(row.address).split(",")[0]);
-    var sub = snipParts.join(" · ");
     var status = row.status || "new";
     reqModalBody.innerHTML =
       '<div class="req-modal-head">' +
         "<div>" +
           "<h2 id=\"reqModalTitle\">" + esc(row.name || "Request") + "</h2>" +
-          '<span class="badge ' + esc(status) + '" style="margin-top:10px;">' + esc(status) + "</span>" +
+          '<span class="badge ' + esc(status) + '" style="margin-top:10px;">' + esc(statusDisplay(status)) + "</span>" +
         "</div>" +
       "</div>" +
-      (sub ? '<p class="req-modal-sub">' + esc(sub) + "</p>" : "") +
       '<div class="req-fields">' +
         '<div class="req-field"><span class="lbl">Phone</span><span class="val">' + phoneVal + "</span></div>" +
         '<div class="req-field"><span class="lbl">Address</span><span class="val">' + esc(row.address || "—") + "</span></div>" +
@@ -2231,7 +2232,7 @@ select{
       '<div class="req-actions">' +
         '<div class="status-dd" data-status="' + row.id + '">' +
           '<button type="button" class="status-dd-btn" aria-label="Status" aria-haspopup="listbox" aria-expanded="false">' +
-            '<span class="status-dd-label">' + esc(status) + "</span>" +
+            '<span class="status-dd-label">' + esc(statusDisplay(status)) + "</span>" +
             '<svg class="status-dd-chev" viewBox="0 0 12 8" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m1.5 1.5 4.5 4.5 4.5-4.5"/></svg>' +
           "</button>" +
           '<ul class="status-dd-menu" role="listbox" aria-label="Status" hidden>' +
@@ -2544,7 +2545,7 @@ select{
                 '<p class="req-name">' + esc(row.name) + "</p>" +
                 (snip ? '<p class="req-snip" title="' + escAttr(fmtDate(row.created_at)) + '">' + esc(snip) + "</p>" : "") +
               "</div>" +
-              '<span class="badge ' + esc(row.status) + '">' + esc(row.status) + "</span>" +
+              '<span class="badge ' + esc(row.status) + '">' + esc(statusDisplay(row.status)) + "</span>" +
             "</button>" +
             callBtn +
             '<button type="button" class="req-chev-btn" aria-expanded="false" aria-controls="' + dialogId + '" aria-label="Open request details">' +
