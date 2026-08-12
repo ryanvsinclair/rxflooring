@@ -101,6 +101,9 @@ select{
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
 }
+select{
+  color-scheme:light;
+}
 .wrap{max-width:var(--wide); margin:0 auto; padding:0 var(--gut); width:100%; box-sizing:border-box;}
 [hidden]{display:none !important;}
 
@@ -352,7 +355,8 @@ select{
   border-color:rgba(192,57,43,.35);
 }
 .card-actions select{
-  border:1px solid var(--rule); border-radius:10px; padding:8px 10px; background:var(--panel); color:var(--ink);
+  border:1px solid var(--rule); border-radius:10px; padding:8px 10px;
+  background-color:#FFFFFF; color:#1D242B; color-scheme:light;
 }
 .card-actions select:hover,
 .card-actions select:active,
@@ -360,8 +364,12 @@ select{
 .card-actions select:focus-visible{
   outline:none;
   border-color:var(--rule);
-  background:var(--panel);
-  color:var(--ink);
+  background-color:#FFFFFF;
+  color:#1D242B;
+}
+.card-actions select option{
+  background-color:#FFFFFF;
+  color:#1D242B;
 }
 .empty{
   border:1px dashed var(--rule); border-radius:16px; padding:36px 20px;
@@ -693,13 +701,16 @@ select{
   border:1px solid var(--rule);
   border-radius:12px;
   padding:10px 12px;
-  background:var(--panel);
   min-height:44px; flex:1 1 140px;
-  color:var(--ink);
+  color:#1D242B;
+  color-scheme:light;
+  appearance:none;
+  -webkit-appearance:none;
+  background-color:#FFFFFF;
 }
 .req-actions .pill{
   min-height:44px;
-  background:var(--panel);
+  background-color:#FFFFFF;
   color:var(--ink);
   border:1px solid var(--rule);
 }
@@ -707,19 +718,24 @@ select{
 .req-actions .pill:active,
 .req-actions .pill:focus,
 .req-actions .pill:focus-visible{
-  background:var(--panel);
+  background-color:#FFFFFF;
   color:var(--ink);
   border-color:var(--rule);
   outline:none;
 }
-.req-actions .pill.ghost{background:var(--panel);}
+.req-actions .pill.ghost{background-color:#FFFFFF;}
 .req-actions select:hover,
 .req-actions select:active,
 .req-actions select:focus,
 .req-actions select:focus-visible{
   outline:none;
   border-color:var(--rule);
-  background:var(--panel);
+  background-color:#FFFFFF;
+  color:#1D242B;
+}
+.req-actions select option{
+  background-color:#FFFFFF;
+  color:#1D242B;
 }
 @media(prefers-reduced-motion:reduce){
   .req-modal-reveal > *,.req-modal-card > .req-modal-x{opacity:1; transform:none; animation:none !important;}
@@ -736,15 +752,14 @@ select{
   width:100%;
 }
 .panel-toolbar.is-split{justify-content:space-between;}
-.panel-toolbar .pill,
-.panel-toolbar select{
+.panel-toolbar .pill{
   min-height:40px;
   padding:8px 14px;
   font-size:13px;
   color:var(--ink);
   border:1px solid var(--rule);
   border-radius:980px;
-  background:var(--panel);
+  background-color:#FFFFFF;
   box-shadow:var(--shadow);
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
@@ -752,35 +767,64 @@ select{
 .panel-toolbar .pill:hover,
 .panel-toolbar .pill:active,
 .panel-toolbar .pill:focus,
-.panel-toolbar .pill:focus-visible,
-.panel-toolbar select:hover,
-.panel-toolbar select:active,
-.panel-toolbar select:focus,
-.panel-toolbar select:focus-visible{
-  background:var(--panel);
+.panel-toolbar .pill:focus-visible{
+  background-color:#FFFFFF;
   color:var(--ink);
   border-color:var(--rule);
   outline:none;
   box-shadow:var(--shadow);
 }
-.panel-toolbar .pill.ghost{background:var(--panel);}
+.panel-toolbar .pill.ghost{background-color:#FFFFFF;}
 .panel-toolbar .pill.ghost:hover,
 .panel-toolbar .pill.ghost:active,
 .panel-toolbar .pill.ghost:focus,
 .panel-toolbar .pill.ghost:focus-visible{
-  background:var(--panel);
+  background-color:#FFFFFF;
   color:var(--ink);
   border-color:var(--rule);
 }
-.panel-toolbar select{
+.panel-toolbar select,
+#statusFilter{
+  min-height:40px;
+  padding:8px 14px;
+  padding-right:34px;
+  font-size:13px;
+  color:#1D242B;
+  border:1px solid var(--rule);
+  border-radius:980px;
+  box-shadow:var(--shadow);
   max-width:min(100%,220px);
   appearance:none;
   -webkit-appearance:none;
-  background-color:var(--panel);
+  -moz-appearance:none;
+  color-scheme:light;
+  background-color:#FFFFFF;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath stroke='%2379828B' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='m1.5 1.5 4.5 4.5 4.5-4.5'/%3E%3C/svg%3E");
   background-repeat:no-repeat;
   background-position:right 14px center;
-  padding-right:34px;
+  background-size:12px 8px;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.panel-toolbar select:hover,
+.panel-toolbar select:active,
+.panel-toolbar select:focus,
+.panel-toolbar select:focus-visible,
+#statusFilter:hover,
+#statusFilter:active,
+#statusFilter:focus,
+#statusFilter:focus-visible{
+  color:#1D242B;
+  border-color:var(--rule);
+  outline:none;
+  box-shadow:var(--shadow);
+  /* Keep color only — never reset background shorthand (clears chevron + flashes dark) */
+  background-color:#FFFFFF;
+}
+.panel-toolbar select option,
+#statusFilter option{
+  background-color:#FFFFFF;
+  color:#1D242B;
 }
 .panel-toolbar .jobs-add{
   width:40px; height:40px; min-height:40px; padding:0;
@@ -2345,7 +2389,10 @@ select{
   }
 
   document.getElementById("refreshRequests").addEventListener("click", loadRequests);
-  statusFilter.addEventListener("change", loadRequests);
+  statusFilter.addEventListener("change", function () {
+    statusFilter.blur();
+    loadRequests();
+  });
 
   /* ---------- jobs: full-page wizard (+ / Edit) ----------
      Popup morph modal deactivated — see HTML comment above #jobPageView. */
