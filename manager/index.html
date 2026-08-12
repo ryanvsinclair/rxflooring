@@ -2201,7 +2201,6 @@ select{
       ? '<a href="tel:' + escAttr(tel) + '">' + esc(row.phone) + "</a>"
       : "—";
     var snipParts = [];
-    if (row.phone) snipParts.push(phoneShort(row.phone));
     if (row.preferred_date) snipParts.push(fmtDay(row.preferred_date).replace(/,.*/, ""));
     else if (row.address) snipParts.push(String(row.address).split(",")[0]);
     var sub = snipParts.join(" · ");
