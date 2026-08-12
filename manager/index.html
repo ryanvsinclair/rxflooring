@@ -274,12 +274,6 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   border:1px dashed var(--rule); border-radius:16px; padding:36px 20px;
   text-align:center; color:var(--muted);
 }
-.empty .empty-cta{
-  font:inherit; font-size:16px; font-weight:600; color:var(--accent);
-  background:none; border:0; padding:0; cursor:pointer;
-  text-decoration:underline; text-underline-offset:3px;
-}
-.empty .empty-cta:hover{color:var(--accent-hover);}
 .empty .empty-sub{display:block; margin-top:10px; font-size:13.5px;}
 
 /* Concept 2: Home mode switch + job buckets */
@@ -2836,13 +2830,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
   function renderJobsList() {
     var rows = jobsForBucket(jobBucket);
     if (!cachedJobs.length) {
-      jobsList.innerHTML =
-        '<div class="empty">' +
-          '<button type="button" class="empty-cta" id="emptyJobsAdd">Click here to add a new job</button>' +
-          '<span class="empty-sub">No jobs yet.</span>' +
-        "</div>";
-      var emptyBtn = document.getElementById("emptyJobsAdd");
-      if (emptyBtn) emptyBtn.addEventListener("click", function () { jobAddBtn.click(); });
+      jobsList.innerHTML = '<div class="empty">No jobs yet.</div>';
       return;
     }
     if (!rows.length) {
