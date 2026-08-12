@@ -13,6 +13,7 @@ function draftPayloadFromForm(form, existing, selectedTitles) {
     prescribed: prescribed,
     address: form.address.trim() || null,
     notes: form.notes.trim() || null,
+    completed_at: form.completed_at || null,
   };
   if (existing) {
     payload.status = existing.status;
@@ -23,6 +24,18 @@ function draftPayloadFromForm(form, existing, selectedTitles) {
   }
   if (form.assessmentId) payload.assessment_request_id = form.assessmentId;
   return payload;
+}
+
+function todayInputValue(now) {
+  var d = now || new Date();
+  var m = String(d.getMonth() + 1).padStart(2, "0");
+  var day = String(d.getDate()).padStart(2, "0");
+  return d.getFullYear() + "-" + m + "-" + day;
+}
+
+function completedAtIso(dateStr) {
+  if (!dateStr) return null;
+  return new Date(dateStr + "T12:00:00").toISOString();
 }
 
 function jobBucketOf(job) {
@@ -47,27 +60,30 @@ function assert(cond, msg) {
 }
 
 // New draft
+var today = todayInputValue(new Date("2026-08-12T15:00:00"));
 var p1 = draftPayloadFromForm(
-  { title: "", description: "", address: "", notes: "", assessmentId: null },
+  { title: "", description: "", address: "", notes: "", completed_at: completedAtIso(today), assessmentId: null },
   null,
   []
 );
 assert(p1.title === "Untitled draft", "new draft title");
 assert(p1.published === false && p1.status === "planned", "new draft flags");
 assert(p1.prescribed === null, "no services → null prescribed");
+assert(typeof p1.completed_at === "string" && p1.completed_at.indexOf("2026-08-12") === 0, "today date saved");
 
 // Selected services become prescribed text
 var p2 = draftPayloadFromForm(
-  { title: "Living room", description: "x", address: "", notes: "", assessmentId: null },
+  { title: "Living room", description: "x", address: "", notes: "", completed_at: completedAtIso("2026-08-01"), assessmentId: null },
   { status: "complete", published: true },
   ["Carpet Installation", "LVP / LVT Installation"]
 );
 assert(p2.published === true && p2.status === "complete", "live edit preserves publish");
 assert(p2.prescribed === "Carpet Installation · LVP / LVT Installation", "prescribed from picks");
+assert(typeof p2.completed_at === "string" && p2.completed_at.indexOf("2026-08-01") === 0, "changed date kept");
 
 // Edit archived stays archived
 var p3 = draftPayloadFromForm(
-  { title: "Old job", description: "", address: "", notes: "", assessmentId: null },
+  { title: "Old job", description: "", address: "", notes: "", completed_at: null, assessmentId: null },
   { status: "archived", published: false },
   []
 );
@@ -87,4 +103,6 @@ var catalog = [
 var ids = matchServiceTitles(catalog, ["Carpet Installation", "lvp"]);
 assert(ids.join(",") === "1,2", "match by title and slug");
 
-console.log("OK — draft payload + services pick logic (9 checks)");
+assert(todayInputValue(new Date("2026-08-12T08:00:00")) === "2026-08-12", "today input value");
+
+console.log("OK — draft payload + date + services pick logic (12 checks)");

@@ -1681,7 +1681,11 @@ select{
             <label class="job-wizard-label" for="jobNotes">Internal notes <span class="wizard-optional">(optional)</span></label>
             <input id="jobNotes" name="notes" placeholder="Managers only — not on the site">
           </div>
-          <div class="job-wizard-step" data-step="8" data-key="review">
+          <div class="job-wizard-step" data-step="8" data-key="completed">
+            <label class="job-wizard-label" for="jobCompletedAt">Completed date</label>
+            <input id="jobCompletedAt" name="completed_at" type="date">
+          </div>
+          <div class="job-wizard-step" data-step="9" data-key="review">
             <label class="job-wizard-label">How it looks on the site</label>
             <div class="job-review" id="jobReviewSummary" aria-live="polite"></div>
             <p class="job-form-fine">Saved as a draft. Publish from Jobs → Draft when you are ready.</p>
@@ -2763,6 +2767,32 @@ select{
     return text;
   }
 
+  function todayInputValue() {
+    var d = new Date();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+
+  function toDateInput(iso) {
+    if (!iso) return todayInputValue();
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return todayInputValue();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+
+  function completedAtIso(dateStr) {
+    if (!dateStr) return null;
+    return new Date(dateStr + "T12:00:00").toISOString();
+  }
+
+  function setCompletedDateValue(value) {
+    if (!jobForm.elements.completed_at) return;
+    jobForm.elements.completed_at.value = value || todayInputValue();
+  }
+
   function setSelectedServiceIds(ids) {
     var set = {};
     (ids || []).forEach(function (id) { if (id) set[id] = true; });
@@ -3013,6 +3043,7 @@ select{
     syncPrescribedField();
     jobForm.elements.address.value = job.address || "";
     jobForm.elements.notes.value = job.notes || "";
+    setCompletedDateValue(toDateInput(job.completed_at || job.created_at));
     var hasBefore = !!photoByKind(job.job_photos, "before");
     var hasAfter = !!photoByKind(job.job_photos, "after");
     beforeCurrent.hidden = !hasBefore;
@@ -3056,7 +3087,12 @@ select{
     if (!afterUrl && existing && photoByKind(existing.job_photos, "after")) {
       afterUrl = publicPhotoUrl(photoByKind(existing.job_photos, "after").storage_path);
     }
-    var agoSrc = existing && (existing.completed_at || existing.created_at);
+    var agoSrc = "";
+    if (jobForm.elements.completed_at && jobForm.elements.completed_at.value) {
+      agoSrc = completedAtIso(jobForm.elements.completed_at.value);
+    } else {
+      agoSrc = existing && (existing.completed_at || existing.created_at);
+    }
     var ago = agoSrc ? fmtRel(agoSrc) : "just now";
     if (!ago || ago === "just now") ago = "just now";
     else if (!/ago$/i.test(ago)) ago = ago + " ago";
@@ -3300,6 +3336,7 @@ select{
     jobForm.elements.id.value = "";
     delete jobForm.dataset.assessmentId;
     setSelectedServiceIds([]);
+    setCompletedDateValue(todayInputValue());
     clearShotUi();
     showJobError("");
     setJobFormMode(false);
@@ -3346,12 +3383,16 @@ select{
     var title = jobForm.elements.title.value.trim() || "Untitled draft";
     var existing = currentJobRecord();
     var prescribed = syncPrescribedField() || null;
+    var completedVal = jobForm.elements.completed_at && jobForm.elements.completed_at.value
+      ? completedAtIso(jobForm.elements.completed_at.value)
+      : null;
     var payload = {
       title: title,
       description: jobForm.elements.description.value.trim() || null,
       prescribed: prescribed || null,
       address: jobForm.elements.address.value.trim() || null,
-      notes: jobForm.elements.notes.value.trim() || null
+      notes: jobForm.elements.notes.value.trim() || null,
+      completed_at: completedVal
     };
     if (existing) {
       payload.status = existing.status;
