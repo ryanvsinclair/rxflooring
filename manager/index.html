@@ -619,7 +619,15 @@ button{
   -webkit-backdrop-filter:blur(14px) saturate(140%);
   backdrop-filter:blur(14px) saturate(140%);
 }
-.req-actions .pill:hover{background:rgba(255,255,255,.14); color:var(--ink);}
+.req-actions .pill:hover,
+.req-actions .pill:active,
+.req-actions .pill:focus,
+.req-actions .pill:focus-visible{
+  background:rgba(255,255,255,.06);
+  color:var(--ink);
+  outline:none;
+  box-shadow:0 0 0 1px rgba(29,36,43,.08);
+}
 .req-actions .pill.ghost{background:rgba(255,255,255,.06);}
 @media(prefers-reduced-motion:reduce){
   .req-modal-reveal > *,.req-modal-card > .req-modal-x{opacity:1; transform:none; animation:none !important;}
