@@ -1988,6 +1988,7 @@ select{
     var sel = reqModalBody.querySelector("select[data-status]");
     if (sel) {
       sel.addEventListener("change", async function () {
+        sel.blur();
         var id = sel.getAttribute("data-status");
         var { error } = await sb.from("assessment_requests").update({ status: sel.value }).eq("id", id);
         if (error) {
