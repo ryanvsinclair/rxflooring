@@ -769,6 +769,7 @@ button{
 }
 .job-check input{width:18px; height:18px; margin-top:2px; accent-color:var(--accent); flex-shrink:0;}
 .shot-slot{
+  position:relative;
   border:1px dashed var(--rule);
   border-radius:16px;
   background:var(--bg-alt);
@@ -777,12 +778,22 @@ button{
   display:flex;
   flex-direction:column;
   gap:10px;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
 }
 .shot-slot input[type=file]{
+  position:absolute;
+  inset:0;
   width:100%;
-  font-size:14px;
-  min-height:48px;
-  color:var(--ink);
+  height:100%;
+  opacity:0;
+  margin:0;
+  padding:0;
+  border:0;
+  cursor:pointer;
+  font-size:0;
+  z-index:2;
 }
 .shot-preview{
   width:100%;
@@ -791,9 +802,28 @@ button{
   object-fit:cover;
   background:var(--panel-alt);
   border:1px solid var(--rule);
+  pointer-events:none;
+  position:relative;
+  z-index:1;
 }
 .shot-preview[hidden]{display:none !important;}
-.shot-current{font-size:12.5px; color:var(--muted); line-height:1.4; margin:0;}
+.shot-current{font-size:12.5px; color:var(--muted); line-height:1.4; margin:0; pointer-events:none; position:relative; z-index:1;}
+.shot-slot .job-wizard-label{pointer-events:none; position:relative; z-index:1;}
+.shot-empty{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:96px;
+  font-size:13px;
+  color:var(--muted);
+  text-align:center;
+  line-height:1.35;
+  pointer-events:none;
+  position:relative;
+  z-index:1;
+}
+.shot-empty[hidden]{display:none !important;}
 .shot-pair{display:grid; gap:12px;}
 @media(min-width:420px){
   .shot-pair{grid-template-columns:1fr 1fr;}
@@ -937,12 +967,6 @@ button{
   margin:0; font-size:18px; font-weight:600; letter-spacing:-.025em; color:var(--ink);
 }
 .job-page-sub{margin:2px 0 0; font-size:12.5px; color:var(--muted);}
-.job-page-badge{
-  flex-shrink:0;
-  font-size:10px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
-  padding:5px 9px; border-radius:999px;
-  background:rgba(27,77,255,.1); color:var(--accent);
-}
 .job-page-progress{
   flex-shrink:0;
   padding:12px var(--gut) 14px;
@@ -958,16 +982,14 @@ button{
   width:12.5%; transition:width .35s cubic-bezier(.22,.55,.3,1);
 }
 .job-page-progress-meta{
-  display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+  display:flex; align-items:baseline; justify-content:center; gap:12px;
 }
 .job-page-step-num{
+  margin:0;
   font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
   color:var(--muted);
 }
 .job-page-step-num span{color:var(--accent);}
-.job-page-step-label{
-  font-size:13px; font-weight:600; color:var(--ink); letter-spacing:-.01em;
-}
 #jobPageBody{
   flex:1 1 auto;
   min-height:0;
@@ -992,7 +1014,20 @@ button{
   background:var(--bg);
   position:sticky;
   bottom:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:16px;
 }
+.job-form--page .job-wizard-back{
+  position:absolute;
+  left:0;
+  top:50%;
+  transform:translateY(-50%);
+}
+.job-form--page .job-wizard-back[hidden]{visibility:hidden;}
+.job-form--page .job-wizard-dots{display:none;}
+.job-form--page .job-wizard-nav .pill{margin:0;}
 .job-form--page .job-form-fine{margin-top:14px;}
 .job-form--page .job-form-clear{margin-bottom:8px;}
 @media(prefers-reduced-motion:reduce){
@@ -1032,6 +1067,7 @@ button{
   .job-form h2{font-size:22px;}
   .job-wizard-dots{order:3; flex-basis:100%; justify-content:center; margin-top:2px;}
   .job-wizard-nav .pill{flex:1 1 auto;}
+  .job-form--page .job-wizard-nav .pill{flex:0 0 auto;}
   .gate-actions .pill{min-height:48px;}
 }
 @media(prefers-reduced-motion:reduce){
@@ -1194,14 +1230,12 @@ button{
       <h2 id="jobFormHeading">Post a job</h2>
       <p class="job-page-sub">Saved as draft after each step</p>
     </div>
-    <span class="job-page-badge">Draft</span>
   </header>
 
   <div class="job-page-progress" aria-hidden="true">
     <div class="job-page-progress-track"><div class="job-page-progress-fill" id="jobPageProgressFill"></div></div>
     <div class="job-page-progress-meta">
       <p class="job-page-step-num">Step <span id="jobPageStepNum">1</span> of 8</p>
-      <p class="job-page-step-label" id="jobPageStepLabel">Photos</p>
     </div>
   </div>
 
@@ -1219,15 +1253,17 @@ button{
             <div class="shot-pair">
               <div class="shot-slot" id="jobBeforeSlot">
                 <span class="job-wizard-label" style="margin:0;">Before</span>
+                <div class="shot-empty" id="jobBeforeEmpty">Tap to add photo</div>
                 <img class="shot-preview" id="jobBeforePreview" alt="" hidden>
-                <p class="shot-current" id="jobBeforeCurrent" hidden>Current photo on file — pick a new one to replace.</p>
-                <input id="jobBefore" name="before" type="file" accept="image/*" capture="environment">
+                <p class="shot-current" id="jobBeforeCurrent" hidden>Current photo on file — tap to replace.</p>
+                <input id="jobBefore" name="before" type="file" accept="image/*" capture="environment" aria-label="Before photo">
               </div>
               <div class="shot-slot" id="jobAfterSlot">
                 <span class="job-wizard-label" style="margin:0;">After <span class="wizard-optional">(optional)</span></span>
+                <div class="shot-empty" id="jobAfterEmpty">Tap to add photo</div>
                 <img class="shot-preview" id="jobAfterPreview" alt="" hidden>
-                <p class="shot-current" id="jobAfterCurrent" hidden>Current photo on file — pick a new one to replace.</p>
-                <input id="jobAfter" name="after" type="file" accept="image/*" capture="environment">
+                <p class="shot-current" id="jobAfterCurrent" hidden>Current photo on file — tap to replace.</p>
+                <input id="jobAfter" name="after" type="file" accept="image/*" capture="environment" aria-label="After photo">
               </div>
             </div>
           </div>
@@ -1246,9 +1282,10 @@ button{
           <div class="job-wizard-step" data-step="5" data-key="after">
             <label class="job-wizard-label" for="jobAfterLater">After photo <span class="wizard-optional">(optional)</span></label>
             <div class="shot-slot" id="jobAfterLaterSlot">
+              <div class="shot-empty" id="jobAfterLaterEmpty">Tap to add photo</div>
               <img class="shot-preview" id="jobAfterLaterPreview" alt="" hidden>
-              <p class="shot-current" id="jobAfterLaterCurrent" hidden>Current photo on file — pick a new one to replace.</p>
-              <input id="jobAfterLater" name="after_later" type="file" accept="image/*" capture="environment">
+              <p class="shot-current" id="jobAfterLaterCurrent" hidden>Current photo on file — tap to replace.</p>
+              <input id="jobAfterLater" name="after_later" type="file" accept="image/*" capture="environment" aria-label="After photo">
             </div>
           </div>
           <div class="job-wizard-step" data-step="6" data-key="address">
@@ -2165,6 +2202,9 @@ button{
   var beforeCurrent = document.getElementById("jobBeforeCurrent");
   var afterCurrent = document.getElementById("jobAfterCurrent");
   var afterLaterCurrent = document.getElementById("jobAfterLaterCurrent");
+  var beforeEmpty = document.getElementById("jobBeforeEmpty");
+  var afterEmpty = document.getElementById("jobAfterEmpty");
+  var afterLaterEmpty = document.getElementById("jobAfterLaterEmpty");
   var beforeSlot = document.getElementById("jobBeforeSlot");
   var afterSlot = document.getElementById("jobAfterSlot");
   var afterLaterSlot = document.getElementById("jobAfterLaterSlot");
@@ -2187,17 +2227,6 @@ button{
   var jobPageClose = document.getElementById("jobPageClose");
   var jobPageProgressFill = document.getElementById("jobPageProgressFill");
   var jobPageStepNum = document.getElementById("jobPageStepNum");
-  var jobPageStepLabel = document.getElementById("jobPageStepLabel");
-  var JOB_STEP_LABELS = {
-    photos: "Photos",
-    title: "Title",
-    description: "Description",
-    prescribed: "Prescribed",
-    after: "After photo",
-    address: "Address",
-    notes: "Notes",
-    review: "Review"
-  };
   var TOTAL_JOB_STEPS = jobWizardSteps.length;
   var currentJobStep = 1;
   var cachedJobs = [];
@@ -2212,14 +2241,10 @@ button{
   }
 
   function updateJobPageProgress() {
-    var step = jobWizardSteps[currentJobStep - 1];
-    var key = jobStepKey(step);
-    var label = JOB_STEP_LABELS[key] || key;
     if (jobPageProgressFill) {
       jobPageProgressFill.style.width = (currentJobStep / TOTAL_JOB_STEPS * 100) + "%";
     }
     if (jobPageStepNum) jobPageStepNum.textContent = String(currentJobStep);
-    if (jobPageStepLabel) jobPageStepLabel.textContent = label;
   }
 
   function openJobModal(trigger, opts) {
@@ -2350,6 +2375,7 @@ button{
     if (hasBefore) {
       beforePreview.src = publicPhotoUrl(photoByKind(job.job_photos, "before").storage_path);
       beforePreview.hidden = !beforePreview.src;
+      setShotEmpty(beforeEmpty, beforePreview.hidden);
     }
     if (hasAfter) {
       var url = publicPhotoUrl(photoByKind(job.job_photos, "after").storage_path);
@@ -2357,6 +2383,8 @@ button{
       afterPreview.hidden = !url;
       afterLaterPreview.src = url;
       afterLaterPreview.hidden = !url;
+      setShotEmpty(afterEmpty, afterPreview.hidden);
+      setShotEmpty(afterLaterEmpty, afterLaterPreview.hidden);
     }
     delete jobForm.dataset.assessmentId;
     setJobFormMode(true);
@@ -2522,6 +2550,7 @@ button{
       var url = URL.createObjectURL(pendingAfterFile);
       afterLaterPreview.src = url;
       afterLaterPreview.hidden = false;
+      setShotEmpty(afterLaterEmpty, false);
     }
   });
   afterLaterInput.addEventListener("change", function () {
@@ -2531,6 +2560,7 @@ button{
       var url = URL.createObjectURL(pendingAfterFile);
       afterPreview.src = url;
       afterPreview.hidden = false;
+      setShotEmpty(afterEmpty, false);
     }
   });
 
@@ -2569,23 +2599,30 @@ button{
     return null;
   }
 
-  function bindShotPreview(input, img) {
+  function setShotEmpty(emptyEl, show) {
+    if (!emptyEl) return;
+    emptyEl.hidden = !show;
+  }
+
+  function bindShotPreview(input, img, emptyEl) {
     if (!input || !img) return;
     input.addEventListener("change", function () {
       var file = input.files && input.files[0];
       if (!file) {
         img.hidden = true;
         img.removeAttribute("src");
+        setShotEmpty(emptyEl, true);
         return;
       }
       var url = URL.createObjectURL(file);
       img.src = url;
       img.hidden = false;
+      setShotEmpty(emptyEl, false);
     });
   }
-  bindShotPreview(beforeInput, beforePreview);
-  bindShotPreview(afterInput, afterPreview);
-  bindShotPreview(afterLaterInput, afterLaterPreview);
+  bindShotPreview(beforeInput, beforePreview, beforeEmpty);
+  bindShotPreview(afterInput, afterPreview, afterEmpty);
+  bindShotPreview(afterLaterInput, afterLaterPreview, afterLaterEmpty);
 
   function clearShotUi() {
     beforeInput.value = "";
@@ -2601,6 +2638,9 @@ button{
     beforeCurrent.hidden = true;
     afterCurrent.hidden = true;
     afterLaterCurrent.hidden = true;
+    setShotEmpty(beforeEmpty, true);
+    setShotEmpty(afterEmpty, true);
+    setShotEmpty(afterLaterEmpty, true);
     beforeSlot.classList.remove("shake");
     afterSlot.classList.remove("shake");
     if (afterLaterSlot) afterLaterSlot.classList.remove("shake");
