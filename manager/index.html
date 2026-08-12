@@ -1284,6 +1284,54 @@ select{
 .job-form--page .job-wizard-nav .pill{margin:0;}
 .job-form--page .job-form-fine{margin-top:14px;}
 .job-form--page .job-form-clear{margin-bottom:8px;}
+.job-draft-chip{
+  position:absolute;
+  left:var(--gut);
+  bottom:calc(14px + env(safe-area-inset-bottom, 0px));
+  z-index:28;
+  width:76px;
+  height:76px;
+  margin:0;
+  padding:0;
+  border:2px solid #FFFFFF;
+  border-radius:22px;
+  overflow:hidden;
+  background:var(--panel-alt);
+  box-shadow:0 8px 24px rgba(29,36,43,.14);
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.job-draft-chip[hidden]{display:none !important;}
+.job-draft-chip:hover,
+.job-draft-chip:active,
+.job-draft-chip:focus,
+.job-draft-chip:focus-visible{
+  outline:none;
+  border-color:#FFFFFF;
+  background:var(--panel-alt);
+}
+.job-draft-chip img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  pointer-events:none;
+}
+.job-draft-chip-tag{
+  position:absolute;
+  left:6px;
+  bottom:6px;
+  font-size:9px;
+  font-weight:600;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#fff;
+  background:rgba(29,36,43,.5);
+  padding:3px 7px;
+  border-radius:980px;
+  pointer-events:none;
+}
 @media(prefers-reduced-motion:reduce){
   .job-page-progress-fill{transition:none;}
 }
@@ -1577,6 +1625,11 @@ select{
       </div>
     </form>
   </div>
+
+  <button type="button" class="job-draft-chip" id="jobDraftChip" hidden aria-label="Continue latest draft">
+    <img id="jobDraftChipImg" alt="">
+    <span class="job-draft-chip-tag">Draft</span>
+  </button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2632,6 +2685,13 @@ select{
     updateJobPageProgress();
     goToJobStep(currentJobStep, false);
     if (jobPageBody) jobPageBody.scrollTop = 0;
+    if (typeof updateJobDraftChip === "function") {
+      if (!cachedJobs.length && typeof loadJobs === "function") {
+        loadJobs().then(function () { updateJobDraftChip(); });
+      } else {
+        updateJobDraftChip();
+      }
+    }
   }
 
   function closeJobModal(afterClose) {
@@ -2639,6 +2699,8 @@ select{
       if (afterClose) afterClose();
       return;
     }
+    var chip = document.getElementById("jobDraftChip");
+    if (chip) chip.hidden = true;
     jobPageView.hidden = true;
     appView.hidden = false;
     setAppChrome(true);
@@ -2761,6 +2823,7 @@ select{
     delete jobForm.dataset.assessmentId;
     setJobFormMode(true);
     goToJobStep(1, false);
+    updateJobDraftChip();
   }
 
   function updateJobReviewSummary() {
@@ -3026,6 +3089,7 @@ select{
     showJobError("");
     setJobFormMode(false);
     goToJobStep(1, false);
+    updateJobDraftChip();
   }
 
   resetJobForm();
@@ -3170,6 +3234,7 @@ select{
           afterLaterPreview.hidden = !afterUrl;
         }
       }
+      updateJobDraftChip();
       return { ok: true, job: refreshed.data || res.data };
     } finally {
       jobDraftSaving = false;
@@ -3184,6 +3249,59 @@ select{
 
   function jobsForBucket(bucket) {
     return cachedJobs.filter(function (j) { return jobBucketOf(j) === bucket; });
+  }
+
+  function latestDraftWithPhoto() {
+    var drafts = jobsForBucket("draft").slice().sort(function (a, b) {
+      var at = a.updated_at || a.created_at || "";
+      var bt = b.updated_at || b.created_at || "";
+      return at < bt ? 1 : at > bt ? -1 : 0;
+    });
+    var currentId = jobForm && jobForm.elements.id ? jobForm.elements.id.value : "";
+    for (var i = 0; i < drafts.length; i++) {
+      var job = drafts[i];
+      if (currentId && job.id === currentId) continue;
+      var before = photoByKind(job.job_photos, "before");
+      var after = photoByKind(job.job_photos, "after");
+      var path = (before && before.storage_path) || (after && after.storage_path) || "";
+      var url = publicPhotoUrl(path);
+      if (url) return { job: job, url: url };
+    }
+    return null;
+  }
+
+  function updateJobDraftChip() {
+    var chip = document.getElementById("jobDraftChip");
+    var img = document.getElementById("jobDraftChipImg");
+    if (!chip || !img) return;
+    if (!isJobFormOpen()) {
+      chip.hidden = true;
+      return;
+    }
+    var latest = latestDraftWithPhoto();
+    if (!latest) {
+      chip.hidden = true;
+      img.removeAttribute("src");
+      return;
+    }
+    img.src = latest.url;
+    chip.hidden = false;
+    chip.setAttribute(
+      "aria-label",
+      "Continue draft" + (latest.job.title && latest.job.title !== "Untitled draft" ? ": " + latest.job.title : "")
+    );
+  }
+
+  var jobDraftChip = document.getElementById("jobDraftChip");
+  if (jobDraftChip) {
+    jobDraftChip.addEventListener("click", function () {
+      var latest = latestDraftWithPhoto();
+      if (!latest || !latest.job) return;
+      fillJobFormFromJob(latest.job);
+      updateJobPageProgress();
+      updateJobDraftChip();
+      if (jobPageBody) jobPageBody.scrollTop = 0;
+    });
   }
 
   function renderJobsList() {
@@ -3382,6 +3500,7 @@ select{
     }
     cachedJobs = jobs || [];
     renderJobsList();
+    updateJobDraftChip();
   }
 
   function sanitizeFile(name) {
