@@ -697,16 +697,25 @@ select{
   margin-top:18px;
   display:flex; gap:8px; flex-wrap:wrap; align-items:center;
 }
-.req-actions select{
-  border:1px solid var(--rule);
-  border-radius:12px;
-  padding:10px 12px;
-  min-height:44px; flex:1 1 140px;
-  color:#1D242B;
-  color-scheme:light;
-  appearance:none;
-  -webkit-appearance:none;
-  background-color:#FFFFFF;
+.req-actions .status-dd{
+  flex:1 1 140px;
+  max-width:none;
+  z-index:30;
+}
+.req-actions .status-dd-btn{
+  min-height:44px;
+  padding:10px 14px;
+  font-size:14px;
+  box-shadow:none;
+}
+.req-actions .status-dd-btn:hover,
+.req-actions .status-dd-btn:active,
+.req-actions .status-dd-btn:focus,
+.req-actions .status-dd-btn:focus-visible{
+  box-shadow:none;
+}
+.req-actions .status-dd-menu{
+  z-index:40;
 }
 .req-actions .pill{
   min-height:44px;
@@ -724,19 +733,6 @@ select{
   outline:none;
 }
 .req-actions .pill.ghost{background-color:#FFFFFF;}
-.req-actions select:hover,
-.req-actions select:active,
-.req-actions select:focus,
-.req-actions select:focus-visible{
-  outline:none;
-  border-color:var(--rule);
-  background-color:#FFFFFF;
-  color:#1D242B;
-}
-.req-actions select option{
-  background-color:#FFFFFF;
-  color:#1D242B;
-}
 @media(prefers-reduced-motion:reduce){
   .req-modal-reveal > *,.req-modal-card > .req-modal-x{opacity:1; transform:none; animation:none !important;}
 }
@@ -2039,6 +2035,11 @@ select{
     reqMorphLabel.style.opacity = "";
   }
   function reqHardHide() {
+    var statusRoot = reqModalBody.querySelector(".status-dd[data-status]");
+    if (statusRoot && typeof statusRoot._rxCleanup === "function") {
+      statusRoot._rxCleanup();
+      statusRoot._rxCleanup = null;
+    }
     reqModal.hidden = true;
     reqModal.classList.remove("measuring");
     reqClearAnims(reqCard);
@@ -2100,28 +2101,69 @@ select{
     );
   }
   function bindReqModalActions(rowData) {
-    var sel = reqModalBody.querySelector("select[data-status]");
-    if (sel) {
-      sel.addEventListener("change", async function () {
-        sel.blur();
-        var id = sel.getAttribute("data-status");
-        var { error } = await sb.from("assessment_requests").update({ status: sel.value }).eq("id", id);
-        if (error) {
-          showError(appError, error.message);
-          return;
-        }
-        if (requestsById[id]) requestsById[id].status = sel.value;
-        var srcBadge = reqLastRow && reqLastRow.querySelector(".badge");
-        if (srcBadge) {
-          srcBadge.className = "badge " + sel.value;
-          srcBadge.textContent = sel.value;
-        }
-        var modalBadge = reqModalBody.querySelector(".badge");
-        if (modalBadge) {
-          modalBadge.className = "badge " + sel.value;
-          modalBadge.textContent = sel.value;
-        }
+    var root = reqModalBody.querySelector(".status-dd[data-status]");
+    var btn = root && root.querySelector(".status-dd-btn");
+    var menu = root && root.querySelector(".status-dd-menu");
+    var label = root && root.querySelector(".status-dd-label");
+    if (root && btn && menu) {
+      function setOpen(open) {
+        menu.hidden = !open;
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+      }
+      function applyStatus(value) {
+        if (label) label.textContent = value;
+        menu.querySelectorAll("[data-value]").forEach(function (opt) {
+          var on = opt.getAttribute("data-value") === value;
+          opt.classList.toggle("is-selected", on);
+          opt.setAttribute("aria-selected", on ? "true" : "false");
+        });
+      }
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        setOpen(menu.hidden);
       });
+      menu.querySelectorAll("[data-value]").forEach(function (opt) {
+        opt.addEventListener("click", async function (e) {
+          e.stopPropagation();
+          var id = root.getAttribute("data-status");
+          var value = opt.getAttribute("data-value");
+          setOpen(false);
+          if (!id || !value) return;
+          var { error } = await sb.from("assessment_requests").update({ status: value }).eq("id", id);
+          if (error) {
+            showError(appError, error.message);
+            return;
+          }
+          applyStatus(value);
+          if (requestsById[id]) requestsById[id].status = value;
+          var srcBadge = reqLastRow && reqLastRow.querySelector(".badge");
+          if (srcBadge) {
+            srcBadge.className = "badge " + value;
+            srcBadge.textContent = value;
+          }
+          var modalBadge = reqModalBody.querySelector(".badge");
+          if (modalBadge) {
+            modalBadge.className = "badge " + value;
+            modalBadge.textContent = value;
+          }
+        });
+      });
+      var onDoc = function (e) {
+        if (!root.contains(e.target)) setOpen(false);
+      };
+      var onKey = function (e) {
+        if (e.key === "Escape" && !menu.hidden) {
+          e.stopPropagation();
+          setOpen(false);
+          btn.focus();
+        }
+      };
+      document.addEventListener("click", onDoc);
+      document.addEventListener("keydown", onKey);
+      root._rxCleanup = function () {
+        document.removeEventListener("click", onDoc);
+        document.removeEventListener("keydown", onKey);
+      };
     }
     var jobBtn = reqModalBody.querySelector("[data-job-from]");
     if (jobBtn) {
@@ -2145,6 +2187,12 @@ select{
       });
     }
   }
+  function reqStatusOption(value, current) {
+    var on = value === current;
+    return '<li role="presentation"><button type="button" role="option" data-value="' + value +
+      '" aria-selected="' + (on ? "true" : "false") + '"' +
+      (on ? ' class="is-selected"' : "") + ">" + value.replace("_", " ") + "</button></li>";
+  }
   function fillRequestModal(row) {
     var tel = telHref(row.phone);
     var phoneVal = tel
@@ -2155,11 +2203,12 @@ select{
     if (row.preferred_date) snipParts.push(fmtDay(row.preferred_date).replace(/,.*/, ""));
     else if (row.address) snipParts.push(String(row.address).split(",")[0]);
     var sub = snipParts.join(" · ");
+    var status = row.status || "new";
     reqModalBody.innerHTML =
       '<div class="req-modal-head">' +
         "<div>" +
           "<h2 id=\"reqModalTitle\">" + esc(row.name || "Request") + "</h2>" +
-          '<span class="badge ' + esc(row.status) + '" style="margin-top:10px;">' + esc(row.status) + "</span>" +
+          '<span class="badge ' + esc(status) + '" style="margin-top:10px;">' + esc(status) + "</span>" +
         "</div>" +
       "</div>" +
       (sub ? '<p class="req-modal-sub">' + esc(sub) + "</p>" : "") +
@@ -2179,10 +2228,20 @@ select{
         '<div class="req-field"><span class="lbl">Received</span><span class="val">' + esc(fmtDate(row.created_at)) + "</span></div>" +
       "</div>" +
       '<div class="req-actions">' +
-        '<select data-status="' + row.id + '" aria-label="Status">' +
-          opt("new", row.status) + opt("contacted", row.status) + opt("scheduled", row.status) +
-          opt("done", row.status) + opt("closed", row.status) + opt("archived", row.status) +
-        "</select>" +
+        '<div class="status-dd" data-status="' + row.id + '">' +
+          '<button type="button" class="status-dd-btn" aria-label="Status" aria-haspopup="listbox" aria-expanded="false">' +
+            '<span class="status-dd-label">' + esc(status) + "</span>" +
+            '<svg class="status-dd-chev" viewBox="0 0 12 8" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m1.5 1.5 4.5 4.5 4.5-4.5"/></svg>' +
+          "</button>" +
+          '<ul class="status-dd-menu" role="listbox" aria-label="Status" hidden>' +
+            reqStatusOption("new", status) +
+            reqStatusOption("contacted", status) +
+            reqStatusOption("scheduled", status) +
+            reqStatusOption("done", status) +
+            reqStatusOption("closed", status) +
+            reqStatusOption("archived", status) +
+          "</ul>" +
+        "</div>" +
         '<button type="button" class="pill ghost" data-job-from="' + row.id +
           '" data-title="' + escAttr(row.name) +
           '" data-address="' + escAttr(row.address) + '">Create job</button>' +
@@ -2498,10 +2557,6 @@ select{
     }).join("");
 
     bindRequestOpen();
-  }
-
-  function opt(value, current) {
-    return '<option value="' + value + '"' + (value === current ? " selected" : "") + ">" + value.replace("_", " ") + "</option>";
   }
 
   document.getElementById("refreshRequests").addEventListener("click", loadRequests);
