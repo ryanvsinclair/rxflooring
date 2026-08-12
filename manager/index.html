@@ -2725,23 +2725,38 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 
   function draftPayloadFromForm() {
     var title = jobForm.elements.title.value.trim() || "Untitled draft";
+    var existing = currentJobRecord();
     var payload = {
       title: title,
       description: jobForm.elements.description.value.trim() || null,
       prescribed: jobForm.elements.prescribed.value.trim() || null,
       address: jobForm.elements.address.value.trim() || null,
-      notes: jobForm.elements.notes.value.trim() || null,
-      status: "planned",
-      published: false
+      notes: jobForm.elements.notes.value.trim() || null
     };
+    if (existing) {
+      payload.status = existing.status;
+      payload.published = !!existing.published;
+    } else {
+      payload.status = "planned";
+      payload.published = false;
+    }
     if (jobForm.dataset.assessmentId) {
       payload.assessment_request_id = jobForm.dataset.assessmentId;
     }
     return payload;
   }
 
+  function waitForDraftSave() {
+    return new Promise(function (resolve) {
+      (function poll() {
+        if (!jobDraftSaving) { resolve(); return; }
+        setTimeout(poll, 40);
+      })();
+    });
+  }
+
   async function saveDraftStep() {
-    if (jobDraftSaving) return { ok: true };
+    await waitForDraftSave();
     jobDraftSaving = true;
     try {
       var id = jobForm.elements.id.value;
@@ -2749,9 +2764,16 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
       var res = id
         ? await sb.from("jobs").update(payload).eq("id", id).select("*, job_photos(*)").single()
         : await sb.from("jobs").insert(payload).select("*, job_photos(*)").single();
-      if (res.error) return { error: res.error };
+      if (res.error) {
+        var msg = res.error.message || "Could not save draft.";
+        if (/row-level security|JWT|not authenticated|401|403/i.test(msg)) {
+          msg = "Session expired or not allowed to save. Sign in again and retry.";
+        }
+        return { error: { message: msg } };
+      }
 
       jobForm.elements.id.value = res.data.id;
+      if (jobForm.dataset.assessmentId) delete jobForm.dataset.assessmentId;
       var idx = cachedJobs.findIndex(function (j) { return j.id === res.data.id; });
       if (idx >= 0) cachedJobs[idx] = res.data;
       else cachedJobs.unshift(res.data);
@@ -2763,26 +2785,50 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
 
       if (beforeFile) {
         var upB = await uploadKindPhoto(res.data.id, beforeFile, "before");
-        if (upB.error) return { error: upB.error };
+        if (upB.error) {
+          var upMsg = upB.error.message || "Before photo upload failed.";
+          if (/row-level security|JWT|not authenticated|401|403|AccessDenied/i.test(upMsg)) {
+            upMsg = "Could not upload before photo. Sign in again and retry.";
+          }
+          return { error: { message: upMsg } };
+        }
         pendingBeforeFile = null;
         beforeInput.value = "";
       }
       if (afterFile) {
         var upA = await uploadKindPhoto(res.data.id, afterFile, "after");
-        if (upA.error) return { error: upA.error };
+        if (upA.error) {
+          var upMsgA = upA.error.message || "After photo upload failed.";
+          if (/row-level security|JWT|not authenticated|401|403|AccessDenied/i.test(upMsgA)) {
+            upMsgA = "Could not upload after photo. Sign in again and retry.";
+          }
+          return { error: { message: upMsgA } };
+        }
         pendingAfterFile = null;
         afterInput.value = "";
         afterLaterInput.value = "";
       }
 
-      // refresh photos on cached row
       var refreshed = await sb.from("jobs").select("*, job_photos(*)").eq("id", res.data.id).single();
       if (!refreshed.error && refreshed.data) {
         var i2 = cachedJobs.findIndex(function (j) { return j.id === refreshed.data.id; });
         if (i2 >= 0) cachedJobs[i2] = refreshed.data;
-        beforeCurrent.hidden = !photoByKind(refreshed.data.job_photos, "before");
-        afterCurrent.hidden = !photoByKind(refreshed.data.job_photos, "after");
+        var beforePhoto = photoByKind(refreshed.data.job_photos, "before");
+        var afterPhoto = photoByKind(refreshed.data.job_photos, "after");
+        beforeCurrent.hidden = !beforePhoto;
+        afterCurrent.hidden = !afterPhoto;
         afterLaterCurrent.hidden = afterCurrent.hidden;
+        if (beforePhoto) {
+          beforePreview.src = publicPhotoUrl(beforePhoto.storage_path);
+          beforePreview.hidden = !beforePreview.src;
+        }
+        if (afterPhoto) {
+          var afterUrl = publicPhotoUrl(afterPhoto.storage_path);
+          afterPreview.src = afterUrl;
+          afterPreview.hidden = !afterUrl;
+          afterLaterPreview.src = afterUrl;
+          afterLaterPreview.hidden = !afterUrl;
+        }
       }
       return { ok: true, job: refreshed.data || res.data };
     } finally {
