@@ -1930,17 +1930,7 @@ button,a,select,input,textarea,[tabindex]{-webkit-tap-highlight-color:transparen
       return;
     }
     if (!data || !data.length) {
-      requestsList.innerHTML =
-        '<div class="empty">' +
-          '<button type="button" class="empty-cta" id="emptyAddJob">Click here to add a new job</button>' +
-          '<span class="empty-sub">No booking requests yet.</span>' +
-        "</div>";
-      var emptyBtn = document.getElementById("emptyAddJob");
-      if (emptyBtn) {
-        emptyBtn.addEventListener("click", function () {
-          document.getElementById("jobAddBtn").click();
-        });
-      }
+      requestsList.innerHTML = '<div class="empty">No booking requests yet.</div>';
       return;
     }
     data = sortRequestsForFocus(data, focusYmd);
