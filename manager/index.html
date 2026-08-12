@@ -899,6 +899,105 @@ button{
   background:var(--accent);
   transform:scale(1.3);
 }
+
+/* Full-page add/edit job (popup morph deactivated — see HTML comment) */
+#jobPageView{
+  position:absolute;
+  inset:0;
+  z-index:40;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  background:
+    radial-gradient(90% 50% at 50% -20%, rgba(27,77,255,.07) 0%, transparent 55%),
+    var(--bg);
+}
+#jobPageView[hidden]{display:none !important;}
+.job-page-header{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:calc(10px + env(safe-area-inset-top, 0px)) var(--gut) 10px;
+  border-bottom:1px solid var(--rule-soft);
+  background:rgba(255,255,255,.92);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+}
+.job-page-close{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:40px; height:40px; padding:0; flex-shrink:0;
+  border:1px solid var(--rule); border-radius:50%;
+  background:var(--panel); color:var(--ink); cursor:pointer;
+}
+.job-page-close:hover{background:var(--bg-alt);}
+.job-page-close svg{display:block;}
+.job-page-header-text{flex:1 1 auto; min-width:0;}
+.job-page-header h2{
+  margin:0; font-size:18px; font-weight:600; letter-spacing:-.025em; color:var(--ink);
+}
+.job-page-sub{margin:2px 0 0; font-size:12.5px; color:var(--muted);}
+.job-page-badge{
+  flex-shrink:0;
+  font-size:10px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
+  padding:5px 9px; border-radius:999px;
+  background:rgba(27,77,255,.1); color:var(--accent);
+}
+.job-page-progress{
+  flex-shrink:0;
+  padding:12px var(--gut) 14px;
+  border-bottom:1px solid var(--rule-soft);
+  background:var(--bg);
+}
+.job-page-progress-track{
+  height:3px; border-radius:999px; background:var(--rule-soft);
+  overflow:hidden; margin-bottom:10px;
+}
+.job-page-progress-fill{
+  height:100%; border-radius:999px; background:var(--accent);
+  width:12.5%; transition:width .35s cubic-bezier(.22,.55,.3,1);
+}
+.job-page-progress-meta{
+  display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+}
+.job-page-step-num{
+  font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--muted);
+}
+.job-page-step-num span{color:var(--accent);}
+.job-page-step-label{
+  font-size:13px; font-weight:600; color:var(--ink); letter-spacing:-.01em;
+}
+#jobPageBody{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  padding:20px var(--gut) 12px;
+}
+.job-form--page{
+  display:flex;
+  flex-direction:column;
+  min-height:min(100%, 100%);
+}
+.job-form--page .job-form-reveal > *{opacity:1; animation:none !important;}
+.job-form--page .job-wizard-steps{margin-top:0; flex:1 1 auto;}
+.job-form--page .job-wizard-nav{
+  flex-shrink:0;
+  margin-top:16px;
+  padding-top:14px;
+  border-top:1px solid var(--rule-soft);
+  background:var(--bg);
+  position:sticky;
+  bottom:0;
+}
+.job-form--page .job-form-fine{margin-top:14px;}
+.job-form--page .job-form-clear{margin-bottom:8px;}
+@media(prefers-reduced-motion:reduce){
+  .job-page-progress-fill{transition:none;}
+}
 .job-form-clear{
   display:block;
   margin:14px auto 0;
@@ -1072,24 +1171,51 @@ button{
   </div>
 </div>
 
-<!-- Job morph: + / Edit → centered glass wizard (same WAAPI pattern as requests). -->
+<!-- POPUP JOB FORM (deactivated — full-page #jobPageView is active)
 <div class="req-morph" id="jobMorph" hidden aria-hidden="true"><span></span></div>
-
 <div class="req-modal-root" id="jobModal" hidden>
   <div class="req-modal-backdrop" data-job-close></div>
   <div class="req-modal-card job-modal-card" id="jobModalDialog" role="dialog" aria-modal="true" aria-labelledby="jobFormHeading" tabindex="-1">
     <button class="req-modal-x" type="button" data-job-close aria-label="Close">&times;</button>
     <div class="req-modal-scroll">
-    <form class="job-form" id="jobForm" novalidate>
+    <form class="job-form" id="jobFormPopup" novalidate>...</form>
+    </div>
+  </div>
+</div>
+-->
+
+<!-- Full-page add / edit job -->
+<div id="jobPageView" hidden>
+  <header class="job-page-header">
+    <button type="button" class="job-page-close" id="jobPageClose" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <div class="job-page-header-text">
+      <h2 id="jobFormHeading">Post a job</h2>
+      <p class="job-page-sub">Saved as draft after each step</p>
+    </div>
+    <span class="job-page-badge">Draft</span>
+  </header>
+
+  <div class="job-page-progress" aria-hidden="true">
+    <div class="job-page-progress-track"><div class="job-page-progress-fill" id="jobPageProgressFill"></div></div>
+    <div class="job-page-progress-meta">
+      <p class="job-page-step-num">Step <span id="jobPageStepNum">1</span> of 8</p>
+      <p class="job-page-step-label" id="jobPageStepLabel">Photos</p>
+    </div>
+  </div>
+
+  <div id="jobPageBody">
+    <form class="job-form job-form--page" id="jobForm" novalidate>
       <div class="job-form-reveal">
-        <h2 id="jobFormHeading">Post a job</h2>
         <input type="hidden" name="id" id="jobId">
-        <p class="err-banner" id="jobFormError" hidden style="margin-top:14px;"></p>
+        <p class="err-banner" id="jobFormError" hidden style="margin-top:0;"></p>
 
         <p class="job-wizard-status" id="jobWizardStatus" aria-live="polite"></p>
         <div class="job-wizard-steps" id="jobWizardSteps">
           <div class="job-wizard-step is-active" data-step="1" data-key="photos">
             <label class="job-wizard-label">Photos</label>
+            <p class="field-hint" style="margin:-4px 0 12px;font-size:13.5px;color:var(--muted);line-height:1.45;">Before photo is required to publish. After can wait until the job is done.</p>
             <div class="shot-pair">
               <div class="shot-slot" id="jobBeforeSlot">
                 <span class="job-wizard-label" style="margin:0;">Before</span>
@@ -1148,7 +1274,6 @@ button{
         <button class="job-form-clear" type="button" id="jobResetBtn">Clear form</button>
       </div>
     </form>
-    </div>
   </div>
 </div>
 
@@ -1419,7 +1544,7 @@ button{
       var name = tab.getAttribute("data-nav");
       if (name === "add") {
         if (typeof jobBusy !== "undefined" && jobBusy) return;
-        if (jobModal && !jobModal.hidden) {
+        if (typeof isJobFormOpen === "function" && isJobFormOpen()) {
           closeJobModal();
           return;
         }
@@ -1435,7 +1560,7 @@ button{
         t.classList.toggle("is-active", on);
         t.setAttribute("aria-selected", on ? "true" : "false");
       });
-      if (jobModal && !jobModal.hidden && typeof closeJobModal === "function") closeJobModal();
+      if (typeof isJobFormOpen === "function" && isJobFormOpen()) closeJobModal();
     });
   });
 
@@ -2029,8 +2154,8 @@ button{
   document.getElementById("refreshRequests").addEventListener("click", loadRequests);
   statusFilter.addEventListener("change", loadRequests);
 
-  /* ---------- jobs: morph modal wizard (+ / Edit) ----------
-     Note: a job is essentially a "prescription" on the public landing page. */
+  /* ---------- jobs: full-page wizard (+ / Edit) ----------
+     Popup morph modal deactivated — see HTML comment above #jobPageView. */
   var beforeInput = document.getElementById("jobBefore");
   var afterInput = document.getElementById("jobAfter");
   var afterLaterInput = document.getElementById("jobAfterLater");
@@ -2057,11 +2182,22 @@ button{
   var jobWizardDots = document.getElementById("jobWizardDots");
   var jobWizardStatus = document.getElementById("jobWizardStatus");
   var jobAddBtn = document.getElementById("jobAddBtn");
-  var jobMorph = document.getElementById("jobMorph");
-  var jobMorphLabel = jobMorph.firstElementChild;
-  var jobModal = document.getElementById("jobModal");
-  var jobCard = jobModal.querySelector(".job-modal-card");
-  var jobBackdrop = jobModal.querySelector(".req-modal-backdrop");
+  var jobPageView = document.getElementById("jobPageView");
+  var jobPageBody = document.getElementById("jobPageBody");
+  var jobPageClose = document.getElementById("jobPageClose");
+  var jobPageProgressFill = document.getElementById("jobPageProgressFill");
+  var jobPageStepNum = document.getElementById("jobPageStepNum");
+  var jobPageStepLabel = document.getElementById("jobPageStepLabel");
+  var JOB_STEP_LABELS = {
+    photos: "Photos",
+    title: "Title",
+    description: "Description",
+    prescribed: "Prescribed",
+    after: "After photo",
+    address: "Address",
+    notes: "Notes",
+    review: "Review"
+  };
   var TOTAL_JOB_STEPS = jobWizardSteps.length;
   var currentJobStep = 1;
   var cachedJobs = [];
@@ -2070,13 +2206,76 @@ button{
   var jobDraftSaving = false;
   var pendingBeforeFile = null;
   var pendingAfterFile = null;
+
+  function isJobFormOpen() {
+    return jobPageView && !jobPageView.hidden;
+  }
+
+  function updateJobPageProgress() {
+    var step = jobWizardSteps[currentJobStep - 1];
+    var key = jobStepKey(step);
+    var label = JOB_STEP_LABELS[key] || key;
+    if (jobPageProgressFill) {
+      jobPageProgressFill.style.width = (currentJobStep / TOTAL_JOB_STEPS * 100) + "%";
+    }
+    if (jobPageStepNum) jobPageStepNum.textContent = String(currentJobStep);
+    if (jobPageStepLabel) jobPageStepLabel.textContent = label;
+  }
+
+  function openJobModal(trigger, opts) {
+    opts = opts || {};
+    if (jobBusy) return;
+    if (isJobFormOpen()) return;
+    if (!reqModal.hidden) return;
+    jobLastTrigger = trigger || jobAddBtn;
+    jobBusy = false;
+    appView.hidden = true;
+    if (bottomNav) bottomNav.hidden = true;
+    jobPageView.hidden = false;
+    updateJobPageProgress();
+    goToJobStep(currentJobStep, false);
+    if (jobPageBody) jobPageBody.scrollTop = 0;
+  }
+
+  function closeJobModal(afterClose) {
+    if (!isJobFormOpen()) {
+      if (afterClose) afterClose();
+      return;
+    }
+    jobPageView.hidden = true;
+    appView.hidden = false;
+    setAppChrome(true);
+    document.body.style.overflow = "";
+    document.querySelectorAll(".bottom-nav .tab").forEach(function (t) {
+      var on = t.getAttribute("data-nav") === "home";
+      t.classList.toggle("is-active", on);
+      t.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    if (jobLastTrigger && jobLastTrigger.style) jobLastTrigger.style.visibility = "";
+    jobLastTrigger = null;
+    jobBusy = false;
+    if (afterClose) afterClose();
+  }
+
+  if (jobPageClose) {
+    jobPageClose.addEventListener("click", function () { closeJobModal(); });
+  }
+  document.addEventListener("keydown", function (e) {
+    if (!isJobFormOpen()) return;
+    if (e.key === "Escape") closeJobModal();
+  });
+
+  /* POPUP JOB FORM (deactivated) — morph modal open/close
+  var jobMorph = document.getElementById("jobMorph");
+  var jobMorphLabel = jobMorph.firstElementChild;
+  var jobModal = document.getElementById("jobModal");
+  var jobCard = jobModal.querySelector(".job-modal-card");
+  var jobBackdrop = jobModal.querySelector(".req-modal-backdrop");
   var jobLastSkin = null;
   var JOB_CARD_RADIUS = 26;
-  var JOB_SHADOW_ON = "0 0 0 1px rgba(29,36,43,.08), 0 20px 60px rgba(29,36,43,.18)";
-  var JOB_SHADOW_OFF = "0 0 0 1px rgba(29,36,43,.08), 0 12px 36px rgba(29,36,43,.1)";
-  var JOB_GLASS_BG = "rgb(255, 255, 255)";
-  var JOB_GLASS_BORDER = "rgb(227, 230, 234)";
-  var JOB_GLASS_BORDER_W = "1px";
+  var JOB_SHADOW_ON = "...";
+  ... openJobModal / closeJobModal with WAAPI morph animations ...
+  */
 
   jobWizardSteps.forEach(function () {
     var dot = document.createElement("span");
@@ -2088,311 +2287,6 @@ button{
   function jobReducedMotion() {
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
-  function jobFadeDur() { return jobReducedMotion() ? 1 : 860; }
-  function jobExpandDur() { return jobReducedMotion() ? 1 : 470; }
-  function jobClearAnims(el) {
-    if (!el || !el.getAnimations) return;
-    el.getAnimations().forEach(function (a) { a.cancel(); });
-  }
-  function jobSettle(anim, dur, fn) {
-    var done = false;
-    function go() { if (done) return; done = true; fn(); }
-    if (anim) anim.onfinish = go;
-    setTimeout(go, dur + 80);
-  }
-  function jobRectOf(el) {
-    var r = el.getBoundingClientRect();
-    return { l: r.left, t: r.top, w: r.width, h: r.height };
-  }
-  function jobSkinOf(el) {
-    var cs = getComputedStyle(el);
-    var r = el.getBoundingClientRect();
-    return {
-      bg: cs.backgroundColor,
-      fg: cs.color,
-      borderWidth: cs.borderTopWidth,
-      borderColor: cs.borderTopColor,
-      radius: parseFloat(cs.borderRadius) || (r.height / 2)
-    };
-  }
-  function jobPlaceMorph(r, radius, skin) {
-    jobMorph.style.left = r.l + "px";
-    jobMorph.style.top = r.t + "px";
-    jobMorph.style.width = r.w + "px";
-    jobMorph.style.height = r.h + "px";
-    jobMorph.style.borderRadius = radius + "px";
-    if (skin) {
-      jobMorph.style.backgroundColor = skin.bg;
-      jobMorph.style.borderWidth = skin.borderWidth;
-      jobMorph.style.borderColor = skin.borderColor;
-      jobMorph.style.borderStyle = "solid";
-      jobMorphLabel.style.color = skin.fg || "var(--ink)";
-    }
-  }
-  function jobFrame(r, radius, bg, shadow, borderColor, borderWidth) {
-    return {
-      left: r.l + "px", top: r.t + "px", width: r.w + "px", height: r.h + "px",
-      borderRadius: radius + "px", backgroundColor: bg, boxShadow: shadow,
-      borderTopColor: borderColor, borderRightColor: borderColor,
-      borderBottomColor: borderColor, borderLeftColor: borderColor,
-      borderTopWidth: borderWidth, borderRightWidth: borderWidth,
-      borderBottomWidth: borderWidth, borderLeftWidth: borderWidth
-    };
-  }
-  function jobResetMorph() {
-    jobMorph.style.opacity = "1";
-    jobClearAnims(jobMorph);
-    jobClearAnims(jobMorphLabel);
-    jobMorph.hidden = true;
-    jobMorph.style.opacity = "";
-    jobMorphLabel.style.opacity = "";
-  }
-  function jobHardHide() {
-    jobModal.hidden = true;
-    jobModal.classList.remove("measuring");
-    jobClearAnims(jobCard);
-    jobClearAnims(jobBackdrop);
-    jobCard.classList.remove("fields-in");
-    jobCard.style.opacity = "";
-    jobCard.style.visibility = "";
-    jobBackdrop.style.opacity = "";
-  }
-  function jobRevealFields() {
-    jobCard.classList.remove("fields-in");
-    jobForm.querySelectorAll(".job-form-reveal > *").forEach(function (el) {
-      el.style.opacity = "";
-    });
-    var closeX = jobCard.querySelector(".req-modal-x");
-    if (closeX) closeX.style.opacity = "";
-    void jobCard.offsetWidth;
-    requestAnimationFrame(function () {
-      if (jobModal.hidden) return;
-      if (jobReducedMotion()) {
-        jobForm.querySelectorAll(".job-form-reveal > *").forEach(function (el) {
-          el.style.opacity = "1";
-        });
-        if (closeX) closeX.style.opacity = "1";
-        return;
-      }
-      jobCard.classList.add("fields-in");
-    });
-  }
-  function jobHandoffMorphToCard(onReady) {
-    jobModal.classList.remove("measuring");
-    jobClearAnims(jobCard);
-    jobCard.style.visibility = "";
-    jobCard.style.opacity = "1";
-    jobMorph.style.opacity = "1";
-    jobClearAnims(jobMorph);
-    jobClearAnims(jobMorphLabel);
-    jobMorph.hidden = true;
-    jobMorph.style.opacity = "";
-    jobMorphLabel.style.opacity = "";
-    if (onReady) onReady();
-  }
-  function jobShowCard(onFaded) {
-    jobClearAnims(jobCard);
-    jobClearAnims(jobBackdrop);
-    jobCard.style.visibility = "";
-    jobCard.style.opacity = "0";
-    jobBackdrop.style.opacity = "0";
-    var fade = jobFadeDur();
-    var cardFade = jobCard.animate(
-      [{ opacity: 0 }, { opacity: 1 }],
-      { duration: fade, easing: "cubic-bezier(.22,.45,.3,1)", fill: "forwards" }
-    );
-    jobBackdrop.animate(
-      [{ opacity: 0 }, { opacity: 1 }],
-      { duration: fade + 140, easing: "ease-out", fill: "forwards" }
-    );
-    jobSettle(cardFade, fade, function () { if (onFaded) onFaded(); });
-  }
-  function jobFocusables() {
-    return Array.prototype.filter.call(
-      jobCard.querySelectorAll("a[href],button:not([disabled]),input,select,textarea"),
-      function (el) { return el.offsetParent !== null; }
-    );
-  }
-  function openJobModal(trigger, opts) {
-    opts = opts || {};
-    if (jobBusy) return;
-    if (!jobModal.hidden) return;
-    if (!reqModal.hidden) return;
-    var triggerEl = trigger || jobAddBtn;
-    if (!triggerEl) return;
-
-    jobBusy = true;
-    jobLastTrigger = triggerEl;
-    jobLastSkin = jobSkinOf(triggerEl);
-    jobResetMorph();
-
-    var expand = jobExpandDur();
-    var fade = jobFadeDur();
-    var label = opts.label || jobFormHeading.textContent || "Job";
-
-    jobClearAnims(jobCard);
-    jobClearAnims(jobBackdrop);
-    jobModal.hidden = false;
-    jobModal.classList.add("measuring");
-    jobCard.classList.remove("fields-in");
-    document.body.style.overflow = "hidden";
-    jobCard.style.opacity = "0";
-    jobBackdrop.style.opacity = "0";
-
-    if (jobReducedMotion()) {
-      jobModal.classList.remove("measuring");
-      triggerEl.style.visibility = "hidden";
-      jobShowCard(function () {
-        jobRevealFields();
-        jobBusy = false;
-        goToJobStep(currentJobStep, false);
-        jobCard.focus({ preventScroll: true });
-      });
-      return;
-    }
-
-    var cr = jobRectOf(jobCard);
-    var br = jobRectOf(triggerEl);
-    var skin = jobLastSkin;
-    jobMorphLabel.textContent = label;
-    jobMorphLabel.style.opacity = "1";
-    jobMorph.style.opacity = "0";
-    jobMorph.hidden = false;
-    jobPlaceMorph(br, skin.radius, skin);
-    triggerEl.style.visibility = "hidden";
-
-    jobMorph.animate(
-      [
-        jobFrame(br, skin.radius, skin.bg, JOB_SHADOW_OFF, skin.borderColor, skin.borderWidth),
-        jobFrame(cr, JOB_CARD_RADIUS, JOB_GLASS_BG, JOB_SHADOW_ON, JOB_GLASS_BORDER, JOB_GLASS_BORDER_W)
-      ],
-      { duration: expand, easing: "cubic-bezier(.22,.85,.28,1)", fill: "forwards" }
-    );
-    jobMorph.animate(
-      [{ opacity: 0 }, { opacity: 1 }],
-      { duration: fade, easing: "cubic-bezier(.22,.45,.3,1)", fill: "forwards" }
-    );
-    jobMorphLabel.animate(
-      [{ opacity: 1 }, { opacity: 0 }],
-      { duration: Math.round(expand * 0.28), easing: "ease-out", fill: "forwards" }
-    );
-    jobBackdrop.animate(
-      [{ opacity: 0 }, { opacity: 1 }],
-      { duration: fade + 140, easing: "ease-out", fill: "forwards" }
-    );
-
-    jobSettle(null, Math.max(expand, fade), function () {
-      jobHandoffMorphToCard(function () {
-        jobRevealFields();
-        jobBusy = false;
-        goToJobStep(currentJobStep, false);
-        jobCard.focus({ preventScroll: true });
-      });
-    });
-  }
-  function closeJobModal(afterClose) {
-    if (jobModal.hidden) {
-      if (afterClose) afterClose();
-      return;
-    }
-    if (jobBusy) {
-      jobClearAnims(jobCard);
-      jobClearAnims(jobBackdrop);
-      jobClearAnims(jobMorph);
-      jobClearAnims(jobMorphLabel);
-      jobResetMorph();
-      jobBusy = false;
-    }
-    jobBusy = true;
-
-    var dur = jobReducedMotion() ? 1 : 330;
-    var t = jobLastTrigger;
-    if (t) t.style.visibility = "";
-    var live = !!(t && document.contains(t));
-    var skin = jobLastSkin || (live ? jobSkinOf(t) : null);
-
-    function cleanup() {
-      jobResetMorph();
-      jobHardHide();
-      document.body.style.overflow = "";
-      jobBusy = false;
-      if (t) t.style.visibility = "";
-      if (live && t.focus) t.focus({ preventScroll: true });
-      jobLastTrigger = null;
-      jobLastSkin = null;
-      if (afterClose) afterClose();
-    }
-
-    if (!live || jobReducedMotion() || !skin) {
-      jobClearAnims(jobCard);
-      jobClearAnims(jobBackdrop);
-      var plain = jobCard.animate(
-        [{ opacity: 1 }, { opacity: 0 }],
-        { duration: dur, fill: "forwards" }
-      );
-      jobBackdrop.animate(
-        [{ opacity: 1 }, { opacity: 0 }],
-        { duration: dur, fill: "forwards" }
-      );
-      jobSettle(plain, dur, cleanup);
-      return;
-    }
-
-    jobClearAnims(jobCard);
-    jobClearAnims(jobBackdrop);
-    jobClearAnims(jobMorph);
-    jobClearAnims(jobMorphLabel);
-
-    var cr = jobRectOf(jobCard);
-    jobCard.style.visibility = "hidden";
-    jobCard.style.opacity = "0";
-    jobBackdrop.animate(
-      [{ opacity: 1 }, { opacity: 0 }],
-      { duration: Math.round(dur * 0.45), easing: "ease-in", fill: "forwards" }
-    );
-
-    var br = jobRectOf(t);
-    jobMorphLabel.textContent = jobFormHeading.textContent || "Job";
-    jobMorphLabel.style.opacity = "0";
-    jobMorphLabel.style.color = skin.fg || "var(--ink)";
-    jobMorph.style.opacity = "1";
-    jobMorph.hidden = false;
-    jobPlaceMorph(cr, JOB_CARD_RADIUS, {
-      bg: JOB_GLASS_BG,
-      fg: skin.fg,
-      borderWidth: JOB_GLASS_BORDER_W,
-      borderColor: JOB_GLASS_BORDER,
-      radius: JOB_CARD_RADIUS
-    });
-
-    var anim = jobMorph.animate(
-      [
-        jobFrame(cr, JOB_CARD_RADIUS, JOB_GLASS_BG, JOB_SHADOW_ON, JOB_GLASS_BORDER, JOB_GLASS_BORDER_W),
-        jobFrame(br, skin.radius, skin.bg, JOB_SHADOW_OFF, skin.borderColor, skin.borderWidth)
-      ],
-      { duration: dur, easing: "cubic-bezier(.4,0,.7,.2)", fill: "forwards" }
-    );
-    jobMorphLabel.animate(
-      [{ opacity: 0, offset: 0 }, { opacity: 0, offset: 0.5 }, { opacity: 1, offset: 1 }],
-      { duration: dur, easing: "ease-in", fill: "forwards" }
-    );
-
-    jobSettle(anim, dur, cleanup);
-  }
-
-  jobModal.querySelectorAll("[data-job-close]").forEach(function (el) {
-    el.addEventListener("click", function () { closeJobModal(); });
-  });
-  document.addEventListener("keydown", function (e) {
-    if (jobModal.hidden) return;
-    if (e.key === "Escape") { closeJobModal(); return; }
-    if (e.key !== "Tab") return;
-    var f = jobFocusables();
-    if (!f.length) return;
-    var first = f[0], last = f[f.length - 1];
-    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-  });
 
   function jobStepKey(step) {
     return step ? step.getAttribute("data-key") || "" : "";
@@ -2569,10 +2463,12 @@ button{
       d.classList.toggle("is-active", i === currentJobStep - 1);
     });
     jobWizardStatus.textContent = "Step " + currentJobStep + " of " + TOTAL_JOB_STEPS;
+    updateJobPageProgress();
     updateJobWizardBtn();
     if (jobStepKey(step) === "review") updateJobReviewSummary();
     var field = jobStepField(step);
     if (field) field.focus({ preventScroll: true });
+    if (jobPageBody && animate) jobPageBody.scrollTop = 0;
   }
 
   function goToJobStep(n, animate) {
@@ -2955,7 +2851,7 @@ button{
       btn.addEventListener("click", function () {
         var job = cachedJobs.find(function (j) { return j.id === btn.getAttribute("data-edit-job"); });
         if (!job || jobBusy) return;
-        if (!jobModal.hidden) {
+        if (isJobFormOpen()) {
           closeJobModal(function () {
             fillJobFormFromJob(job);
             openJobModal(btn, { label: job.title || "Edit job" });
@@ -3151,6 +3047,7 @@ button{
     if (event === "SIGNED_OUT") {
       gateView.hidden = false;
       appView.hidden = true;
+      if (jobPageView) jobPageView.hidden = true;
       setAppChrome(false);
     }
     if (event === "SIGNED_IN") {
