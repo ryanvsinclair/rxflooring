@@ -984,10 +984,77 @@ select{
   25%{transform:translateX(-6px);}
   75%{transform:translateX(6px);}
 }
+.job-svc-hint{
+  margin:0 0 12px;
+  font-size:13px;
+  line-height:1.4;
+  color:var(--muted);
+}
+.job-svc-picks{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  max-height:min(48vh, 360px);
+  overflow:auto;
+  padding:2px;
+  scrollbar-width:thin;
+  border-radius:12px;
+}
+.job-svc-picks.shake{
+  outline:2px solid rgba(192,57,43,.45);
+  outline-offset:2px;
+}
+.job-svc-group{
+  flex:1 1 100%;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:0 0 10px;
+}
+.job-svc-group:last-child{margin-bottom:0;}
+.job-svc-cat{
+  flex:1 1 100%;
+  margin:4px 0 2px;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.job-svc-chip{
+  appearance:none;
+  margin:0;
+  cursor:pointer;
+  border:1px solid var(--edge);
+  background:var(--panel-alt);
+  color:var(--ink);
+  border-radius:980px;
+  padding:9px 13px;
+  font:inherit;
+  font-size:13px;
+  font-weight:500;
+  letter-spacing:-.01em;
+  transition:background .16s ease, border-color .16s ease, color .16s ease;
+}
+.job-svc-chip:hover{
+  border-color:var(--edge-hover);
+  background:#e8ebef;
+}
+.job-svc-chip.is-on{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:var(--on-accent);
+}
+.job-svc-empty{
+  margin:0;
+  font-size:14px;
+  color:var(--muted);
+}
 .job-wizard-step input.shake,
 .job-wizard-step select.shake,
 .job-wizard-step textarea.shake,
-.job-wizard-step .shot-slot.shake{
+.job-wizard-step .shot-slot.shake,
+.job-wizard-step .job-svc-picks.shake{
   border-color:rgba(192,57,43,.7);
   box-shadow:0 0 0 3px rgba(192,57,43,.12);
   animation:jobWizardShake .34s ease;
@@ -1384,7 +1451,8 @@ select{
   .job-wizard-step input.shake,
   .job-wizard-step select.shake,
   .job-wizard-step textarea.shake,
-  .job-wizard-step .shot-slot.shake{animation:none;}
+  .job-wizard-step .shot-slot.shake,
+  .job-wizard-step .job-svc-picks.shake{animation:none;}
 }
 .empty .empty-sub{display:block; margin-top:6px; font-size:13.5px;}
 .photos{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
@@ -1589,8 +1657,10 @@ select{
             <textarea id="jobDescription" name="description" rows="4" placeholder="e.g. Moisture under the old floor. Pulled, dried, levelled, re-laid."></textarea>
           </div>
           <div class="job-wizard-step" data-step="4" data-key="prescribed">
-            <label class="job-wizard-label" for="jobPrescribed">Prescribed services</label>
-            <input id="jobPrescribed" name="prescribed" placeholder="e.g. Removal · Subfloor · LVP" autocomplete="off">
+            <label class="job-wizard-label" id="jobServicesLabel">Services provided</label>
+            <p class="job-svc-hint">Tap every service you delivered on this job.</p>
+            <div class="job-svc-picks" id="jobSvcPicks" role="group" aria-labelledby="jobServicesLabel"></div>
+            <input type="hidden" id="jobPrescribed" name="prescribed" value="">
           </div>
           <div class="job-wizard-step" data-step="5" data-key="after">
             <label class="job-wizard-label" for="jobAfterLater">After photo <span class="wizard-optional">(optional)</span></label>
@@ -2235,6 +2305,12 @@ select{
           jobForm.elements.title.value = "Assessment · " + (jobBtn.getAttribute("data-title") || "");
           jobForm.elements.address.value = jobBtn.getAttribute("data-address") || "";
           jobForm.dataset.assessmentId = jobBtn.getAttribute("data-job-from");
+          try {
+            var svcList = JSON.parse(jobBtn.getAttribute("data-services") || "[]");
+            setSelectedServiceTitles(Array.isArray(svcList) ? svcList : []);
+          } catch (err) {
+            setSelectedServiceIds([]);
+          }
           setJobFormMode(false);
           goToJobStep(1, false);
           openJobModal(document.getElementById("jobAddBtn"), { label: "Post a job" });
@@ -2299,7 +2375,8 @@ select{
         "</div>" +
         '<button type="button" class="pill ghost" data-job-from="' + row.id +
           '" data-title="' + escAttr(row.name) +
-          '" data-address="' + escAttr(row.address) + '">Create job</button>' +
+          '" data-address="' + escAttr(row.address) +
+          '" data-services="' + escAttr(JSON.stringify(row.services || [])) + '">Create job</button>' +
       "</div>";
     bindReqModalActions(row);
   }
@@ -2660,6 +2737,131 @@ select{
   var jobDraftSaving = false;
   var pendingBeforeFile = null;
   var pendingAfterFile = null;
+  var cachedServices = [];
+  var selectedServiceIds = [];
+  var jobSvcPicks = document.getElementById("jobSvcPicks");
+  var JOBS_SELECT = "*, job_photos(*), job_services(service_id)";
+
+  function serviceIdsFromJob(job) {
+    var links = (job && job.job_services) || [];
+    return links.map(function (l) { return l.service_id; }).filter(Boolean);
+  }
+
+  function prescribedFromSelected() {
+    var byId = {};
+    cachedServices.forEach(function (s) { byId[s.id] = s; });
+    return selectedServiceIds.map(function (id) {
+      return byId[id] && byId[id].title;
+    }).filter(Boolean).join(" · ");
+  }
+
+  function syncPrescribedField() {
+    var text = prescribedFromSelected();
+    if (jobForm.elements.prescribed) jobForm.elements.prescribed.value = text;
+    return text;
+  }
+
+  function setSelectedServiceIds(ids) {
+    var set = {};
+    (ids || []).forEach(function (id) { if (id) set[id] = true; });
+    selectedServiceIds = cachedServices.filter(function (s) { return set[s.id]; }).map(function (s) { return s.id; });
+    if (jobSvcPicks) {
+      jobSvcPicks.querySelectorAll(".job-svc-chip").forEach(function (chip) {
+        var on = !!set[chip.getAttribute("data-id")];
+        chip.classList.toggle("is-on", on);
+        chip.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+      jobSvcPicks.classList.remove("shake");
+    }
+    syncPrescribedField();
+  }
+
+  function setSelectedServiceTitles(titles) {
+    var want = {};
+    (titles || []).forEach(function (t) {
+      var key = String(t || "").trim().toLowerCase();
+      if (key) want[key] = true;
+    });
+    var ids = cachedServices.filter(function (s) {
+      return want[String(s.title || "").toLowerCase()] || want[String(s.slug || "").toLowerCase()];
+    }).map(function (s) { return s.id; });
+    setSelectedServiceIds(ids);
+  }
+
+  function renderJobServicePicks() {
+    if (!jobSvcPicks) return;
+    if (!cachedServices.length) {
+      jobSvcPicks.innerHTML = '<p class="job-svc-empty">No services yet — run <code>supabase/services.sql</code> in the SQL Editor.</p>';
+      return;
+    }
+    var groups = [];
+    var byCat = {};
+    cachedServices.forEach(function (s) {
+      var key = s.category || "other";
+      if (!byCat[key]) {
+        byCat[key] = { label: s.category_label || key, items: [] };
+        groups.push(byCat[key]);
+      }
+      byCat[key].items.push(s);
+    });
+    var selected = {};
+    selectedServiceIds.forEach(function (id) { selected[id] = true; });
+    jobSvcPicks.innerHTML = groups.map(function (g) {
+      return '<div class="job-svc-group">' +
+        '<div class="job-svc-cat">' + esc(g.label) + "</div>" +
+        g.items.map(function (s) {
+          var on = !!selected[s.id];
+          return '<button type="button" class="job-svc-chip' + (on ? " is-on" : "") +
+            '" data-id="' + escAttr(s.id) + '" aria-pressed="' + (on ? "true" : "false") + '">' +
+            esc(s.title) + "</button>";
+        }).join("") +
+      "</div>";
+    }).join("");
+  }
+
+  if (jobSvcPicks) {
+    jobSvcPicks.addEventListener("click", function (e) {
+      var chip = e.target.closest(".job-svc-chip");
+      if (!chip || !jobSvcPicks.contains(chip)) return;
+      var id = chip.getAttribute("data-id");
+      if (!id) return;
+      var next = selectedServiceIds.slice();
+      var idx = next.indexOf(id);
+      if (idx >= 0) next.splice(idx, 1);
+      else next.push(id);
+      setSelectedServiceIds(next);
+    });
+  }
+
+  async function loadServicesCatalog() {
+    var res = await sb.from("services")
+      .select("id, slug, title, detail, category, category_label, sort_order, active")
+      .eq("active", true)
+      .order("sort_order", { ascending: true })
+      .order("title", { ascending: true });
+    if (res.error) {
+      cachedServices = [];
+      renderJobServicePicks();
+      return { error: res.error };
+    }
+    cachedServices = res.data || [];
+    renderJobServicePicks();
+    setSelectedServiceIds(selectedServiceIds);
+    return { ok: true };
+  }
+
+  async function syncJobServices(jobId, serviceIds) {
+    var del = await sb.from("job_services").delete().eq("job_id", jobId);
+    if (del.error) return { error: del.error };
+    var ids = serviceIds || [];
+    if (!ids.length) return { ok: true };
+    var rows = ids.map(function (service_id) {
+      return { job_id: jobId, service_id: service_id };
+    });
+    var ins = await sb.from("job_services").insert(rows);
+    if (ins.error) return { error: ins.error };
+    return { ok: true };
+  }
 
   function isJobFormOpen() {
     return jobPageView && !jobPageView.hidden;
@@ -2798,7 +3000,15 @@ select{
     jobForm.elements.title.value = job.title && job.title !== "Untitled draft" ? job.title : (job.title || "");
     if (job.title === "Untitled draft") jobForm.elements.title.value = "";
     jobForm.elements.description.value = job.description || "";
-    jobForm.elements.prescribed.value = job.prescribed || "";
+    var linked = serviceIdsFromJob(job);
+    if (linked.length) {
+      setSelectedServiceIds(linked);
+    } else if (job.prescribed) {
+      setSelectedServiceTitles(String(job.prescribed).split(/\s*[·,|]\s*/));
+    } else {
+      setSelectedServiceIds([]);
+    }
+    syncPrescribedField();
     jobForm.elements.address.value = job.address || "";
     jobForm.elements.notes.value = job.notes || "";
     var hasBefore = !!photoByKind(job.job_photos, "before");
@@ -2829,7 +3039,7 @@ select{
   function updateJobReviewSummary() {
     var title = jobForm.elements.title.value.trim() || "Untitled draft";
     var description = jobForm.elements.description.value.trim();
-    var prescribed = jobForm.elements.prescribed.value.trim();
+    var prescribed = syncPrescribedField() || jobForm.elements.prescribed.value.trim();
     var beforeUrl = "";
     var afterUrl = "";
     if (beforePreview && !beforePreview.hidden && beforePreview.src) beforeUrl = beforePreview.src;
@@ -2948,6 +3158,7 @@ select{
     if (key === "title") {
       return !!(jobForm.elements.title.value && jobForm.elements.title.value.trim());
     }
+    if (key === "prescribed") return selectedServiceIds.length > 0;
     return true;
   }
 
@@ -2956,6 +3167,7 @@ select{
     var target = null;
     if (key === "photos") target = beforeSlot;
     else if (key === "after") target = afterLaterSlot || afterSlot;
+    else if (key === "prescribed") target = jobSvcPicks;
     else target = jobStepField(step);
     if (!target) return;
     target.classList.remove("shake");
@@ -3085,6 +3297,7 @@ select{
     jobForm.reset();
     jobForm.elements.id.value = "";
     delete jobForm.dataset.assessmentId;
+    setSelectedServiceIds([]);
     clearShotUi();
     showJobError("");
     setJobFormMode(false);
@@ -3130,10 +3343,11 @@ select{
   function draftPayloadFromForm() {
     var title = jobForm.elements.title.value.trim() || "Untitled draft";
     var existing = currentJobRecord();
+    var prescribed = syncPrescribedField() || null;
     var payload = {
       title: title,
       description: jobForm.elements.description.value.trim() || null,
-      prescribed: jobForm.elements.prescribed.value.trim() || null,
+      prescribed: prescribed || null,
       address: jobForm.elements.address.value.trim() || null,
       notes: jobForm.elements.notes.value.trim() || null
     };
@@ -3166,18 +3380,31 @@ select{
       var id = jobForm.elements.id.value;
       var payload = draftPayloadFromForm();
       var res = id
-        ? await sb.from("jobs").update(payload).eq("id", id).select("*, job_photos(*)").single()
-        : await sb.from("jobs").insert(payload).select("*, job_photos(*)").single();
+        ? await sb.from("jobs").update(payload).eq("id", id).select(JOBS_SELECT).single()
+        : await sb.from("jobs").insert(payload).select(JOBS_SELECT).single();
       if (res.error) {
         var msg = res.error.message || "Could not save draft.";
         if (/row-level security|JWT|not authenticated|401|403/i.test(msg)) {
           msg = "Session expired or not allowed to save. Sign in again and retry.";
+        }
+        if (/job_services|services/i.test(msg) || /column|schema cache|does not exist/i.test(msg)) {
+          msg = msg + " — run supabase/services.sql in the SQL Editor.";
         }
         return { error: { message: msg } };
       }
 
       jobForm.elements.id.value = res.data.id;
       if (jobForm.dataset.assessmentId) delete jobForm.dataset.assessmentId;
+
+      var linked = await syncJobServices(res.data.id, selectedServiceIds);
+      if (linked.error) {
+        var linkMsg = linked.error.message || "Could not save services.";
+        if (/job_services|services|schema cache|does not exist/i.test(linkMsg)) {
+          linkMsg = linkMsg + " — run supabase/services.sql in the SQL Editor.";
+        }
+        return { error: { message: linkMsg } };
+      }
+
       var idx = cachedJobs.findIndex(function (j) { return j.id === res.data.id; });
       if (idx >= 0) cachedJobs[idx] = res.data;
       else cachedJobs.unshift(res.data);
@@ -3213,8 +3440,11 @@ select{
         afterLaterInput.value = "";
       }
 
-      var refreshed = await sb.from("jobs").select("*, job_photos(*)").eq("id", res.data.id).single();
+      var refreshed = await sb.from("jobs").select(JOBS_SELECT).eq("id", res.data.id).single();
       if (!refreshed.error && refreshed.data) {
+        refreshed.data.job_services = (selectedServiceIds || []).map(function (service_id) {
+          return { service_id: service_id };
+        });
         var i2 = cachedJobs.findIndex(function (j) { return j.id === refreshed.data.id; });
         if (i2 >= 0) cachedJobs[i2] = refreshed.data;
         var beforePhoto = photoByKind(refreshed.data.job_photos, "before");
@@ -3407,7 +3637,7 @@ select{
           showError(appError, "Add a title before publishing.");
           return;
         }
-        if (!job.prescribed) {
+        if (!job.prescribed && !serviceIdsFromJob(job).length) {
           showError(appError, "Add prescribed services before publishing.");
           return;
         }
@@ -3488,17 +3718,29 @@ select{
   async function loadJobs() {
     showError(appError, "");
     jobsList.innerHTML = '<p class="loading">Loading…</p>';
-    var { data: jobs, error } = await sb.from("jobs")
-      .select("*, job_photos(*)")
+    var res = await sb.from("jobs")
+      .select(JOBS_SELECT)
       .order("created_at", { ascending: false });
-    if (error) {
+    if (res.error && /job_services|Could not find the table/i.test(res.error.message || "")) {
+      res = await sb.from("jobs")
+        .select("*, job_photos(*)")
+        .order("created_at", { ascending: false });
+      if (!res.error) {
+        showError(appError, "Services table missing — run supabase/services.sql in the SQL Editor to enable service picks.");
+      }
+    }
+    if (res.error) {
       jobsList.innerHTML = "";
-      showError(appError, error.message + (error.message.indexOf("description") >= 0 || error.message.indexOf("published") >= 0
-        ? " — run supabase/prescription_jobs.sql in the SQL Editor."
-        : ""));
+      var hint = "";
+      if (/job_services|relation.*services/i.test(res.error.message || "")) {
+        hint = " — run supabase/services.sql in the SQL Editor.";
+      } else if ((res.error.message || "").indexOf("description") >= 0 || (res.error.message || "").indexOf("published") >= 0) {
+        hint = " — run supabase/prescription_jobs.sql in the SQL Editor.";
+      }
+      showError(appError, res.error.message + hint);
       return;
     }
-    cachedJobs = jobs || [];
+    cachedJobs = res.data || [];
     renderJobsList();
     updateJobDraftChip();
   }
@@ -3571,6 +3813,7 @@ select{
     // Magic-link (or successful) sign-in clears the password lockout.
     try { await sb.rpc("clear_manager_login_lock"); } catch (e) { /* optional until SQL applied */ }
     setLockedUI(false);
+    await loadServicesCatalog();
     await loadRequests();
   }
 
