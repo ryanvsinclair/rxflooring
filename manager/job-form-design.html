@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#FFFFFF">
+<title>RX Manager · Add job (full-page design · temp)</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;}
+html{
+  -webkit-text-size-adjust:100%;
+  height:100%;
+  background:#FFFFFF;
+}
+body{margin:0; min-height:100%;}
+button,input,select,textarea{font:inherit;color:inherit;}
+
+:root{
+  color-scheme:light;
+  --bg:#FFFFFF;
+  --bg-alt:#F5F6F8;
+  --panel:#FFFFFF;
+  --panel-alt:#EDF0F2;
+  --ink:#1D242B;
+  --body:#4A535C;
+  --muted:#79828B;
+  --rule:#E3E6EA;
+  --rule-soft:#EDEFF2;
+  --accent:#1B4DFF;
+  --accent-hover:#0B3AD6;
+  --on-accent:#FFFFFF;
+  --signal:#00875A;
+  --danger:#C0392B;
+  --shadow:0 1px 2px rgba(29,36,43,.04),0 8px 28px rgba(29,36,43,.06);
+  --sf:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",system-ui,sans-serif;
+  --rx:"Iowan Old Style","Hoefler Text",Palatino,"Times New Roman",serif;
+  --gut:20px;
+  --wide:640px;
+  --header-h:52px;
+  --progress-h:44px;
+  --footer-h:72px;
+  --safe-top:env(safe-area-inset-top, 0px);
+  --safe-bottom:env(safe-area-inset-bottom, 0px);
+}
+
+/* ---------- design chrome (desktop note) ---------- */
+.design-note{
+  background:var(--bg-alt);
+  border-bottom:1px solid var(--rule);
+  padding:14px var(--gut);
+  font-family:var(--sf);
+  font-size:14px;
+  line-height:1.45;
+  color:var(--body);
+}
+.design-note-inner{
+  max-width:960px; margin:0 auto;
+  display:flex; flex-wrap:wrap; gap:10px 20px; align-items:baseline;
+}
+.design-note strong{color:var(--ink); font-weight:600;}
+.design-note .tag{
+  display:inline-block; margin-right:8px; padding:2px 8px; border-radius:999px;
+  font-size:10px; letter-spacing:.06em; text-transform:uppercase;
+  background:rgba(27,77,255,.1); color:var(--accent); font-weight:600;
+}
+.design-note a{color:var(--accent); text-decoration:none; font-weight:500;}
+.design-note a:hover{color:var(--accent-hover);}
+
+/* ---------- full-page shell ---------- */
+.page{
+  font-family:var(--sf);
+  color:var(--body);
+  letter-spacing:-.011em;
+  -webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(90% 50% at 50% -20%, rgba(27,77,255,.07) 0%, transparent 55%),
+    var(--bg);
+  min-height:calc(100vh - 52px);
+  min-height:calc(100dvh - 52px);
+  display:flex;
+  flex-direction:column;
+}
+.page-shell{
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+  max-width:var(--wide);
+  width:100%;
+  margin:0 auto;
+  min-height:0;
+}
+
+/* header */
+.page-header{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:calc(10px + var(--safe-top)) var(--gut) 10px;
+  border-bottom:1px solid var(--rule-soft);
+  background:rgba(255,255,255,.92);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+.page-back{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:40px; height:40px; padding:0;
+  border:1px solid var(--rule); border-radius:50%;
+  background:var(--panel); color:var(--ink);
+  cursor:pointer; flex-shrink:0;
+  transition:background .15s ease, border-color .15s ease;
+}
+.page-back:hover{background:var(--bg-alt); border-color:var(--rule);}
+.page-back svg{display:block;}
+.page-header-text{flex:1 1 auto; min-width:0;}
+.page-header h1{
+  margin:0; font-size:18px; font-weight:600; letter-spacing:-.025em; color:var(--ink);
+}
+.page-header .sub{
+  margin:2px 0 0; font-size:12.5px; color:var(--muted);
+}
+.page-badge{
+  flex-shrink:0;
+  font-size:10px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
+  padding:5px 9px; border-radius:999px;
+  background:rgba(27,77,255,.1); color:var(--accent);
+}
+
+/* progress */
+.page-progress{
+  flex-shrink:0;
+  padding:12px var(--gut) 14px;
+  border-bottom:1px solid var(--rule-soft);
+  background:var(--bg);
+}
+.progress-track{
+  height:3px; border-radius:999px; background:var(--rule-soft);
+  overflow:hidden; margin-bottom:10px;
+}
+.progress-fill{
+  height:100%; border-radius:999px; background:var(--accent);
+  width:12.5%; transition:width .35s cubic-bezier(.22,.55,.3,1);
+}
+.progress-meta{
+  display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+}
+.progress-step{
+  font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--muted);
+}
+.progress-step span{color:var(--accent);}
+.progress-label{
+  font-size:13px; font-weight:600; color:var(--ink); letter-spacing:-.01em;
+}
+
+/* scrollable step area */
+.page-body{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  padding:24px var(--gut) 28px;
+}
+.step{display:none; animation:stepIn .32s cubic-bezier(.22,.55,.3,1) both;}
+.step.is-active{display:block;}
+@keyframes stepIn{
+  from{opacity:0; transform:translateY(8px);}
+  to{opacity:1; transform:none;}
+}
+@media(prefers-reduced-motion:reduce){
+  .step.is-active{animation:none;}
+  .progress-fill{transition:none;}
+}
+
+.field-label{
+  display:block;
+  font-size:12px; font-weight:600; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:9px;
+}
+.field-label .opt{
+  text-transform:none; letter-spacing:0; font-weight:400;
+}
+.field-hint{
+  margin:-4px 0 12px; font-size:13.5px; line-height:1.45; color:var(--muted);
+}
+.field input:not([type=file]):not([type=hidden]),
+.field textarea{
+  width:100%;
+  background:var(--panel);
+  border:1px solid var(--rule);
+  border-radius:12px;
+  padding:14px 15px;
+  font-size:16px;
+  color:var(--ink);
+  transition:border-color .16s ease, box-shadow .16s ease;
+}
+.field textarea{min-height:120px; resize:vertical; line-height:1.45;}
+.field input::placeholder,
+.field textarea::placeholder{color:var(--muted);}
+.field input:focus,
+.field textarea:focus{
+  outline:none; border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(27,77,255,.12);
+}
+.field input.invalid,
+.field textarea.invalid,
+.shot-slot.invalid{
+  border-color:rgba(192,57,43,.65);
+  box-shadow:0 0 0 3px rgba(192,57,43,.1);
+}
+
+/* photo slots */
+.shot-pair{display:grid; gap:12px;}
+@media(min-width:420px){.shot-pair{grid-template-columns:1fr 1fr;}}
+.shot-slot{
+  border:1px dashed var(--rule);
+  border-radius:16px;
+  background:var(--bg-alt);
+  padding:14px;
+  min-height:168px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.shot-slot .field-label{margin-bottom:4px;}
+.shot-preview{
+  width:100%; aspect-ratio:4/3; border-radius:12px;
+  object-fit:cover; background:var(--panel-alt);
+  border:1px solid var(--rule);
+}
+.shot-preview[hidden]{display:none !important;}
+.shot-slot input[type=file]{
+  width:100%; font-size:14px; min-height:44px; color:var(--ink);
+}
+.shot-empty{
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:8px;
+  min-height:100px; color:var(--muted); text-align:center;
+  padding:12px;
+}
+.shot-empty svg{opacity:.45;}
+.shot-empty span{font-size:13px; line-height:1.35;}
+
+/* review slip */
+.review-intro{
+  margin:0 0 16px; font-size:14.5px; line-height:1.45; color:var(--muted);
+}
+.job-slip{
+  --slip-ink:#1D242B;
+  --slip-body:#4A535C;
+  --slip-muted:#79828B;
+  --slip-rule:#E3E6EA;
+  --slip-accent:#1B4DFF;
+  background:#FFFFFF;
+  color:var(--slip-body);
+  border-radius:18px;
+  padding:16px;
+  border:1px solid var(--slip-rule);
+  box-shadow:var(--shadow);
+}
+.job-slip-top{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin-bottom:10px;
+}
+.job-slip .mark{
+  font-family:var(--rx); font-size:22px; color:var(--slip-accent); line-height:1;
+}
+.job-ago{
+  font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--slip-muted);
+}
+.job-pair{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+.job-shot{
+  position:relative; overflow:hidden; border-radius:12px;
+  background:#EDF0F2; aspect-ratio:4/3;
+}
+.job-shot img{width:100%; height:100%; object-fit:cover; display:block;}
+.job-shot.is-empty{
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--slip-muted);
+}
+.job-shot i{
+  position:absolute; left:8px; bottom:8px;
+  font-style:normal; font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+  color:#fff; background:rgba(29,36,43,.42); padding:4px 7px; border-radius:980px;
+}
+.job-slip h3{
+  margin:12px 0 0; color:var(--slip-ink); font-size:17px;
+  letter-spacing:-.02em; font-weight:600;
+}
+.job-slip > p{
+  margin:7px 0 0; font-size:14px; color:var(--slip-body); line-height:1.45;
+}
+.job-slip .svc-line{margin-top:10px; font-size:12.5px; color:var(--slip-muted);}
+.job-slip .svc-line b{color:var(--slip-ink); font-weight:600;}
+.slip-missing{opacity:.55; font-style:italic;}
+.review-fine{
+  margin:18px 0 0; font-size:13px; line-height:1.5; color:var(--muted); text-align:center;
+}
+.review-meta{
+  margin-top:20px; padding-top:16px; border-top:1px solid var(--rule-soft);
+  display:grid; gap:10px;
+}
+.review-row{
+  display:flex; gap:10px; font-size:13.5px; line-height:1.4;
+}
+.review-row dt{
+  flex:0 0 88px; margin:0; font-weight:600; color:var(--muted);
+  font-size:11px; letter-spacing:.04em; text-transform:uppercase;
+}
+.review-row dd{margin:0; color:var(--ink); flex:1 1 auto; word-break:break-word;}
+
+/* footer */
+.page-footer{
+  flex-shrink:0;
+  display:flex; align-items:center; gap:12px;
+  padding:12px var(--gut) calc(12px + var(--safe-bottom));
+  border-top:1px solid var(--rule);
+  background:rgba(255,255,255,.94);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+  position:sticky;
+  bottom:0;
+  z-index:20;
+}
+.btn-back{
+  background:none; border:0; color:var(--muted);
+  font-size:14px; font-weight:500; cursor:pointer; padding:10px 4px;
+  min-height:44px; transition:color .15s ease;
+}
+.btn-back:hover{color:var(--ink);}
+.btn-back[hidden]{visibility:hidden;}
+.btn-dots{
+  flex:1 1 auto; display:flex; gap:5px; align-items:center; justify-content:center;
+}
+.btn-dot{
+  width:6px; height:6px; border-radius:50%;
+  background:rgba(29,36,43,.16); transition:background .2s, transform .2s;
+}
+.btn-dot.is-active{background:var(--accent); transform:scale(1.25);}
+.btn-primary{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:48px; padding:0 24px;
+  background:var(--accent); color:var(--on-accent);
+  border:0; border-radius:999px;
+  font-size:16px; font-weight:600; letter-spacing:-.01em;
+  cursor:pointer; transition:background .15s ease;
+  margin-left:auto;
+}
+.btn-primary:hover{background:var(--accent-hover);}
+.btn-primary:disabled{opacity:.5; cursor:not-allowed;}
+
+.page-clear{
+  display:block; width:100%; margin-top:8px;
+  background:none; border:0; color:var(--muted);
+  font-size:13px; font-weight:500; cursor:pointer; padding:10px;
+  text-align:center;
+}
+.page-clear:hover{color:var(--ink);}
+
+/* done toast */
+.toast{
+  position:fixed; left:50%; bottom:calc(88px + var(--safe-bottom));
+  transform:translateX(-50%) translateY(12px);
+  background:var(--ink); color:#fff;
+  padding:12px 18px; border-radius:12px;
+  font-size:14px; font-weight:500;
+  box-shadow:0 12px 40px rgba(29,36,43,.2);
+  opacity:0; pointer-events:none;
+  transition:opacity .25s ease, transform .25s ease;
+  z-index:50;
+}
+.toast.is-visible{opacity:1; transform:translateX(-50%) translateY(0);}
+
+@media(min-width:720px){
+  .design-note{display:block;}
+  .page{
+    min-height:calc(100vh - 52px);
+    border-left:1px solid var(--rule-soft);
+    border-right:1px solid var(--rule-soft);
+    box-shadow:var(--shadow);
+    margin:0 auto;
+    max-width:var(--wide);
+  }
+}
+@media(max-width:719px){
+  .design-note{font-size:13px; padding:12px 16px;}
+}
+</style>
+</head>
+<body>
+
+<div class="design-note">
+  <div class="design-note-inner">
+    <p><span class="tag">Temp</span><strong>Full-page add job</strong> — design mockup for moving the wizard out of the modal. Interactive; nothing saves.</p>
+    <p><a href="/manager/">← Back to manager</a> · <a href="/manager/nav-concepts.html">Nav concepts</a></p>
+  </div>
+</div>
+
+<div class="page" id="page">
+  <div class="page-shell">
+    <header class="page-header">
+      <button type="button" class="page-back" id="btnClose" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="page-header-text">
+        <h1>Add job</h1>
+        <p class="sub">Saved as draft after each step</p>
+      </div>
+      <span class="page-badge" id="draftBadge">Draft</span>
+    </header>
+
+    <div class="page-progress" aria-hidden="true">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-meta">
+        <p class="progress-step">Step <span id="stepNum">1</span> of 8</p>
+        <p class="progress-label" id="stepLabel">Photos</p>
+      </div>
+    </div>
+
+    <main class="page-body" id="pageBody">
+      <!-- 1 Photos -->
+      <section class="step is-active" data-step="1" data-key="photos">
+        <p class="field-hint">Before photo is required to publish. After can wait until the job is done.</p>
+        <div class="shot-pair">
+          <div class="shot-slot" id="beforeSlot">
+            <label class="field-label">Before</label>
+            <div class="shot-empty" id="beforeEmpty">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+              <span>Tap to add before photo</span>
+            </div>
+            <img class="shot-preview" id="beforePreview" alt="Before" hidden>
+            <input type="file" id="beforeInput" accept="image/*" capture="environment">
+          </div>
+          <div class="shot-slot" id="afterSlot">
+            <label class="field-label">After <span class="opt">(optional)</span></label>
+            <div class="shot-empty" id="afterEmpty">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+              <span>Skip if not done yet</span>
+            </div>
+            <img class="shot-preview" id="afterPreview" alt="After" hidden>
+            <input type="file" id="afterInput" accept="image/*" capture="environment">
+          </div>
+        </div>
+      </section>
+
+      <!-- 2 Title -->
+      <section class="step" data-step="2" data-key="title">
+        <label class="field-label" for="titleInput">Title</label>
+        <div class="field">
+          <input id="titleInput" type="text" placeholder="e.g. Peaking LVP" autocomplete="off">
+        </div>
+      </section>
+
+      <!-- 3 Description -->
+      <section class="step" data-step="3" data-key="description">
+        <label class="field-label" for="descInput">Description <span class="opt">(optional)</span></label>
+        <div class="field">
+          <textarea id="descInput" placeholder="e.g. Moisture under the old floor. Pulled, dried, levelled, re-laid."></textarea>
+        </div>
+      </section>
+
+      <!-- 4 Prescribed -->
+      <section class="step" data-step="4" data-key="prescribed">
+        <label class="field-label" for="prescribedInput">Prescribed services</label>
+        <p class="field-hint">What the RX team did — shows on the public job card.</p>
+        <div class="field">
+          <input id="prescribedInput" type="text" placeholder="e.g. Removal · Subfloor · LVP" autocomplete="off">
+        </div>
+      </section>
+
+      <!-- 5 After (if skipped) -->
+      <section class="step" data-step="5" data-key="after">
+        <label class="field-label">After photo <span class="opt">(optional)</span></label>
+        <p class="field-hint">Add the finished shot when you have it.</p>
+        <div class="shot-slot" id="afterLaterSlot">
+          <div class="shot-empty" id="afterLaterEmpty">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            <span>Tap to add after photo</span>
+          </div>
+          <img class="shot-preview" id="afterLaterPreview" alt="After" hidden>
+          <input type="file" id="afterLaterInput" accept="image/*" capture="environment">
+        </div>
+      </section>
+
+      <!-- 6 Address -->
+      <section class="step" data-step="6" data-key="address">
+        <label class="field-label" for="addressInput">Address <span class="opt">(private, optional)</span></label>
+        <p class="field-hint">For your records only — never shown on the site.</p>
+        <div class="field">
+          <input id="addressInput" type="text" placeholder="Job site address" autocomplete="street-address">
+        </div>
+      </section>
+
+      <!-- 7 Notes -->
+      <section class="step" data-step="7" data-key="notes">
+        <label class="field-label" for="notesInput">Internal notes <span class="opt">(optional)</span></label>
+        <div class="field">
+          <input id="notesInput" type="text" placeholder="Managers only — not on the site">
+        </div>
+      </section>
+
+      <!-- 8 Review -->
+      <section class="step" data-step="8" data-key="review">
+        <p class="review-intro">How it looks on the site</p>
+        <article class="job-slip" id="reviewSlip"></article>
+        <dl class="review-meta" id="reviewMeta"></dl>
+        <p class="review-fine">Saved as a draft. Publish from Jobs → Draft when you are ready.</p>
+        <button type="button" class="page-clear" id="btnClear">Clear form</button>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <button type="button" class="btn-back" id="btnBack" hidden>Back</button>
+      <div class="btn-dots" id="dots" aria-hidden="true"></div>
+      <button type="button" class="btn-primary" id="btnNext">Continue</button>
+    </footer>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function () {
+  var STEPS = [
+    { key: "photos", label: "Photos" },
+    { key: "title", label: "Title" },
+    { key: "description", label: "Description" },
+    { key: "prescribed", label: "Prescribed" },
+    { key: "after", label: "After photo" },
+    { key: "address", label: "Address" },
+    { key: "notes", label: "Notes" },
+    { key: "review", label: "Review" }
+  ];
+  var TOTAL = STEPS.length;
+  var current = 1;
+
+  var beforeInput = document.getElementById("beforeInput");
+  var afterInput = document.getElementById("afterInput");
+  var afterLaterInput = document.getElementById("afterLaterInput");
+  var beforePreview = document.getElementById("beforePreview");
+  var afterPreview = document.getElementById("afterPreview");
+  var afterLaterPreview = document.getElementById("afterLaterPreview");
+  var beforeEmpty = document.getElementById("beforeEmpty");
+  var afterEmpty = document.getElementById("afterEmpty");
+  var afterLaterEmpty = document.getElementById("afterLaterEmpty");
+  var beforeSlot = document.getElementById("beforeSlot");
+  var titleInput = document.getElementById("titleInput");
+  var descInput = document.getElementById("descInput");
+  var prescribedInput = document.getElementById("prescribedInput");
+  var addressInput = document.getElementById("addressInput");
+  var notesInput = document.getElementById("notesInput");
+  var reviewSlip = document.getElementById("reviewSlip");
+  var reviewMeta = document.getElementById("reviewMeta");
+  var progressFill = document.getElementById("progressFill");
+  var stepNum = document.getElementById("stepNum");
+  var stepLabel = document.getElementById("stepLabel");
+  var btnBack = document.getElementById("btnBack");
+  var btnNext = document.getElementById("btnNext");
+  var btnClear = document.getElementById("btnClear");
+  var btnClose = document.getElementById("btnClose");
+  var dotsEl = document.getElementById("dots");
+  var toast = document.getElementById("toast");
+  var steps = document.querySelectorAll(".step");
+
+  var urls = { before: null, after: null, afterLater: null };
+
+  function esc(s) {
+    return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function hasAfterPhoto() {
+    return !!(urls.after || urls.afterLater);
+  }
+
+  function afterUrl() {
+    return urls.after || urls.afterLater;
+  }
+
+  function shouldSkipAfterStep() {
+    return hasAfterPhoto();
+  }
+
+  function nextIndex(from) {
+    var n = from + 1;
+    while (n <= TOTAL) {
+      if (STEPS[n - 1].key === "after" && shouldSkipAfterStep()) { n++; continue; }
+      return n;
+    }
+    return TOTAL;
+  }
+
+  function prevIndex(from) {
+    var n = from - 1;
+    while (n >= 1) {
+      if (STEPS[n - 1].key === "after" && shouldSkipAfterStep()) { n--; continue; }
+      return n;
+    }
+    return 1;
+  }
+
+  function bindPhoto(input, preview, emptyEl, key) {
+    input.addEventListener("change", function () {
+      var file = input.files && input.files[0];
+      if (urls[key]) URL.revokeObjectURL(urls[key]);
+      if (!file) {
+        urls[key] = null;
+        preview.hidden = true;
+        preview.removeAttribute("src");
+        if (emptyEl) emptyEl.hidden = false;
+        return;
+      }
+      urls[key] = URL.createObjectURL(file);
+      preview.src = urls[key];
+      preview.hidden = false;
+      if (emptyEl) emptyEl.hidden = true;
+      if (key === "after" && urls.afterLater) {
+        URL.revokeObjectURL(urls.afterLater);
+        urls.afterLater = null;
+        afterLaterPreview.hidden = true;
+        afterLaterEmpty.hidden = false;
+        afterLaterInput.value = "";
+      }
+    });
+  }
+
+  bindPhoto(beforeInput, beforePreview, beforeEmpty, "before");
+  bindPhoto(afterInput, afterPreview, afterEmpty, "after");
+  bindPhoto(afterLaterInput, afterLaterPreview, afterLaterEmpty, "afterLater");
+
+  function renderDots() {
+    dotsEl.innerHTML = "";
+    for (var i = 1; i <= TOTAL; i++) {
+      if (i === 5 && shouldSkipAfterStep()) continue;
+      var d = document.createElement("span");
+      d.className = "btn-dot" + (i === current ? " is-active" : "");
+      dotsEl.appendChild(d);
+    }
+  }
+
+  function renderReview() {
+    var title = titleInput.value.trim();
+    var desc = descInput.value.trim();
+    var prescribed = prescribedInput.value.trim();
+    var bUrl = urls.before;
+    var aUrl = afterUrl();
+    reviewSlip.innerHTML =
+      '<div class="job-slip-top">' +
+        '<span class="mark" aria-hidden="true">℞</span>' +
+        '<span class="job-ago">just now</span>' +
+      '</div>' +
+      '<div class="job-pair">' +
+        (bUrl
+          ? '<div class="job-shot"><img src="' + esc(bUrl) + '" alt=""><i>Before</i></div>'
+          : '<div class="job-shot is-empty">Before</div>') +
+        (aUrl
+          ? '<div class="job-shot"><img src="' + esc(aUrl) + '" alt=""><i>After</i></div>'
+          : '<div class="job-shot is-empty">After</div>') +
+      '</div>' +
+      '<h3>' + esc(title || "Job title") + '</h3>' +
+      '<p' + (desc ? '' : ' class="slip-missing"') + '>' +
+        esc(desc || "Description will show here") +
+      '</p>' +
+      '<p class="svc-line"><b>Prescribed:</b> ' +
+        (prescribed ? esc(prescribed) : '<span class="slip-missing">Services</span>') +
+      '</p>';
+
+    var addr = addressInput.value.trim();
+    var notes = notesInput.value.trim();
+    var meta = "";
+    if (addr) meta += '<div class="review-row"><dt>Address</dt><dd>' + esc(addr) + '</dd></div>';
+    if (notes) meta += '<div class="review-row"><dt>Notes</dt><dd>' + esc(notes) + '</dd></div>';
+    reviewMeta.innerHTML = meta;
+    reviewMeta.hidden = !meta;
+  }
+
+  function showStep(n, animate) {
+    current = n;
+    steps.forEach(function (s) {
+      s.classList.toggle("is-active", parseInt(s.dataset.step, 10) === n);
+    });
+    progressFill.style.width = (n / TOTAL * 100) + "%";
+    stepNum.textContent = String(n);
+    stepLabel.textContent = STEPS[n - 1].label;
+    btnBack.hidden = n === 1;
+    btnNext.textContent = n === TOTAL ? "Done" : "Continue";
+    renderDots();
+    if (n === TOTAL) renderReview();
+    if (animate) {
+      var body = document.getElementById("pageBody");
+      body.scrollTop = 0;
+    }
+  }
+
+  function validateStep() {
+    var key = STEPS[current - 1].key;
+    if (key === "photos") {
+      if (!urls.before) {
+        beforeSlot.classList.add("invalid");
+        setTimeout(function () { beforeSlot.classList.remove("invalid"); }, 600);
+        return false;
+      }
+    }
+    if (key === "title") {
+      if (!titleInput.value.trim()) {
+        titleInput.classList.add("invalid");
+        titleInput.focus();
+        setTimeout(function () { titleInput.classList.remove("invalid"); }, 600);
+        return false;
+      }
+    }
+    if (key === "prescribed") {
+      if (!prescribedInput.value.trim()) {
+        prescribedInput.classList.add("invalid");
+        prescribedInput.focus();
+        setTimeout(function () { prescribedInput.classList.remove("invalid"); }, 600);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("is-visible");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(function () { toast.classList.remove("is-visible"); }, 2800);
+  }
+
+  btnNext.addEventListener("click", function () {
+    if (current < TOTAL) {
+      if (!validateStep()) return;
+      showStep(nextIndex(current), true);
+      return;
+    }
+    showToast("Draft saved — would return to Jobs → Draft");
+  });
+
+  btnBack.addEventListener("click", function () {
+    showStep(prevIndex(current), true);
+  });
+
+  btnClose.addEventListener("click", function () {
+    if (confirm("Discard this draft and go back to manager?")) {
+      window.location.href = "/manager/";
+    }
+  });
+
+  btnClear.addEventListener("click", function () {
+    if (!confirm("Clear all fields?")) return;
+    [beforeInput, afterInput, afterLaterInput].forEach(function (i) { i.value = ""; });
+    titleInput.value = "";
+    descInput.value = "";
+    prescribedInput.value = "";
+    addressInput.value = "";
+    notesInput.value = "";
+    Object.keys(urls).forEach(function (k) {
+      if (urls[k]) URL.revokeObjectURL(urls[k]);
+      urls[k] = null;
+    });
+    beforePreview.hidden = afterPreview.hidden = afterLaterPreview.hidden = true;
+    beforeEmpty.hidden = afterEmpty.hidden = afterLaterEmpty.hidden = false;
+    showStep(1, true);
+  });
+
+  showStep(1, false);
+})();
+</script>
+</body>
+</html>
