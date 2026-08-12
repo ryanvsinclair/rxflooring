@@ -783,63 +783,109 @@ select{
   color:var(--ink);
   border-color:var(--rule);
 }
-.panel-toolbar .status-filter{
+/* Custom bookings status filter (no native <select>) */
+.status-dd{
   position:relative;
   flex:1 1 auto;
   min-width:0;
   max-width:min(100%,220px);
-  height:40px;
-  border-radius:980px;
-  border:1px solid var(--rule);
-  background-color:#FFFFFF;
-  box-shadow:var(--shadow);
-  overflow:hidden;
-  -webkit-tap-highlight-color:transparent;
+  z-index:15;
 }
-.panel-toolbar .status-filter select,
-#statusFilter{
-  display:block;
+.status-dd-btn{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
   width:100%;
-  height:100%;
-  min-height:0;
+  min-height:40px;
+  padding:8px 14px;
   margin:0;
-  padding:0 34px 0 14px;
+  border:1px solid var(--rule);
+  border-radius:980px;
+  background:#FFFFFF;
+  box-shadow:var(--shadow);
+  color:var(--ink);
+  font:inherit;
   font-size:13px;
-  line-height:40px;
-  color:#1D242B;
-  border:0;
-  border-radius:0;
-  box-shadow:none;
-  appearance:none;
-  -webkit-appearance:none;
-  -moz-appearance:none;
-  color-scheme:light;
-  background-color:#FFFFFF;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath stroke='%2379828B' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='m1.5 1.5 4.5 4.5 4.5-4.5'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right 14px center;
-  background-size:12px 8px;
+  font-weight:600;
+  letter-spacing:-.01em;
+  text-align:left;
+  cursor:pointer;
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;
 }
-.panel-toolbar .status-filter select:hover,
-.panel-toolbar .status-filter select:active,
-.panel-toolbar .status-filter select:focus,
-.panel-toolbar .status-filter select:focus-visible,
-#statusFilter:hover,
-#statusFilter:active,
-#statusFilter:focus,
-#statusFilter:focus-visible{
-  color:#1D242B;
-  border:0;
+.status-dd-btn:hover,
+.status-dd-btn:active,
+.status-dd-btn:focus,
+.status-dd-btn:focus-visible{
+  background:#FFFFFF;
+  color:var(--ink);
+  border-color:var(--rule);
   outline:none;
-  box-shadow:none;
-  background-color:#FFFFFF;
+  box-shadow:var(--shadow);
 }
-.panel-toolbar .status-filter select option,
-#statusFilter option{
-  background-color:#FFFFFF;
-  color:#1D242B;
+.status-dd-btn .status-dd-chev{
+  flex-shrink:0;
+  width:12px;
+  height:8px;
+  color:var(--muted);
+}
+.status-dd-btn[aria-expanded="true"] .status-dd-chev{
+  transform:rotate(180deg);
+}
+.status-dd-menu{
+  position:absolute;
+  left:0;
+  right:0;
+  top:calc(100% + 6px);
+  margin:0;
+  padding:6px;
+  list-style:none;
+  border:1px solid var(--rule);
+  border-radius:16px;
+  background:#FFFFFF;
+  box-shadow:var(--shadow);
+  max-height:min(280px, 50vh);
+  overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.status-dd-menu[hidden]{display:none !important;}
+.status-dd-menu button{
+  display:block;
+  width:100%;
+  margin:0;
+  padding:11px 12px;
+  border:0;
+  border-radius:12px;
+  background:transparent;
+  color:var(--ink);
+  font:inherit;
+  font-size:14px;
+  font-weight:500;
+  text-align:left;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.status-dd-menu button:hover,
+.status-dd-menu button:active,
+.status-dd-menu button:focus,
+.status-dd-menu button:focus-visible{
+  background:var(--bg-alt);
+  color:var(--ink);
+  outline:none;
+}
+.status-dd-menu button.is-selected{
+  color:var(--accent);
+  font-weight:600;
+}
+.status-dd-menu button.is-selected:hover,
+.status-dd-menu button.is-selected:active,
+.status-dd-menu button.is-selected:focus,
+.status-dd-menu button.is-selected:focus-visible{
+  background:rgba(27,77,255,.08);
+  color:var(--accent);
 }
 .panel-toolbar .jobs-add{
   width:40px; height:40px; min-height:40px; padding:0;
@@ -1276,18 +1322,8 @@ select{
   .req-call{width:38px; height:38px; min-width:38px; min-height:38px;}
   .panel-toolbar{margin-bottom:14px; gap:6px;}
   .panel-toolbar .pill{min-height:38px; padding:7px 12px; font-size:12.5px;}
-  .panel-toolbar .status-filter{
-    height:38px;
-    max-width:none;
-    flex:1 1 auto;
-  }
-  .panel-toolbar .status-filter select,
-  #statusFilter{
-    font-size:12.5px;
-    line-height:38px;
-    padding:0 32px 0 12px;
-    background-position:right 12px center;
-  }
+  .status-dd{max-width:none; flex:1 1 auto;}
+  .status-dd-btn{min-height:38px; padding:7px 12px; font-size:12.5px;}
   .panel-toolbar .jobs-add{width:38px; height:38px; min-height:38px; font-size:20px;}
   .job-form h2{font-size:22px;}
   .job-wizard-dots{order:3; flex-basis:100%; justify-content:center; margin-top:2px;}
@@ -1370,17 +1406,21 @@ select{
 
       <div id="mode-bookings">
         <div class="panel-toolbar is-split">
-          <div class="status-filter">
-            <select id="statusFilter" aria-label="Filter by status">
-              <option value="active" selected>Active</option>
-              <option value="all">All statuses</option>
-              <option value="new">New</option>
-              <option value="contacted">Contacted</option>
-              <option value="scheduled">Scheduled</option>
-              <option value="done">Done</option>
-              <option value="closed">Closed</option>
-              <option value="archived">Archived</option>
-            </select>
+          <div class="status-dd" id="statusFilter">
+            <button type="button" class="status-dd-btn" id="statusFilterBtn" aria-label="Filter by status" aria-haspopup="listbox" aria-expanded="false" aria-controls="statusFilterMenu">
+              <span id="statusFilterLabel">Active</span>
+              <svg class="status-dd-chev" viewBox="0 0 12 8" fill="none" aria-hidden="true"><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="m1.5 1.5 4.5 4.5 4.5-4.5"/></svg>
+            </button>
+            <ul class="status-dd-menu" id="statusFilterMenu" role="listbox" aria-label="Filter by status" hidden>
+              <li role="presentation"><button type="button" role="option" data-value="active" aria-selected="true" class="is-selected">Active</button></li>
+              <li role="presentation"><button type="button" role="option" data-value="all" aria-selected="false">All statuses</button></li>
+              <li role="presentation"><button type="button" role="option" data-value="new" aria-selected="false">New</button></li>
+              <li role="presentation"><button type="button" role="option" data-value="contacted" aria-selected="false">Contacted</button></li>
+              <li role="presentation"><button type="button" role="option" data-value="scheduled" aria-selected="false">Scheduled</button></li>
+              <li role="presentation"><button type="button" role="option" data-value="done" aria-selected="false">Done</button></li>
+              <li role="presentation"><button type="button" role="option" data-value="closed" aria-selected="false">Closed</button></li>
+              <li role="presentation"><button type="button" role="option" data-value="archived" aria-selected="false">Archived</button></li>
+            </ul>
           </div>
           <button type="button" class="pill ghost" id="refreshRequests">Refresh</button>
         </div>
@@ -1615,7 +1655,55 @@ select{
   var emailLinkBtn = document.getElementById("emailLinkBtn");
   var requestsList = document.getElementById("requestsList");
   var jobsList = document.getElementById("jobsList");
-  var statusFilter = document.getElementById("statusFilter");
+  var statusFilterRoot = document.getElementById("statusFilter");
+  var statusFilterBtn = document.getElementById("statusFilterBtn");
+  var statusFilterLabel = document.getElementById("statusFilterLabel");
+  var statusFilterMenu = document.getElementById("statusFilterMenu");
+  var statusFilterValue = "active";
+
+  function setStatusFilterOpen(open) {
+    if (!statusFilterMenu || !statusFilterBtn) return;
+    statusFilterMenu.hidden = !open;
+    statusFilterBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  function setStatusFilterValue(value, label) {
+    statusFilterValue = value || "active";
+    if (statusFilterLabel) statusFilterLabel.textContent = label || value;
+    if (statusFilterMenu) {
+      statusFilterMenu.querySelectorAll("[data-value]").forEach(function (opt) {
+        var on = opt.getAttribute("data-value") === statusFilterValue;
+        opt.classList.toggle("is-selected", on);
+        opt.setAttribute("aria-selected", on ? "true" : "false");
+      });
+    }
+  }
+
+  if (statusFilterBtn && statusFilterMenu) {
+    statusFilterBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      setStatusFilterOpen(statusFilterMenu.hidden);
+    });
+    statusFilterMenu.querySelectorAll("[data-value]").forEach(function (opt) {
+      opt.addEventListener("click", function (e) {
+        e.stopPropagation();
+        setStatusFilterValue(opt.getAttribute("data-value"), opt.textContent.trim());
+        setStatusFilterOpen(false);
+        loadRequests();
+      });
+    });
+    document.addEventListener("click", function (e) {
+      if (!statusFilterRoot || statusFilterMenu.hidden) return;
+      if (statusFilterRoot.contains(e.target)) return;
+      setStatusFilterOpen(false);
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && statusFilterMenu && !statusFilterMenu.hidden) {
+        setStatusFilterOpen(false);
+        statusFilterBtn.focus();
+      }
+    });
+  }
   var jobForm = document.getElementById("jobForm");
 
   function showError(el, msg) {
@@ -2355,7 +2443,7 @@ select{
     var q = sb.from("assessment_requests")
       .select("*")
       .order("preferred_date", { ascending: true });
-    var filter = statusFilter.value;
+    var filter = statusFilterValue;
     if (filter === "active") q = q.neq("status", "archived");
     else if (filter && filter !== "all") q = q.eq("status", filter);
     var { data, error } = await q;
@@ -2417,10 +2505,6 @@ select{
   }
 
   document.getElementById("refreshRequests").addEventListener("click", loadRequests);
-  statusFilter.addEventListener("change", function () {
-    statusFilter.blur();
-    loadRequests();
-  });
 
   /* ---------- jobs: full-page wizard (+ / Edit) ----------
      Popup morph modal deactivated — see HTML comment above #jobPageView. */
