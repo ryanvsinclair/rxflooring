@@ -5,8 +5,9 @@ Allow: /
 Disallow: /manager
 Disallow: /manager/
 Disallow: /freezer.html
+Disallow: /preview1.html
+Disallow: /public/previews/
 Disallow: /*-concepts.html
-Disallow: /jobs-focus-splits.html
-Disallow: /services-bubbles.html
+Disallow: /*-design.html
 
 Sitemap: https://rxflooring.ca/sitemap.xml

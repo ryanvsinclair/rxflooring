@@ -5,6 +5,68 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RX Flooring · Ottawa carpet, vinyl &amp; hardwood installation</title>
 <meta name="description" content="Ottawa flooring installation by the RX Flooring team. Ten years in the trade, 750+ units delivered in 2025 for Minto, Mattamy, Caivan and Claridge. Carpet, LVP, laminate, hardwood and tile: assessed, prescribed, installed.">
+<link rel="canonical" href="https://rxflooring.ca/">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta name="theme-color" content="#FFFFFF">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="RX Flooring">
+<meta property="og:locale" content="en_CA">
+<meta property="og:url" content="https://rxflooring.ca/">
+<meta property="og:title" content="RX Flooring · Ottawa carpet, vinyl &amp; hardwood installation">
+<meta property="og:description" content="Ottawa flooring installation by the RX Flooring team. Carpet, LVP, laminate, hardwood and tile: assessed, prescribed, installed. Free on-site assessment.">
+<meta property="og:image" content="https://rxflooring.ca/assets/hero-poster.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="720">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="RX Flooring · Ottawa carpet, vinyl &amp; hardwood installation">
+<meta name="twitter:description" content="Ottawa flooring installation by the RX Flooring team. Carpet, LVP, laminate, hardwood and tile: assessed, prescribed, installed.">
+<meta name="twitter:image" content="https://rxflooring.ca/assets/hero-poster.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://rxflooring.ca/#website",
+      "url": "https://rxflooring.ca/",
+      "name": "RX Flooring",
+      "description": "Ottawa carpet, vinyl, laminate, hardwood and tile installation — assessed, prescribed, installed.",
+      "publisher": { "@id": "https://rxflooring.ca/#business" },
+      "inLanguage": "en-CA"
+    },
+    {
+      "@type": "HomeAndConstructionBusiness",
+      "@id": "https://rxflooring.ca/#business",
+      "name": "RX Flooring",
+      "url": "https://rxflooring.ca/",
+      "image": "https://rxflooring.ca/assets/hero-poster.jpg",
+      "telephone": "+16138903394",
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Ottawa",
+        "addressRegion": "ON",
+        "addressCountry": "CA"
+      },
+      "areaServed": [
+        { "@type": "City", "name": "Ottawa" },
+        { "@type": "City", "name": "Kanata" },
+        { "@type": "City", "name": "Barrhaven" },
+        { "@type": "City", "name": "Nepean" },
+        { "@type": "City", "name": "Orléans" },
+        { "@type": "City", "name": "Stittsville" }
+      ],
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+        "opens": "07:00",
+        "closes": "18:00"
+      },
+      "sameAs": []
+    }
+  ]
+}
+</script>
 <style>
 /* ============================================================
    RX FLOORING · "The Prescription" direction
@@ -853,6 +915,9 @@ body.is-svc-drawer-open{overflow:hidden;}
   aspect-ratio:3/4;
   border-radius:22px; padding:0; box-sizing:border-box;
   position:relative;
+  display:block;
+  text-decoration:none;
+  color:inherit;
   background:transparent;
   border:0;
   /* Soft layered ground shadow - wide falloff, no hard edge */
@@ -864,6 +929,8 @@ body.is-svc-drawer-open{overflow:hidden;}
   transform-style:preserve-3d;
   transition:transform .45s cubic-bezier(.22,.7,.3,1), box-shadow .45s ease;
 }
+a.site-card.is-link{ cursor:pointer; }
+a.site-card.is-link:focus-visible{ outline:2px solid var(--accent); outline-offset:4px; }
 .site-card:hover{
   transform:translateY(-6px) rotateX(5deg);
   box-shadow:
@@ -2286,6 +2353,16 @@ html{scroll-behavior:smooth;}
       </div>
 
       <div class="foot-col">
+        <span class="k">Services</span>
+        <p class="v"><a href="/carpet-installation-ottawa">Carpet installation</a></p>
+        <p class="v"><a href="/lvp-installation-ottawa">LVP / LVT installation</a></p>
+        <p class="v"><a href="/laminate-installation-ottawa">Laminate installation</a></p>
+        <p class="v"><a href="/hardwood-installation-ottawa">Hardwood installation</a></p>
+        <p class="v"><a href="/carpet-repair-restretching-ottawa">Carpet repair</a></p>
+        <p class="v"><a href="/stair-carpet-runners-ottawa">Stair carpet &amp; runners</a></p>
+      </div>
+
+      <div class="foot-col">
         <span class="k">Contact</span>
         <p class="v"><a href="tel:+16138903394">(613) 890-3394</a></p>
         <p class="v" style="margin-top:14px;">
@@ -2297,13 +2374,7 @@ html{scroll-behavior:smooth;}
         <span class="k">Hours</span>
         <p class="v">Mon – Sat</p>
         <p class="v">7:00 AM – 6:00 PM</p>
-      </div>
-
-      <div class="foot-col">
-        <span class="k">Service area</span>
-        <p class="v">Ottawa · Kanata · Barrhaven</p>
-        <p class="v">Nepean · Orleans · Stittsville</p>
-        <p class="v">Manotick &amp; surrounding</p>
+        <p class="v" style="margin-top:14px;">Ottawa &amp; surrounding</p>
       </div>
     </div>
 
@@ -3396,42 +3467,48 @@ function initCoverflowCarousel(root, opts){
       cat: "Flooring",
       slug: "carpet",
       title: "Carpet Installation",
-      detail: "Wall-to-wall stretch-in and glue-down."
+      detail: "Wall-to-wall stretch-in and glue-down.",
+      href: "/carpet-installation-ottawa"
     },
     {
       category: "flooring",
       cat: "Flooring",
       slug: "stairs",
       title: "Stair Wrapping & Runners",
-      detail: "Carpet stair wrapping and stair runners, clean around every spindle."
+      detail: "Carpet stair wrapping and stair runners, clean around every spindle.",
+      href: "/stair-carpet-runners-ottawa"
     },
     {
       category: "flooring",
       cat: "Flooring",
       slug: "seaming",
       title: "Seaming, Repair & Restretching",
-      detail: "Carpet seaming, repair, and power-stretch restretching."
+      detail: "Carpet seaming, repair, and power-stretch restretching.",
+      href: "/carpet-repair-restretching-ottawa"
     },
     {
       category: "flooring",
       cat: "Flooring",
       slug: "lvp",
       title: "LVP / LVT Installation",
-      detail: "Luxury vinyl plank and luxury vinyl tile."
+      detail: "Luxury vinyl plank and luxury vinyl tile.",
+      href: "/lvp-installation-ottawa"
     },
     {
       category: "flooring",
       cat: "Flooring",
       slug: "laminate",
       title: "Laminate Installation",
-      detail: "Laminate flooring, measured and laid right."
+      detail: "Laminate flooring, measured and laid right.",
+      href: "/laminate-installation-ottawa"
     },
     {
       category: "flooring",
       cat: "Flooring",
       slug: "hardwood",
       title: "Hardwood Installation",
-      detail: "Nail-down, glue-down, and floating hardwood."
+      detail: "Nail-down, glue-down, and floating hardwood.",
+      href: "/hardwood-installation-ottawa"
     },
     {
       category: "flooring",
@@ -3555,17 +3632,26 @@ function initCoverflowCarousel(root, opts){
           '<div class="site-card-blur svc-media" aria-hidden="true"></div>' +
           '<div class="site-card-photo svc-media" role="img" aria-label="' + label + '"></div>'
         );
+    var inner =
+      '<div class="site-card-inner">' +
+        media +
+        '<div class="site-card-rim" aria-hidden="true"></div>' +
+        '<div class="site-card-meta">' +
+          '<span class="label">' + esc(s.cat) + "</span>" +
+          "<h3>" + esc(s.title) + "</h3>" +
+          '<p class="role">' + esc(s.detail) + "</p>" +
+        "</div>" +
+      "</div>";
+    if (s.href && !forClone) {
+      return (
+        '<a class="site-card svc-card is-link" data-category="' + esc(s.category) + '" href="' + esc(s.href) + '" aria-label="' + esc(s.title) + ' in Ottawa">' +
+          inner +
+        "</a>"
+      );
+    }
     return (
       '<article class="site-card svc-card" data-category="' + esc(s.category) + '">' +
-        '<div class="site-card-inner">' +
-          media +
-          '<div class="site-card-rim" aria-hidden="true"></div>' +
-          '<div class="site-card-meta">' +
-            '<span class="label">' + esc(s.cat) + "</span>" +
-            "<h3>" + esc(s.title) + "</h3>" +
-            '<p class="role">' + esc(s.detail) + "</p>" +
-          "</div>" +
-        "</div>" +
+        inner +
       "</article>"
     );
   }
