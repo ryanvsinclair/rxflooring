@@ -1,4 +1,4 @@
--- RX Flooring — services catalog + job links
+-- RX Flooring: services catalog + job links
 -- Run in Supabase SQL Editor (safe to re-run).
 -- https://supabase.com/dashboard/project/xddnrxxlkwlpowieufjf/sql/new
 

@@ -105,4 +105,4 @@ assert(ids.join(",") === "1,2", "match by title and slug");
 
 assert(todayInputValue(new Date("2026-08-12T08:00:00")) === "2026-08-12", "today input value");
 
-console.log("OK — draft payload + date + services pick logic (12 checks)");
+console.log("OK: draft payload + date + services pick logic (12 checks)");

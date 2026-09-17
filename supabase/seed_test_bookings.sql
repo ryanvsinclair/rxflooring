@@ -1,4 +1,4 @@
--- RX Flooring — test assessment requests for manager UI design
+-- RX Flooring: test assessment requests for manager UI design
 -- Run in Supabase SQL Editor (bypasses RLS):
 -- https://supabase.com/dashboard/project/xddnrxxlkwlpowieufjf/sql/new
 --
@@ -33,7 +33,7 @@ insert into public.assessment_requests (
   (
     'Priya Nair',
     '613-555-9103',
-    'Orleans — Fallingbrook',
+    'Orleans, Fallingbrook',
     (current_date + interval '5 days')::date,
     'Late afternoon (4–6)',
     null,
@@ -46,7 +46,7 @@ insert into public.assessment_requests (
     '88 Riverside Cres, Manotick',
     (current_date - interval '1 day')::date,
     'Morning (8–12)',
-    'Main floor hardwood. Two dogs — pet-friendly finish.',
+    'Main floor hardwood. Two dogs. Pet-friendly finish.',
     array['Hardwood', 'Refinish'],
     'done'
   ),
@@ -66,7 +66,7 @@ insert into public.assessment_requests (
     '15 Elgin St, Ottawa',
     current_date,
     'Morning (8–12)',
-    'Urgent — move-in next Friday.',
+    'Urgent: move-in next Friday.',
     array['Carpet', 'Stairs'],
     'new'
   ),
@@ -93,10 +93,10 @@ insert into public.assessment_requests (
   (
     'Long Notes Patterson',
     '613-555-9109',
-    'Westboro — Richmond Road area',
+    'Westboro, Richmond Road area',
     (current_date + interval '3 days')::date,
     'Morning (8–12)',
-    'Hall carpet is rippling. Stair runner wanted in charcoal. Previous install was DIY. Please call before 9am — works night shifts. Also interested in quote for basement if main floor goes well.',
+    'Hall carpet is rippling. Stair runner wanted in charcoal. Previous install was DIY. Please call before 9am. Works night shifts. Also interested in quote for basement if main floor goes well.',
     array['Carpet', 'Stairs', 'Removal'],
     'contacted'
   );

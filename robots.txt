@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-# Internal tooling and parked prototypes — not for search.
+# Internal tooling and parked prototypes: not for search.
 Disallow: /manager
 Disallow: /manager/
 Disallow: /freezer.html
