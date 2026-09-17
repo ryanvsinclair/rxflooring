@@ -12,7 +12,7 @@ img{max-width:100%; display:block;}
 button,input,select,textarea{font:inherit; color:inherit;}
 
 :root{
-  /* Light only, by design — same commitment as the home page. */
+  /* Light only, by design: same commitment as the home page. */
   color-scheme:light;
 
   --bg:#FFFFFF;

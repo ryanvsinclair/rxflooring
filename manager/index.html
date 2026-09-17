@@ -225,7 +225,7 @@ select{
   overflow:hidden;
 }
 .bottom-nav{
-  /* Viewport-fixed — do not depend on flex/shell height (iOS PWA). */
+  /* Viewport-fixed: do not depend on flex/shell height (iOS PWA). */
   position:fixed;
   left:0; right:0; bottom:0;
   z-index:30;
@@ -463,7 +463,7 @@ select{
 /* ---------- booking requests: Book CTA / floating morph card ----------
    Compact glass lines. Click morphs to a centered card (same WAAPI pattern as
    index.html Book: flying .morph → .modal-card). No inline drawer expand.
-   Page wash lives on body only — do not paint fills on .wrap (max-width seam). */
+   Page wash lives on body only: do not paint fills on .wrap (max-width seam). */
 .req-list{
   display:flex; flex-direction:column; gap:10px; padding-bottom:16px;
   flex:1 1 auto; min-height:0; min-width:0;
@@ -592,7 +592,7 @@ select{
 }
 .req-chev{width:18px; height:18px; flex-shrink:0; color:inherit;}
 
-/* Morph shell — copy of Book .morph (index.html) */
+/* Morph shell: copy of Book .morph (index.html) */
 .req-morph{
   position:fixed; z-index:101; pointer-events:none; overflow:hidden;
   display:flex; align-items:center; justify-content:center;
@@ -604,7 +604,7 @@ select{
   overflow:hidden; text-overflow:ellipsis; max-width:100%;
 }
 
-/* Centered request card — Book .modal-root / .modal-card over light wash */
+/* Centered request card: Book .modal-root / .modal-card over light wash */
 .req-modal-root{
   position:fixed; inset:0; z-index:100;
   display:flex; align-items:center; justify-content:center; padding:24px;
@@ -894,7 +894,7 @@ select{
   letter-spacing:0;
 }
 
-/* Job wizard — lives in morph modal card (no inline glass shell) */
+/* Job wizard: lives in morph modal card (no inline glass shell) */
 .job-form{
   position:relative;
   width:100%;
@@ -1243,7 +1243,7 @@ select{
   transform:scale(1.3);
 }
 
-/* Full-page add/edit job (popup morph deactivated — see HTML comment) */
+/* Full-page add/edit job (popup morph deactivated: see HTML comment) */
 #jobPageView{
   position:absolute;
   inset:0;
@@ -1590,7 +1590,7 @@ select{
   </div>
 </div>
 
-<!-- POPUP JOB FORM (deactivated — full-page #jobPageView is active)
+<!-- POPUP JOB FORM (deactivated: full-page #jobPageView is active)
 <div class="req-morph" id="jobMorph" hidden aria-hidden="true"><span></span></div>
 <div class="req-modal-root" id="jobModal" hidden>
   <div class="req-modal-backdrop" data-job-close></div>
@@ -1638,14 +1638,14 @@ select{
                 <span class="job-wizard-label" style="margin:0;">Before</span>
                 <div class="shot-empty" id="jobBeforeEmpty">Tap to add photo</div>
                 <img class="shot-preview" id="jobBeforePreview" alt="" hidden>
-                <p class="shot-current" id="jobBeforeCurrent" hidden>Current photo on file — tap to replace.</p>
+                <p class="shot-current" id="jobBeforeCurrent" hidden>Current photo on file. Tap to replace.</p>
                 <input id="jobBefore" name="before" type="file" accept="image/*" aria-label="Before photo">
               </div>
               <div class="shot-slot" id="jobAfterSlot">
                 <span class="job-wizard-label" style="margin:0;">After <span class="wizard-optional">(optional)</span></span>
                 <div class="shot-empty" id="jobAfterEmpty">Tap to add photo</div>
                 <img class="shot-preview" id="jobAfterPreview" alt="" hidden>
-                <p class="shot-current" id="jobAfterCurrent" hidden>Current photo on file — tap to replace.</p>
+                <p class="shot-current" id="jobAfterCurrent" hidden>Current photo on file. Tap to replace.</p>
                 <input id="jobAfter" name="after" type="file" accept="image/*" aria-label="After photo">
               </div>
             </div>
@@ -1669,7 +1669,7 @@ select{
             <div class="shot-slot" id="jobAfterLaterSlot">
               <div class="shot-empty" id="jobAfterLaterEmpty">Tap to add photo</div>
               <img class="shot-preview" id="jobAfterLaterPreview" alt="" hidden>
-              <p class="shot-current" id="jobAfterLaterCurrent" hidden>Current photo on file — tap to replace.</p>
+              <p class="shot-current" id="jobAfterLaterCurrent" hidden>Current photo on file. Tap to replace.</p>
               <input id="jobAfterLater" name="after_later" type="file" accept="image/*" aria-label="After photo">
             </div>
           </div>
@@ -1679,7 +1679,7 @@ select{
           </div>
           <div class="job-wizard-step" data-step="7" data-key="notes">
             <label class="job-wizard-label" for="jobNotes">Internal notes <span class="wizard-optional">(optional)</span></label>
-            <input id="jobNotes" name="notes" placeholder="Managers only — not on the site">
+            <input id="jobNotes" name="notes" placeholder="Managers only, not on the site">
           </div>
           <div class="job-wizard-step" data-step="8" data-key="completed">
             <label class="job-wizard-label" for="jobCompletedAt">Completed date</label>
@@ -2092,7 +2092,7 @@ select{
       .lt("preferred_date", focusYmd)
       .neq("status", "archived");
     if (res.error && /archived|check|constraint/i.test(res.error.message || "")) {
-      showError(appError, res.error.message + " — run the assessment_requests status update in supabase/setup.sql.");
+      showError(appError, res.error.message + ": run the assessment_requests status update in supabase/setup.sql.");
     }
   }
   function sortRequestsForFocus(rows, focusYmd) {
@@ -2340,7 +2340,7 @@ select{
     var tel = telHref(row.phone);
     var phoneVal = tel
       ? '<a href="tel:' + escAttr(tel) + '">' + esc(row.phone) + "</a>"
-      : "—";
+      : "-";
     var status = row.status || "new";
     reqModalBody.innerHTML =
       '<div class="req-modal-head">' +
@@ -2351,7 +2351,7 @@ select{
       "</div>" +
       '<div class="req-fields">' +
         '<div class="req-field"><span class="lbl">Phone</span><span class="val">' + phoneVal + "</span></div>" +
-        '<div class="req-field"><span class="lbl">Address</span><span class="val">' + esc(row.address || "—") + "</span></div>" +
+        '<div class="req-field"><span class="lbl">Address</span><span class="val">' + esc(row.address || "-") + "</span></div>" +
         '<div class="req-field"><span class="lbl">Preferred</span><span class="val">' +
           esc(fmtDay(row.preferred_date)) +
           (row.preferred_window ? " · " + esc(row.preferred_window) : "") +
@@ -2700,7 +2700,7 @@ select{
   document.getElementById("refreshRequests").addEventListener("click", loadRequests);
 
   /* ---------- jobs: full-page wizard (+ / Edit) ----------
-     Popup morph modal deactivated — see HTML comment above #jobPageView. */
+     Popup morph modal deactivated: see HTML comment above #jobPageView. */
   var beforeInput = document.getElementById("jobBefore");
   var afterInput = document.getElementById("jobAfter");
   var afterLaterInput = document.getElementById("jobAfterLater");
@@ -2823,7 +2823,7 @@ select{
   function renderJobServicePicks() {
     if (!jobSvcPicks) return;
     if (!cachedServices.length) {
-      jobSvcPicks.innerHTML = '<p class="job-svc-empty">No services yet — run <code>supabase/services.sql</code> in the SQL Editor.</p>';
+      jobSvcPicks.innerHTML = '<p class="job-svc-empty">No services yet. Run <code>supabase/services.sql</code> in the SQL Editor.</p>';
       return;
     }
     var groups = [];
@@ -2958,7 +2958,7 @@ select{
     if (e.key === "Escape") closeJobModal();
   });
 
-  /* POPUP JOB FORM (deactivated) — morph modal open/close
+  /* POPUP JOB FORM (deactivated): morph modal open/close
   var jobMorph = document.getElementById("jobMorph");
   var jobMorphLabel = jobMorph.firstElementChild;
   var jobModal = document.getElementById("jobModal");
@@ -3431,7 +3431,7 @@ select{
           msg = "Session expired or not allowed to save. Sign in again and retry.";
         }
         if (/job_services|services/i.test(msg) || /column|schema cache|does not exist/i.test(msg)) {
-          msg = msg + " — run supabase/services.sql in the SQL Editor.";
+          msg = msg + ": run supabase/services.sql in the SQL Editor.";
         }
         return { error: { message: msg } };
       }
@@ -3443,7 +3443,7 @@ select{
       if (linked.error) {
         var linkMsg = linked.error.message || "Could not save services.";
         if (/job_services|services|schema cache|does not exist/i.test(linkMsg)) {
-          linkMsg = linkMsg + " — run supabase/services.sql in the SQL Editor.";
+          linkMsg = linkMsg + ": run supabase/services.sql in the SQL Editor.";
         }
         return { error: { message: linkMsg } };
       }
@@ -3769,16 +3769,16 @@ select{
         .select("*, job_photos(*)")
         .order("created_at", { ascending: false });
       if (!res.error) {
-        showError(appError, "Services table missing — run supabase/services.sql in the SQL Editor to enable service picks.");
+        showError(appError, "Services table missing: run supabase/services.sql in the SQL Editor to enable service picks.");
       }
     }
     if (res.error) {
       jobsList.innerHTML = "";
       var hint = "";
       if (/job_services|relation.*services/i.test(res.error.message || "")) {
-        hint = " — run supabase/services.sql in the SQL Editor.";
+        hint = ": run supabase/services.sql in the SQL Editor.";
       } else if ((res.error.message || "").indexOf("description") >= 0 || (res.error.message || "").indexOf("published") >= 0) {
-        hint = " — run supabase/prescription_jobs.sql in the SQL Editor.";
+        hint = ": run supabase/prescription_jobs.sql in the SQL Editor.";
       }
       showError(appError, res.error.message + hint);
       return;
@@ -3811,7 +3811,7 @@ select{
       btn.disabled = false;
       btn.textContent = prevLabel;
       showJobError(saved.error.message + (String(saved.error.message).indexOf("column") >= 0
-        ? " — run supabase/setup.sql in the SQL Editor."
+        ? ": run supabase/setup.sql in the SQL Editor."
         : ""));
       return;
     }

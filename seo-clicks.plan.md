@@ -7,18 +7,18 @@
 | | Step |
 |---|---|
 | **Past** | 13. NAP consistency pass |
-| **Current** | — plan complete — |
-| **Next** | — |
+| **Current** | plan complete |
+| **Next** | |
 
 ---
 
 ## Checklist
 
-### Phase 1 — Baseline (shipped)
+### Phase 1: Baseline (shipped)
 - [x] 1. Audit site SEO / indexed URLs vs JS-only services
 - [x] 2. Homepage SEO + internal links + crawl hygiene
 
-### Phase 2 — High-intent service pages
+### Phase 2: High-intent service pages
 - [x] 2a. LVP installation Ottawa
 - [x] 2b. Laminate installation Ottawa
 - [x] 2c. Hardwood installation Ottawa
@@ -29,14 +29,14 @@
 - [x] 7. Wire new pages into homepage cards, footer, related links, sitemap
   - Link-only on homepage (no visual redesign)
 
-### Phase 3 — Win the SERP / on-page click
+### Phase 3: Win the SERP / on-page click
 - [x] 8. Tighten titles + meta descriptions on all service landings (Ottawa + fixed-price angle)
 - [x] 9. Confirm FAQ schema + above-the-fold Call / Book CTA on every landing
 - [x] 10. Add 1–2 relevant before/after jobs (or placeholders) per new landing where photos exist
   - Added on carpet, carpet repair, stairs, LVP
   - Skipped hardwood / refinish / laminate / tile / subfloor / removal (no matching photos yet)
 
-### Phase 4 — Local authority (assist notes)
+### Phase 4: Local authority (assist notes)
 - [x] 11. Google Business Profile checklist (see Assist notes below)
 - [x] 12. Review-ask flow note for managers (see Assist notes below)
 - [x] 13. NAP consistency pass (site footer + schema match)
@@ -53,7 +53,7 @@
 
 ## Assist notes
 
-### 11 — Google Business Profile
+### 11: Google Business Profile
 1. Primary category: Flooring contractor (or Carpet installer if carpet-led)
 2. Add services matching the Ottawa pages (carpet, LVP, laminate, hardwood, refinish, tile, etc.)
 3. Upload site photos + before/after from jobs
@@ -62,7 +62,7 @@
 6. Post weekly (one finished job or tip)
 7. Turn on messaging / call button
 
-### 12 — Review ask (after job complete)
+### 12: Review ask (after job complete)
 Suggested manager script after walkthrough:
 > “If you’re happy with the floor, a quick Google review helps other Ottawa homeowners find us. Here’s the link: [GBP review URL].”
 
