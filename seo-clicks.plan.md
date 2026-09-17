@@ -6,9 +6,9 @@
 
 | | Step |
 |---|---|
-| **Past** | 7. Wire new pages into homepage cards, footer, related links, sitemap |
-| **Current** | 8. Tighten titles + meta descriptions on all service landings |
-| **Next** | 9. Confirm FAQ schema + above-the-fold Call / Book CTA on every landing |
+| **Past** | 9. Confirm FAQ schema + above-the-fold Call / Book CTA on every landing |
+| **Current** | 10. Add 1–2 relevant before/after jobs per new landing where photos exist |
+| **Next** | 11. Google Business Profile checklist |
 
 ---
 
@@ -34,8 +34,9 @@
   - Cards + footer + sitemap; existing landings’ footers updated
 
 ### Phase 3 — Win the SERP / on-page click
-- [ ] 8. Tighten titles + meta descriptions on all service landings (Ottawa + fixed-price angle)
-- [ ] 9. Confirm FAQ schema + above-the-fold Call / Book CTA on every landing
+- [x] 8. Tighten titles + meta descriptions on all service landings (Ottawa + fixed-price angle)
+- [x] 9. Confirm FAQ schema + above-the-fold Call / Book CTA on every landing
+  - All 10 Ottawa landings: hero Call + Book, FAQPage JSON-LD present
 - [ ] 10. Add 1–2 relevant before/after jobs (or placeholders) per new landing where photos exist
 
 ### Phase 4 — Local authority (manual / ongoing — agent assists, does not claim done without proof)
@@ -66,3 +67,4 @@
 |---|---|---|
 | 2026-09-13 | Steps 1–2, 2a–2c | Merged to `main` (`8822216`) |
 | 2026-09-17 | Steps 3–7 | Refinish, tile, subfloor, removal pages + link-only wiring + sitemap |
+| 2026-09-17 | Steps 8–9 | SERP titles/metas tightened; FAQ + CTA verified on all landings |
