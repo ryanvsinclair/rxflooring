@@ -225,6 +225,33 @@ h2.big{font-size:clamp(28px,4.2vw,44px); line-height:1.1; font-weight:600;}
   font-size:14.5px; color:var(--ink); background:var(--panel);
 }
 
+/* ---------- before / after proof ---------- */
+.lp-proof{
+  max-width:var(--narrow); margin:48px auto 0;
+}
+.lp-proof-grid{
+  display:grid; grid-template-columns:1fr 1fr; gap:14px;
+}
+@media(max-width:520px){
+  .lp-proof-grid{grid-template-columns:1fr;}
+}
+.lp-proof-shot{
+  position:relative; margin:0; border-radius:14px; overflow:hidden;
+  border:1px solid var(--rule); background:var(--panel-alt);
+  aspect-ratio:4/3;
+}
+.lp-proof-shot img{
+  width:100%; height:100%; object-fit:cover; display:block;
+}
+.lp-proof-shot span{
+  position:absolute; left:10px; bottom:10px;
+  font-family:var(--mono); font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+  color:#fff; background:rgba(29,36,43,.42); padding:4px 8px; border-radius:980px;
+}
+.lp-proof-note{
+  margin:12px 0 0; font-size:14.5px; color:var(--muted); line-height:1.45;
+}
+
 /* ---------- related services ---------- */
 .lp-related{
   display:grid; grid-template-columns:repeat(auto-fit,minmax(258px,1fr));
