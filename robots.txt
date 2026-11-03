@@ -1,13 +1,18 @@
 User-agent: *
 Allow: /
 
-# Internal tooling and parked prototypes — not for search.
+# Internal tooling, prototypes, and repo files: not for search.
 Disallow: /manager
 Disallow: /manager/
+Disallow: /freezer
 Disallow: /freezer.html
+Disallow: /preview1
 Disallow: /preview1.html
 Disallow: /public/previews/
 Disallow: /*-concepts.html
 Disallow: /*-design.html
+Disallow: /supabase
+Disallow: /supabase/
+Disallow: /seo-clicks.plan.md
 
 Sitemap: https://rxflooring.ca/sitemap.xml
