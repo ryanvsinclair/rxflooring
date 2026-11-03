@@ -3,6 +3,28 @@
   "framework": null,
   "buildCommand": null,
   "outputDirectory": ".",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.rxflooring.ca" }],
+      "destination": "https://rxflooring.ca/",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.rxflooring.ca" }],
+      "destination": "https://rxflooring.ca/:path*",
+      "permanent": true
+    },
+    { "source": "/services", "destination": "/#services", "permanent": true },
+    { "source": "/jobs", "destination": "/#jobs", "permanent": true },
+    { "source": "/work", "destination": "/#work", "permanent": true },
+    { "source": "/about", "destination": "/#about", "permanent": true },
+    { "source": "/book", "destination": "/?book=1", "permanent": true },
+    { "source": "/contact", "destination": "/?book=1", "permanent": true }
+  ],
   "headers": [
     {
       "source": "/manager/(.*)",
@@ -36,7 +58,25 @@
       ]
     },
     {
+      "source": "/freezer",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
       "source": "/freezer.html",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/preview1",
       "headers": [
         {
           "key": "X-Robots-Tag",
@@ -62,6 +102,5 @@
         }
       ]
     }
-  ],
-  "cleanUrls": true
+  ]
 }
